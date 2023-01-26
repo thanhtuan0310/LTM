@@ -1,5 +1,5 @@
 //Cau truc mot account
-typedef struct student
+typedef struct account
 {    
     char username[50];
     char password[10];
@@ -8,7 +8,7 @@ typedef struct student
     int elo;
     int puzzle_point;
     int current_puzzle;
-}student;
+}account;
 
 typedef struct match
 {    
