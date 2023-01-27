@@ -1,4 +1,5 @@
 #include "client.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,7 +24,7 @@ int connect_to_server()
 
     if (connect(client_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
-        report_err(ERR_CO NNECT_TO_SERVER);
+        report_err(ERR_CONNECT_TO_SERVER);
         exit(0);
     }
 
@@ -64,6 +65,8 @@ void ask_server(int client_socket)
             // }
             break;
         case 2:
+            break;    
+        case 3:
             pkg.ctrl_signal = QUIT_REQ;
             send(client_socket, &pkg, sizeof(pkg), 0);
             close(client_socket);
@@ -73,7 +76,10 @@ void ask_server(int client_socket)
 }
 
 void LoginMenu(){
-
+ printf("------ Welcome to chess ------\n");
+    printf("1. Login\n");
+    printf("2. Sign up\n");
+    printf("3. Exit\n");
 }
 
 void UserMenu(){

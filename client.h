@@ -35,5 +35,5 @@ void UserMenu();
 */
 void ChooseDifficultyComputer();
 
-
+#endif
 
