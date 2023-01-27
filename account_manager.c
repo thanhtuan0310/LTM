@@ -6,7 +6,7 @@
 
 // Lưu dữ liệu vào link list
 
-node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int status) {
+node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int status, int is_signed_in) {
     node temp;
 	temp = (node)malloc(sizeof(struct Account));
 	temp->next = NULL;
@@ -16,6 +16,7 @@ node create(char username[], char password[], int elo, int current_puzzle, int p
     temp->current_puzzle = current_puzzle;
     temp->puzzle_point = puzzle_point;
 	temp->status = status;
+    temp->is_signed_in = is_signed_in;
 	return temp;
 }
 
@@ -44,7 +45,7 @@ node search(node head, char username[]) {
 	else return NULL;
 }
 
-void readFileAccount(FILE *file, node head) {
+void readFileAccount(node head) {
     char username[USERNAME_SIZE];
     char password[PASSWORD_SIZE];
     int st;
@@ -52,13 +53,15 @@ void readFileAccount(FILE *file, node head) {
     int current_puzzle;
     int puzzle_point;
     int status;
+    int is_signed_in;
     node temp;
+    FILE *file = fopen("account.txt", "r");
     if(file == NULL) {
         printf("no such file.");
         return;
     }
 	while (!feof(file)) {
-		fscanf(file, "%s %s %d\n", username, password, &status);
+		fscanf(file, "%s %s %d %d\n", username, password, &status, &is_signed_in);
         char fileName[FILENAME_SIZE] = "./account/";
         char line[MAX_LENGTH];
         strcat(fileName, username);
@@ -89,7 +92,7 @@ void readFileAccount(FILE *file, node head) {
                 }
             }
         }
-        temp = create(username, password, elo, current_puzzle, puzzle_point, status);
+        temp = create(username, password, elo, current_puzzle, puzzle_point, status, is_signed_in);
 		head = addtail(head, temp);
 	}
 }
