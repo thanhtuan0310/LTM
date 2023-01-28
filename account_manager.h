@@ -27,9 +27,10 @@ typedef struct Account {
 
 typedef struct Account *node;
 
-node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int status);
+node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int status, int is_signed_in);
 node addtail(node head, node temp);
 node search(node head, char username[]);
-void readFileAccount(node head);
+void printLists(node head);
+void readFileAccount(node *head);
 
 #endif
