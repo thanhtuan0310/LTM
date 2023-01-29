@@ -21,7 +21,7 @@ node create(char username[], char password[], int elo, int current_puzzle, int p
 }
 
 node addtail(node head, node temp) {   // Them một node vào cuối danh sách liên kết
-	node temp, p;
+	node p;
 	if (head == NULL) {
 		head = temp;
 	} else {
@@ -45,7 +45,15 @@ node search(node head, char username[]) {
 	else return NULL;
 }
 
-void readFileAccount(node head) {
+void printLists(node head) {
+    node p = head;
+    while(p != NULL) {
+        printf("%s %s %d %d %d %d %d\n", p->username, p->password, p->elo, p->current_puzzle, p->puzzle_point, p->status, p->is_signed_in);
+        p = p -> next;
+    }
+}
+
+void readFileAccount(node *head) {
     char username[USERNAME_SIZE];
     char password[PASSWORD_SIZE];
     int st;
@@ -93,6 +101,7 @@ void readFileAccount(node head) {
             }
         }
         temp = create(username, password, elo, current_puzzle, puzzle_point, status, is_signed_in);
-		head = addtail(head, temp);
+        // printf("%s %s %d %d %d %d %d\n", temp->username, temp->password, temp->elo, temp->current_puzzle, temp->puzzle_point, temp->status, temp->is_signed_in);
+		*head = addtail(*head, temp);
 	}
 }

@@ -62,7 +62,7 @@ void make_server()
     
     int listen_socket;
 
-    readFileAccount(acc_list);
+    readFileAccount(&acc_list);
     listen_socket = create_listen_socket();
     for (int i = 0; i < MAX_USER; i++)
     {
@@ -71,14 +71,14 @@ void make_server()
         for (int j = 0; j < MAX_GROUP; j++)
             user[i].group_id[j] = -1;
     }
-    for (int i = 0; i < MAX_GROUP; i++)
-    {
-        for (int j = 0; j < MAX_USER; j++)
-        {
-            group[i].group_member[j].socket = -1;
-        }
-        group[i].curr_num = 0;
-    }
+    // for (int i = 0; i < MAX_GROUP; i++)
+    // {
+    //     for (int j = 0; j < MAX_USER; j++)
+    //     {
+    //         group[i].group_member[j].socket = -1;
+    //     }
+    //     group[i].curr_num = 0;
+    // }
 
     printf("Server created\n");
 
@@ -693,6 +693,6 @@ void sv_logout(int conn_socket, Package *pkg)
 // main
 int main()
 {
-    // make_server();
+    make_server();
     return 0;
 }
