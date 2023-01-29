@@ -1,12 +1,12 @@
-8    r  n  b  q  k  b  n  r
-7    p  p  p  p  p  p  p  p
-6    .  .  .  .  .  .  .  .
-5    .  .  .  .  .  .  .  .
-4    .  .  .  .  .  .  .  .
-3    .  .  .  .  .  .  .  .
-2    P  P  P  P  P  P  P  P
-1    R  N  B  Q  K  B  N  R
+8    .  .  .  r  b  .  .  .
+7    p  q  r  k  .  p  p  B
+6    .  p  p  .  .  .  .  .
+5    .  .  P  .  .  .  .  .
+4    .  P  .  P  .  .  .  N
+3    P  .  .  .  .  B  .  .
+2    .  .  .  .  .  .  P  P
+1    .  .  .  .  B  .  .  K
 
      a  b  c  d  e  f  g  h
 
-MOVE d2d4
+MOVE h7f5
