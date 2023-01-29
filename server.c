@@ -214,8 +214,24 @@ void sv_user_use(int conn_socket)
             sv_private_chat(conn_socket, &pkg);
             break;
 
-        case CHAT_ALL:
-            sv_chat_all(conn_socket, &pkg);
+        case CHOOSE_DIFFCULT:
+            ChooseDiffcultServer(conn_socket, &pkg);
+            break;
+
+        case SHOW_PLAY_PLAYER_MENU:
+            ShowPlayWithPlayer(conn_socket, &pkg);
+            break;
+        
+        case SHOW_CHESS_PUZZLE_MENU:
+            ShowChessPuzzleServer(conn_socket, &pkg);
+            break;
+        
+        case SHOW_FRIEND_MENU:
+            ShowFriendServer(conn_socket, &pkg);
+            break;
+        
+        case SHOW_MATCH_HISTORY_MENU:
+            ShowMatchHistoryServer(conn_socket, &pkg);
             break;
 
         case SHOW_USER:
@@ -226,33 +242,33 @@ void sv_user_use(int conn_socket)
             login = 0;
             sv_logout(conn_socket, &pkg);
             break;
-        case GROUP_CHAT_INIT:
-            sv_group_chat_init(conn_socket, &pkg);
-            break;
-        case SHOW_GROUP:
-            sv_show_group(conn_socket, &pkg);
-            break;
-        case NEW_GROUP:
-            sv_new_group(conn_socket, &pkg);
-            break;
-        case JOIN_GROUP:
-            sv_join_group(conn_socket, &pkg);
-            break;
-        case HANDEL_GROUP_MESS:
-            // hien ra thong tin phong
-            break;
-        case INVITE_FRIEND:
-            sv_invite_friend(conn_socket, &pkg);
-            break;
-        case GROUP_CHAT:
-            sv_group_chat(conn_socket, &pkg);
-            break;
-        case GROUP_INFO:
-            sv_show_group_info(conn_socket, &pkg);
-            break;
-        case LEAVE_GROUP:
-            sv_leave_group(conn_socket, &pkg);
-            break;
+        // case GROUP_CHAT_INIT:
+        //     sv_group_chat_init(conn_socket, &pkg);
+        //     break;
+        // case SHOW_GROUP:
+        //     sv_show_group(conn_socket, &pkg);
+        //     break;
+        // case NEW_GROUP:
+        //     sv_new_group(conn_socket, &pkg);
+        //     break;
+        // case JOIN_GROUP:
+        //     sv_join_group(conn_socket, &pkg);
+        //     break;
+        // case HANDEL_GROUP_MESS:
+        //     // hien ra thong tin phong
+        //     break;
+        // case INVITE_FRIEND:
+        //     sv_invite_friend(conn_socket, &pkg);
+        //     break;
+        // case GROUP_CHAT:
+        //     sv_group_chat(conn_socket, &pkg);
+        //     break;
+        // case GROUP_INFO:
+        //     sv_show_group_info(conn_socket, &pkg);
+        //     break;
+        // case LEAVE_GROUP:
+        //     sv_leave_group(conn_socket, &pkg);
+        //     break;
         default:
             break;
         }
@@ -687,6 +703,47 @@ void sv_logout(int conn_socket, Package *pkg)
 {
     printf("%d logout\n", conn_socket);
     pkg->ctrl_signal = LOG_OUT;
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void ViewInformationServer(int conn_socket, Package *pkg){
+
+}
+
+void ChessPuzzleServer(int conn_socket, Package *pkg){
+
+}
+
+void ViewChessRankServer(int conn_socket, Package *pkg){
+
+}
+
+void ViewChessPuzzleRankServer(int conn_socket, Package *pkg){
+    
+}
+
+void ChooseDiffcultServer(int conn_socket, Package *pkg){
+    strcpy(pkg->msg, "Diffcult\n");
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void ShowPlayWithPlayer(int conn_socket, Package *pkg){
+    strcpy(pkg->msg, "Player\n");
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void ShowChessPuzzleServer(int conn_socket, Package *pkg){
+    strcpy(pkg->msg, "Chess Puzzle\n");
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void ShowFriendServer(int conn_socket, Package *pkg){
+    strcpy(pkg->msg, "Friend\n");
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void ShowMatchHistoryServer(int conn_socket, Package *pkg){
+    strcpy(pkg->msg, "Match\n");
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 

@@ -47,6 +47,23 @@
 #define LEAVE_GROUP 419
 #define LEAVE_GROUP_SUCC 420
 
+#define VIEW_INFORMATION 501
+#define VIEW_MATCH_HISTORY_FRIEND 502
+#define VIEW_MATCH_HISTORY 503
+#define SHOW_PLAY_PLAYER_MENU 504
+#define CHOOSE_DIFFCULT 505
+#define SHOW_CHESS_PUZZLE_MENU 506
+#define SHOW_FRIEND_MENU 507
+#define SHOW_MATCH_HISTORY_MENU 508
+#define VIEW_RANKING 509
+#define VIEW_CHESS_PUZZLE_RANKING 510
+#define PLAY_CHESS_PUZZLE 511
+#define GROUP_INFO 416
+#define SHOW_GROUP_NAME 417
+#define SHOW_GROUP_MEM 418
+#define LEAVE_GROUP 419
+#define LEAVE_GROUP_SUCC 420
+
 //* Cấu trúc gói tin
 typedef struct Package_ {
     char msg[MSG_SIZE]; /* nội dung thông điệp */
