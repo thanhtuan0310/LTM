@@ -35,5 +35,27 @@ void UserMenu();
 */
 void ChooseDifficultyComputer();
 
+/**
+ * Đăng nhập với tên đăng nhập và mật khẩu
+ * @param client_socket socket đã kết nối đến server
+ * @return 0: đăng nhập thất bại
+ * @return 1: đăng nhập thành công
+*/
+int login(int client_socket);
+
+//* Chức năng sau đăng nhập
+/**
+ * Cho người dùng nhập lựa chọn, thực hiện chức năng tương ứng
+ * Phân luồng đọc-ghi
+ * @param client_socket socket đã kết nối đến server
+*/
+void user_use(int client_socket);
+
+/**
+ * Đọc nội dung tin nhắn
+ * @param param socket kết nối đến server
+*/
+void *read_msg(void *param);
+
 #endif
 
