@@ -33,6 +33,32 @@ int connect_to_server()
     return client_socket;
 }
 
+int logup(int client_socket) {
+    char username[USERNAME_SIZE];
+    char password[PASSWORD_SIZE];
+    Package pkg;
+
+    printf("Username: ");
+    scanf("%s", username);
+    printf("Password: ");
+    scanf("%s", password);
+    clear_stdin_buff();
+    strcpy(pkg.msg, username);
+    send(client_socket, &pkg, sizeof(pkg), 0);
+
+    recv(client_socket, &pkg, sizeof(pkg), 0);
+
+    strcpy(pkg.msg, password);
+    send(client_socket, &pkg, sizeof(pkg), 0);
+
+    recv(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
+
+    if (pkg.ctrl_signal == LOGUP_SUCC)
+        strcpy(my_username, username);
+    return pkg.ctrl_signal;
+}
+
 int login(int client_socket) {
     char username[USERNAME_SIZE];
     char password[PASSWORD_SIZE];
@@ -242,6 +268,15 @@ void ask_server(int client_socket)
             }
             break;
         case 2:
+            pkg.ctrl_signal = LOGUP_REQ;
+            send(client_socket, &pkg, sizeof(pkg), 0);
+            result = logup(client_socket);
+            if(result == LOGUP_SUCC) {
+                // user_use(client_socket);
+                continue;
+            } else {
+                report_err(EXISTS_ACC);
+            }
             break;    
         case 3:
             pkg.ctrl_signal = QUIT_REQ;

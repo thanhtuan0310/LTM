@@ -14,12 +14,15 @@
 //* Tín hiệu điều khiển
 // chung
 // server
+#define LOGUP_SUCC 100 /* Đăng ký thành công */
 #define LOGIN_SUCC 101 /* Đăng nhập thành công */
 #define INCORRECT_ACC 102 /* Tài khoản hoặc mật khẩu không chính xác */
 #define SIGNED_IN_ACC 103 /* Tài khoản đã được đăng nhập bởi người khác */
 #define RECV_SUCC 104 /* Nhận dữ liệu thành công */
+#define EXISTS_ACC 105 /* Tài khoản đã tồn tại */ 
 // client
 #define LOGIN_REQ 201 /* Yêu cầu đăng nhập */
+#define LOGUP_REQ 203 /* Yêu cầu đăng ký */
 #define QUIT_REQ 202 /* Thoát ứng dụng */
 
 #define MSG_SENT_SUCC 301

@@ -101,7 +101,26 @@ void readFileAccount(node *head) {
             }
         }
         temp = create(username, password, elo, current_puzzle, puzzle_point, status, is_signed_in);
-        // printf("%s %s %d %d %d %d %d\n", temp->username, temp->password, temp->elo, temp->current_puzzle, temp->puzzle_point, temp->status, temp->is_signed_in);
 		*head = addtail(*head, temp);
 	}
+}
+
+void updateAccountFile(node head) {
+    FILE *file = fopen("account.txt", "w");
+    for (node p = head; p != NULL; p = p->next) {
+		fprintf(file, "%s %s %d %d\n", p->username, p->password, p->status, p->is_signed_in);
+	}
+	fclose(file);
+}
+
+void addFileAccount(char username[]) {
+    char fileName[FILENAME_SIZE] = "./account/";
+    strcat(fileName, username);
+    strcat(fileName, ".txt");
+    FILE *file = fopen(fileName, "w+");
+    fprintf(file, "%s %d\n", "ELO", 1000);
+    fprintf(file, "%s %d %d\n", "PUZZLE", 1, 0);
+    fprintf(file, "%s\n", "FRIEND");
+    fprintf(file, "%s", "MATCH_HISTORY");
+    fclose(file);
 }

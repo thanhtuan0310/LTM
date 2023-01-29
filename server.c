@@ -115,11 +115,62 @@ void *pre_login_srv(void *param)
         case LOGIN_REQ:
             handle_login(conn_socket, acc_list);
             break;
+        case LOGUP_REQ:
+            handle_signup(conn_socket, acc_list);
+            break;
         case QUIT_REQ:
             close(conn_socket);
             printf("user quit\n");
             pthread_exit(NULL);
         }
+    }
+}
+
+void handle_signup(int conn_socket, node acc_list) {
+    char username[USERNAME_SIZE];
+    char password[PASSWORD_SIZE];
+    Package pkg;
+    node target_account;
+    int result;
+
+    recv(conn_socket, &pkg, sizeof(pkg), 0);
+    strcpy(username, pkg.msg);
+
+    pkg.ctrl_signal = RECV_SUCC;
+    send(conn_socket, &pkg, sizeof(pkg), 0);
+
+    recv(conn_socket, &pkg, sizeof(pkg), 0);
+    strcpy(password, pkg.msg);
+
+    printf("%s\n", username);
+    printf("%s\n", password);
+
+    target_account = search(acc_list, username);
+    if(target_account) result = EXISTS_ACC;
+    else result = LOGUP_SUCC;
+
+    if(result == LOGUP_SUCC) {
+        printf("Your account is registed successfully\n");
+        for (int i = 0; i < MAX_USER; i++)
+        {
+            if (user[i].socket < 0)
+            {
+                strcpy(user[i].username, username);
+                user[i].socket = conn_socket;
+                break;
+            }
+        }
+    } else {
+        printf("This account has been existed!\n");
+    }
+    
+    pkg.ctrl_signal = result;
+    send(conn_socket, &pkg, sizeof(pkg), 0);
+    if(result == LOGUP_SUCC) {
+        node temp = create(username, password, 1000, 1, 0, 1, 0);
+        acc_list = addtail(acc_list, temp);
+        updateAccountFile(acc_list);
+        addFileAccount(username);
     }
 }
 
