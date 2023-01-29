@@ -1,3 +1,3 @@
-player1 12345
-player2 3y34y
-player3 33255
+player1 12345 1 0
+player2 3y34y 1 0
+player3 1a2b3 1 0
