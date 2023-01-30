@@ -423,14 +423,32 @@ void ChangePassword(int client_socket){
 
 void ViewFriend(int client_socket){
     //Thai
+    Package pkg;
+    pkg.ctrl_signal = VIEW_FRIEND;
+    pkg.sender = my_username;
+    send(client_socket, &pkg, sizeof(pkg), 0);
 }
 
 void AddFriend(int client_socket){
     //Thai
+    Package pkg;
+    char friends_name[USERNAME_SIZE];
+
+    printf("Friends name: \n");
+    fgets(friends_name, USERNAME_SIZE, stdin);
+    friends_name[strlen(friends_name) - 1] = '\0';
+
+    strcpy(pkg.receiver, friends_name);
+    strcpy(pkg.sender, my_username);
+    strcpy(pkg.msg, my_username);
+    strcat(pkg.msg, " want to makes friend with you ");
+    pkg.ctrl_signal = INVITE_FRIEND;
+    send(client_socket, &pkg, sizeof(pkg), 0);
 }
 
 void RemoveFriend(int client_socket){
      //Thai
+
 }
 
 void ShowPlayComputer(int client_socket)
