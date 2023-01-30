@@ -251,6 +251,11 @@ Chọn độ khó của máy
 void ChooseDiffcultServer(int conn_socket, Package *pkg);
 
 /**
+Xử lý đổi mật khẩu
+*/
+void ChangePassServer(int conn_socket, Package *pkg);
+
+/**
 Chơi với người
 */
 void ShowPlayWithPlayer();

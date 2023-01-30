@@ -54,14 +54,17 @@ void ChessPuzzle();
 /**
  Xem bảng xếp hạng theo elo
 */
-void ViewChessRank();
+void ViewChessRank(int client_socket);
 
 /**
  Xem bảng xếp hạng theo điểm chess puzzle
 */
-void ViewChessPuzzleRank();
+void ViewChessPuzzleRank(int client_socket);
 
-
+/**
+ * Đổi mật khẩu
+ */
+void ChangePassword(int client_socket);
 
 /**
  * Đăng nhập với tên đăng nhập và mật khẩu
@@ -87,7 +90,7 @@ void user_use(int client_socket);
 /**
  * Xem thông tin cá nhân 
 */
-void ViewInformation();
+void ViewInformation(int client_socket);
 
 //* Chức năng sau đăng nhập
 /**

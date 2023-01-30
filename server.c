@@ -284,7 +284,18 @@ void sv_user_use(int conn_socket)
         case SHOW_MATCH_HISTORY_MENU:
             ShowMatchHistoryServer(conn_socket, &pkg);
             break;
-
+        case VIEW_INFORMATION:
+            ViewInformationServer(conn_socket, &pkg);
+            break;
+        case VIEW_CHESS_PUZZLE_RANKING:
+            ViewChessPuzzleRankServer(conn_socket, &pkg);
+            break;
+        case VIEW_RANKING:
+            ViewChessRankServer(conn_socket, &pkg);
+            break;
+        case CHANGE_PASS_REQ:
+            ChangePassServer(conn_socket, &pkg);
+            break;
         case SHOW_USER:
             sv_active_user(conn_socket, &pkg);
             break;
@@ -758,21 +769,24 @@ void sv_logout(int conn_socket, Package *pkg)
 }
 
 void ViewInformationServer(int conn_socket, Package *pkg){
-
+    //Ngoc
 }
 
 void ChessPuzzleServer(int conn_socket, Package *pkg){
-
-}
-
-void ViewChessRankServer(int conn_socket, Package *pkg){
-
-}
-
-void ViewChessPuzzleRankServer(int conn_socket, Package *pkg){
     
 }
 
+void ViewChessRankServer(int conn_socket, Package *pkg){
+    //Ngoc
+}
+
+void ViewChessPuzzleRankServer(int conn_socket, Package *pkg){
+    //Ngoc
+}
+
+void ChangePassServer(int conn_socket, Package *pkg){
+    //Ngoc   
+}
 void ChooseDiffcultServer(int conn_socket, Package *pkg){
     strcpy(pkg->msg, "Diffcult\n");
     send(conn_socket, pkg, sizeof(*pkg), 0);

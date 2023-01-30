@@ -113,7 +113,7 @@ void user_use(int client_socket)
         {
         case 1:
             // private_chat(client_socket);
-            ViewInformation();
+            ViewInformation(client_socket);
             break;
         case 2:
             ShowPlayComputer(client_socket);            
@@ -128,6 +128,10 @@ void user_use(int client_socket)
             break;
         case 5:
             ShowFriendMenu(client_socket);
+            // chat_all(client_socket);
+            break;
+        case 6:
+            ViewChessRank(client_socket);
             // chat_all(client_socket);
             break;
         case 7:
@@ -197,6 +201,19 @@ void *read_msg(void *param)
 
         case SHOW_MATCH_HISTORY_MENU:
             printf("%s\n", pkg.msg);
+            break;
+        
+        case VIEW_INFORMATION:
+            printf("Your information: \n%s \n", pkg.msg);;
+            break;
+        case VIEW_CHESS_PUZZLE_RANKING:
+            printf("Chess puzzle rank: \n%s \n", pkg.msg);;
+            break;
+        case VIEW_RANKING:
+            printf("Chess rank: \n%s \n", pkg.msg);;
+            break;
+        case CHANGE_PASS_REQ:
+            // ChangePassServer(conn_socket, &pkg);
             break;
         // case ERR_INVALID_RECEIVER:
         //     report_err(ERR_INVALID_RECEIVER);
@@ -375,20 +392,24 @@ void MatchHistoryMenu(){
     printf("3. Return main menu\n\n");
 }
 
-void ViewInformation(){
-    
+void ViewInformation(int client_socket){
+    //Ngoc
 }
 
-void ChessPuzzle(){
-
-}
-
-void ViewChessRank(){
+void ChessPuzzle(int client_socket){
 
 }
 
-void ViewChessPuzzleRank(){
+void ViewChessRank(int client_socket){
+    //Ngoc
+}
 
+void ViewChessPuzzleRank(int client_socket){
+    //Ngoc
+}
+
+void ChangePassword(int client_socket){
+     //Ngoc
 }
 
 void ShowPlayComputer(int client_socket)
@@ -480,6 +501,7 @@ void ShowChessPuzzle(int client_socket)
         {
         case 1:
             // show_group(client_socket);
+            ViewChessPuzzleRank(client_socket);
             break;
         case 2:
             // new_group(client_socket);

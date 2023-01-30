@@ -20,10 +20,12 @@
 #define SIGNED_IN_ACC 103 /* Tài khoản đã được đăng nhập bởi người khác */
 #define RECV_SUCC 104 /* Nhận dữ liệu thành công */
 #define EXISTS_ACC 105 /* Tài khoản đã tồn tại */ 
+#define CHANGE_PASS_SUCC 106 /* Đổi mật khẩu thành công*/
 // client
 #define LOGIN_REQ 201 /* Yêu cầu đăng nhập */
 #define LOGUP_REQ 203 /* Yêu cầu đăng ký */
 #define QUIT_REQ 202 /* Thoát ứng dụng */
+#define CHANGE_PASS_REQ 204 /* Đổi mật khẩu */
 
 #define MSG_SENT_SUCC 301
 #define END_CHAT 302
