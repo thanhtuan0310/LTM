@@ -117,7 +117,7 @@ void AddFriend(int client_socket);
 
 void RemoveFriend(int client_socket);
 
-void InRoom(client_socket);
+void InRoom(int client_socket);
 
 void *read_msg(void *param);
 

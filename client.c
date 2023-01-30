@@ -224,6 +224,9 @@ void *read_msg(void *param)
             curr_group_id = pkg.group_id;
             join_succ = 1;
             break;
+        case VIEW_FRIEND:
+            printf("Your friends: \n%s \n", pkg.msg);;
+            break;
         // case ERR_INVALID_RECEIVER:
         //     report_err(ERR_INVALID_RECEIVER);
         //     break;
@@ -388,7 +391,7 @@ void ChessPuzzleMenu(){
 
 void FriendMenu(){
     printf("-------Friend--------\n");    
-    printf("1. View Friends List\n ");
+    printf("1. View Friends List\n");
     printf("2. Add friend\n");   
     printf("3. Remove friend\n");   
     printf("4. Return main menu\n\n");
@@ -444,6 +447,8 @@ void AddFriend(int client_socket){
     strcat(pkg.msg, " want to makes friend with you ");
     pkg.ctrl_signal = INVITE_FRIEND;
     send(client_socket, &pkg, sizeof(pkg), 0);
+
+    sleep(1);
 }
 
 void RemoveFriend(int client_socket){
@@ -646,9 +651,10 @@ void JointRoom(int client_socket)
     strcpy(pkg.msg, room_name);
     send(client_socket, &pkg, sizeof(pkg), 0);
     sleep(1);
-    if (join_succ == 1)
-    printf("Joint success\n");
+    if (join_succ == 1){
+        printf("Joint success\n");
         InRoom(client_socket);
+    }    
     else
         return;
 }

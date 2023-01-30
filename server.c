@@ -927,14 +927,12 @@ void ViewFriendServer(int conn_socket, Package *pkg){
         strcat(pkg->msg,use_friend->friends[i]);
         strcat(pkg->msg,"  ");
     }
-    strcpy(pkg->ctrl_signal,VIEW_FRIEND);
+    // pkg->ctrl_signal,VIEW_FRIEND);
     send(conn_socket, pkg, sizeof(*pkg), 0);
-
 }
 
 void AddFriendServer(int conn_socket, Package *pkg){
     //Thai
-
 
     node use_friend = search(acc_list,pkg->receiver);
     if (use_friend == NULL) {
