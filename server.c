@@ -223,6 +223,7 @@ void handle_login(int conn_socket, node acc_list)
     {
         printf("login success\n");
         target_acc->is_signed_in = 1;
+        updateAccountFile(acc_list);
 
         for (int i = 0; i < MAX_USER; i++)
         {
