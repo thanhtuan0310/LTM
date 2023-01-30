@@ -65,6 +65,7 @@ void make_server()
     int listen_socket;
 
     readFileAccount(&acc_list);
+    // printFriendList(acc_list);
     listen_socket = create_listen_socket();
     for (int i = 0; i < MAX_USER; i++)
     {
@@ -169,7 +170,7 @@ void handle_signup(int conn_socket, node acc_list) {
     pkg.ctrl_signal = result;
     send(conn_socket, &pkg, sizeof(pkg), 0);
     if(result == LOGUP_SUCC) {
-        node temp = create(username, password, 1000, 1, 0, 1, 0);
+        node temp = create(username, password, 1000, 1, 0, 1, 0, 0, 0);
         acc_list = addtail(acc_list, temp);
         updateAccountFile(acc_list);
         addFileAccount(username);
@@ -225,6 +226,7 @@ void handle_login(int conn_socket, node acc_list)
     {
         printf("login success\n");
         target_acc->is_signed_in = 1;
+        // updateAccountFile(acc_list);
 
         for (int i = 0; i < MAX_USER; i++)
         {
@@ -784,6 +786,43 @@ void sv_logout(int conn_socket, Package *pkg)
 
 void ViewInformationServer(int conn_socket, Package *pkg){
     //Ngoc
+    int user_index = search_user(conn_socket);
+    // printf("%s\n", user[user_index].username);
+    char user_name_active[USERNAME_SIZE];
+    strcpy(user_name_active, user[user_index].username);
+    node temp = search(acc_list, user_name_active);
+    char elo_string[5];
+    char current_puzzle_string[5];
+    char puzzle_point_string[5];
+    char match_count_string[5];
+    char win_string[5];
+    sprintf(elo_string, "%d", temp->elo);
+    sprintf(current_puzzle_string, "%d", temp->current_puzzle);
+    sprintf(puzzle_point_string, "%d", temp->puzzle_point);
+    sprintf(match_count_string, "%d", temp->match_count);
+    sprintf(win_string, "%d", temp->win);
+    char information[MAX_LENGTH];
+    // user_name_active + "\n" + "elo: " + elo + "\n" + "current_puzzle: " + current_puzzle + "\n" + "puzzle_point: " + puzzle_point + "\n" + "match_count: " + match_count + "\n" + "win: " + win + "\n";
+    strcat(information, "username: ");
+    strcat(information, user_name_active);
+    strcat(information, "\n");
+    strcat(information, "elo: ");
+    strcat(information, elo_string);
+    strcat(information, "\n");
+    strcat(information, "current_puzzle: ");
+    strcat(information, current_puzzle_string);
+    strcat(information, "\n");
+    strcat(information, "puzzle_point: ");
+    strcat(information, puzzle_point_string);
+    strcat(information, "\n");
+    strcat(information, "match_count: ");
+    strcat(information, match_count_string);
+    strcat(information, "\n");
+    strcat(information, "win: ");
+    strcat(information, win_string);
+    strcpy(pkg->msg, information);
+    pkg->ctrl_signal = VIEW_INFORMATION;
+    send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
 void ChessPuzzleServer(int conn_socket, Package *pkg){
@@ -800,7 +839,17 @@ void ViewChessPuzzleRankServer(int conn_socket, Package *pkg){
 
 void ChangePassServer(int conn_socket, Package *pkg){
     //Ngoc   
+    int user_index = search_user(conn_socket);
+    char user_name_active[USERNAME_SIZE];
+    strcpy(user_name_active, user[user_index].username);
+    node temp = search(acc_list, user_name_active);
+    strcpy(temp->password, pkg->msg);
+    updateAccountFile(acc_list);
+    pkg->ctrl_signal = CHANGE_PASS_SUCC;
+    strcpy(pkg->msg, "Update password successfully\n");
+    send(conn_socket, pkg, sizeof(*pkg), 0);
 }
+
 void ChooseDiffcultServer(int conn_socket, Package *pkg){
     strcpy(pkg->msg, "Diffcult\n");
     send(conn_socket, pkg, sizeof(*pkg), 0);

@@ -6,7 +6,7 @@
 #define USERNAME_SIZE 50
 #define PASSWORD_SIZE 10
 #define FILENAME_SIZE 30
-#define MAX_LENGTH 30
+#define MAX_LENGTH 1024
 #define FRIEND_COUNT 10
 #define MAX_CONSECUTIVE_FAIL 3
 
@@ -30,9 +30,10 @@ typedef struct Account {
 
 typedef struct Account *node;
 
-node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int status, int is_signed_in);
+node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int status, int is_signed_in, int match_count, int win);
 node addtail(node head, node temp);
 node search(node head, char username[]);
+void printFriendList(node head);
 void printLists(node head);
 void readFileAccount(node *head);
 void updateAccountFile(node head);

@@ -6,7 +6,7 @@
 
 // Lưu dữ liệu vào link list
 
-node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int status, int is_signed_in) {
+node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int status, int is_signed_in, int match_count, int win) {
     node temp;
 	temp = (node)malloc(sizeof(struct Account));
 	temp->next = NULL;
@@ -17,6 +17,8 @@ node create(char username[], char password[], int elo, int current_puzzle, int p
     temp->puzzle_point = puzzle_point;
 	temp->status = status;
     temp->is_signed_in = is_signed_in;
+    temp->match_count = match_count;
+    temp->win = win;
 	return temp;
 }
 
@@ -48,7 +50,19 @@ node search(node head, char username[]) {
 void printLists(node head) {
     node p = head;
     while(p != NULL) {
-        printf("%s %s %d %d %d %d %d\n", p->username, p->password, p->elo, p->current_puzzle, p->puzzle_point, p->status, p->is_signed_in);
+        printf("%s %s %d %d %d %d %d %d %d\n", p->username, p->password, p->elo, p->current_puzzle, p->puzzle_point, p->status, p->is_signed_in, p->match_count, p->win);
+        p = p -> next;
+    }
+}
+
+void printFriendList(node head) {
+    node p = head;
+    int i = 0;
+    while(p != NULL) {
+        while(p->friends[i]) {
+            printf("%s\n", p->friends[i++]);
+        }
+        i = 0;
         p = p -> next;
     }
 }
@@ -58,11 +72,16 @@ void readFileAccount(node *head) {
     char password[PASSWORD_SIZE];
     int st;
     int elo;
+    int match_count;
+    int win;
+    // char friends[FRIEND_COUNT][USERNAME_SIZE];
     int current_puzzle;
     int puzzle_point;
     int status;
     int is_signed_in;
     node temp;
+    int i = 0;
+    int j = 0;
     FILE *file = fopen("account.txt", "r");
     if(file == NULL) {
         printf("no such file.");
@@ -80,6 +99,7 @@ void readFileAccount(node *head) {
             return;
         }
         while(fgets(line, sizeof(line), f) != NULL) {
+            i = 0; j = 0;
             char *p;
             if(strstr(line, "ELO")) {
                 p = strtok(line, " ");
@@ -99,8 +119,42 @@ void readFileAccount(node *head) {
                     if(p != NULL) puzzle_point = atoi(p);
                 }
             }
+            if(strstr(line, "MATCH_COUNT")) {
+                p = strtok(line, " ");
+                while(p != NULL) {
+                    p = strtok(NULL, " ");
+                    if(p != NULL) match_count = atoi(p);
+                }
+            }
+            if(strstr(line, "WIN")) {
+                p = strtok(line, " ");
+                while(p != NULL) {
+                    p = strtok(NULL, " ");
+                    if(p != NULL) win = atoi(p);
+                }
+            }
+            if(strstr(line, "FRIENDS")) {
+                p = strtok(line, " ");
+                while(p != NULL) {
+                    p = strtok(NULL, " ");
+                    if(p != NULL) {
+                        // printf("%s\n", p);
+                        strcpy(temp->friends[i++], p);
+                    }
+                }
+            }
+            if(strstr(line, "FRIEND_REQUEST")) {
+                p = strtok(line, " ");
+                while(p != NULL) {
+                    p = strtok(NULL, " ");
+                    if(p != NULL) {
+                        // printf("%s\n", p);
+                        strcpy(temp->friends[j++], p);
+                    }
+                }
+            }
         }
-        temp = create(username, password, elo, current_puzzle, puzzle_point, status, is_signed_in);
+        temp = create(username, password, elo, current_puzzle, puzzle_point, status, is_signed_in, match_count, win);
 		*head = addtail(*head, temp);
 	}
 }
@@ -120,7 +174,10 @@ void addFileAccount(char username[]) {
     FILE *file = fopen(fileName, "w+");
     fprintf(file, "%s %d\n", "ELO", 1000);
     fprintf(file, "%s %d %d\n", "PUZZLE", 1, 0);
+    fprintf(file, "%s %d\n", "MATCH_COUNT", 0);
+    fprintf(file, "%s %d\n", "WIN", 0);
     fprintf(file, "%s\n", "FRIEND");
+    fprintf(file, "%s\n", "FRIEND_REQUEST");
     fprintf(file, "%s", "MATCH_HISTORY");
     fclose(file);
 }

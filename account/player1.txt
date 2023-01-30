@@ -2,16 +2,8 @@ ELO 1238
 PUZZLE 3 43
 MATCH_COUNT 0
 WIN 0
-FRIEND
-afbegheg
-eheheher
-aghhehe
-qreafvga
-agrghthe
-wrgwryyjy
-FRIEND_REQUEST
-wrgheh
-wgwgw
+FRIENDS afbegheg eheheher aghhehe qreafvga agrghthe wrgwryyjy
+FRIEND_REQUEST wrgheh wgwgw
 MATCH_HISTORY
 MATCH 1
 d4 g5

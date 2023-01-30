@@ -141,6 +141,9 @@ void user_use(int client_socket)
             ShowMatchHistoryMenu(client_socket);
             // chat_all(client_socket);
             break;
+        case 8:
+            ChangePassword(client_socket);
+            break;
         case 9:
             login = 0;
             pkg.ctrl_signal = LOG_OUT;
@@ -207,16 +210,16 @@ void *read_msg(void *param)
             break;
         
         case VIEW_INFORMATION:
-            printf("Your information: \n%s \n", pkg.msg);;
+            printf("Your information: \n%s \n", pkg.msg);
             break;
         case VIEW_CHESS_PUZZLE_RANKING:
-            printf("Chess puzzle rank: \n%s \n", pkg.msg);;
+            printf("Chess puzzle rank: \n%s \n", pkg.msg);
             break;
         case VIEW_RANKING:
             printf("Chess rank: \n%s \n", pkg.msg);;
             break;
-        case CHANGE_PASS_REQ:
-            // ChangePassServer(conn_socket, &pkg);
+        case CHANGE_PASS_SUCC:
+            printf("%s\n", pkg.msg);
             break;
         case JOINT_ROOM_SUCC:
             printf("Current room: %s \n", pkg.msg);
@@ -406,6 +409,10 @@ void MatchHistoryMenu(){
 
 void ViewInformation(int client_socket){
     //Ngoc
+    Package pkg;
+    pkg.ctrl_signal = VIEW_INFORMATION;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
 }
 
 void ChessPuzzle(int client_socket){
@@ -421,7 +428,16 @@ void ViewChessPuzzleRank(int client_socket){
 }
 
 void ChangePassword(int client_socket){
-     //Ngoc
+    //Ngoc
+    Package pkg;
+    char newPassword[PASSWORD_SIZE];
+    pkg.ctrl_signal = CHANGE_PASS_REQ;
+    printf("New password: ");
+    scanf("%s", newPassword);
+    clear_stdin_buff();
+    strcpy(pkg.msg, newPassword);
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
 }
 
 void ViewFriend(int client_socket){
