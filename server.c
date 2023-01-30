@@ -8,6 +8,7 @@
 Active_user user[MAX_USER];
 Group group[MAX_GROUP];
 Room room[MAX_ROOM];
+Puzzle puzzle[15];
 node acc_list;
 
 int create_listen_socket()

@@ -40,6 +40,11 @@ typedef struct Room {
     char name[GROUP_NAME_SIZE]; 
 } Room;
 
+typedef struct Puzzle {
+    char board[1024];
+    char move[10]; 
+} Puzzle;
+
 //* Khởi tạo server
 /**
  * Tạo socket của server lắng nghe kết nối từ client

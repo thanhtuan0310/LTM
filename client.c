@@ -152,7 +152,7 @@ void user_use(int client_socket)
             sleep(1);
             break;
         case 29:
-            // see_active_user(client_socket);
+            //see_active_user(client_socket);
             break;
         // 17/01/2023
         case 30:
@@ -630,11 +630,14 @@ void JointRoom(int client_socket)
     sleep(1);
     if (join_succ == 1)
     printf("Joint success\n");
-        // handel_group_mess(client_socket);
+        InRoom(client_socket);
     else
         return;
 }
 
+void InRoom(int client_socket){
+
+}
 // main
 int main()
 {
