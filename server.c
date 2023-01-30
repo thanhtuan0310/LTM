@@ -7,6 +7,7 @@
 
 Active_user user[MAX_USER];
 Group group[MAX_GROUP];
+Room room[MAX_ROOM];
 node acc_list;
 
 int create_listen_socket()
@@ -296,10 +297,13 @@ void sv_user_use(int conn_socket)
         case CHANGE_PASS_REQ:
             ChangePassServer(conn_socket, &pkg);
             break;
+        case CREATE_ROOM:
+            CreateRoomServer(conn_socket, &pkg);
+            break;
         case SHOW_USER:
             sv_active_user(conn_socket, &pkg);
             break;
-
+        
         case LOG_OUT:
             login = 0;
             sv_logout(conn_socket, &pkg);
@@ -812,6 +816,54 @@ void ShowMatchHistoryServer(int conn_socket, Package *pkg){
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
+void CreateRoomServer(int conn_socket, Package *pkg)
+{
+    int user_id = search_user(conn_socket);
+    int room_id = -1;
+    for (int i = 0; i < MAX_ROOM; i++)
+    {
+        if (room[i].curr_num == 0)
+        {
+            room_id = i;
+            AddRoom(&user[user_id], room_id);
+            AddPlayerInRoom(user[user_id], &room[i]);
+            sprintf(room[i].name, "Room_%d", room_id);
+            break;
+        }
+    }
+    strcpy(pkg->msg, room[room_id].name);
+    pkg->ctrl_signal = CREATE_ROOM_SUCC;
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+int AddRoom(Active_user *user, int room_id)
+{
+    for (int i = 0; i < MAX_ROOM; i++)
+    {
+        if (user->room_id[i] < 0)
+        {
+            user->room_id[i] = room_id;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int AddPlayerInRoom(Active_user user, Room *room)
+{
+    int i = 0;
+    for (i = 0; i < MAX_USER; i++)
+    {
+        if (room->member[i].socket < 0)
+        {
+            room->member[i].socket = user.socket;
+            strcpy(room->member[i].username, user.username);
+            room->curr_num++;
+            return i;
+        }
+    }
+    return 0;
+}
 // main
 int main()
 {

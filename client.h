@@ -107,7 +107,7 @@ void ShowFriendMenu(int client_socket);
 
 void ShowMatchHistoryMenu(int client_socket);
 
-
+void CreateRoom(int client_socket);
 
 void *read_msg(void *param);
 

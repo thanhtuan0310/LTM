@@ -228,9 +228,9 @@ void *read_msg(void *param)
         //     printf("Your group: \n%s \n", pkg.msg);
         //     break;
 
-        // case MSG_MAKE_GROUP_SUCC:
-        //     printf("Your new group: %s \n", pkg.msg);
-        //     break;
+        case CREATE_ROOM_SUCC:
+            printf("Complete create: %s \n", pkg.msg);
+            break;
         // case JOIN_GROUP_SUCC:
         //     printf("Current group: %s \n", pkg.msg);
         //     strcpy(curr_group_name, pkg.msg);
@@ -372,23 +372,23 @@ void PlayWithOtherPlayerMenu(){
 
 void ChessPuzzleMenu(){
     printf("-------Chess Puzzle--------\n");    
-    printf("1. View chess puzzle ranking\n ");
-    printf("2. Play\n ");      
+    printf("1. View chess puzzle ranking\n");
+    printf("2. Play\n");      
     printf("3. Return main menu\n\n");
 }
 
 void FriendMenu(){
     printf("-------Friend--------\n");    
     printf("1. View Friends List\n ");
-    printf("2. Add friend\n ");   
-    printf("3. Remove friend\n ");   
+    printf("2. Add friend\n");   
+    printf("3. Remove friend\n");   
     printf("4. Return main menu\n\n");
 }
 
 void MatchHistoryMenu(){
     printf("-------Match history--------\n");    
-    printf("1. View Friends Match history\n ");
-    printf("2. View match history\n ");       
+    printf("1. View Friends Match history\n");
+    printf("2. View match history\n");       
     printf("3. Return main menu\n\n");
 }
 
@@ -466,6 +466,7 @@ void ShowPlayPlayer(int client_socket)
         switch (choice)
         {
         case 1:
+            CreateRoom(client_socket);
             // show_group(client_socket);
             break;
         case 2:
@@ -582,6 +583,14 @@ void ShowMatchHistoryMenu(int client_socket)
         }
     }
 }
+
+void CreateRoom(int client_socket)
+{
+    Package pkg;
+    pkg.ctrl_signal = CREATE_ROOM;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+}
+
 // main
 int main()
 {

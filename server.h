@@ -7,16 +7,19 @@
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 8080
-#define MAX_USER 10
+#define MAX_USER 2
 #define MAX_GROUP 10
+#define MAX_ROOM 10
 #define EMPTY_STRING "EMPTY_STRING"
 #define GROUP_NAME_SIZE 30
+#define ROOM_NAME_SIZE 30
 
 //* Người dùng hoạt động
 typedef struct Active_user_ {
     char username[USERNAME_SIZE]; /* Tên đăng nhập của người dùng */
     int socket; /* Socket người dùng dùng để kết nối đến server */
     int group_id[MAX_GROUP]; /*Group hien tai*/ 
+    int room_id[MAX_ROOM];
 } Active_user;
 
 //* Group
@@ -31,7 +34,11 @@ typedef struct Group_ {
     char group_name[GROUP_NAME_SIZE]; 
 } Group;
 
-
+typedef struct Room {
+    Member member[MAX_USER]; /* Số người trong phòng */
+    int curr_num; /* Số người hiện tại trong phòng */
+    char name[GROUP_NAME_SIZE]; 
+} Room;
 
 //* Khởi tạo server
 /**
@@ -265,6 +272,12 @@ void ShowChessPuzzleServer(int conn_socket, Package *pkg);
 void ShowFriendServer(int conn_socket, Package *pkg);
 
 void ShowMatchHistoryServer(int conn_socket, Package *pkg);
+
+void CreateRoomServer(int conn_socket, Package *pkg);
+
+int AddRoom(Active_user *user, int room_id);
+
+int AddPlayerInRoom(Active_user user, Room *room);
 /**
 Xử lý kết bạn
 */
