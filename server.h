@@ -278,6 +278,16 @@ void CreateRoomServer(int conn_socket, Package *pkg);
 int AddRoom(Active_user *user, int room_id);
 
 int AddPlayerInRoom(Active_user user, Room *room);
+
+void JointRoomServer(int conn_socket, Package *pkg);
+
+void ViewFriendServer(int conn_socket, Package *pkg);
+
+void AddFriendServer(int conn_socket, Package *pkg);
+
+void RemoveFriendServer(int conn_socket, Package *pkg);
+
+int SearchRoom(Room room[], Active_user user, char *name);
 /**
 Xử lý kết bạn
 */

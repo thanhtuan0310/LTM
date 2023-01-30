@@ -6,6 +6,9 @@
 #include <pthread.h>
 
 char my_username[USERNAME_SIZE];
+char curr_room_name[ROOM_NAME_SIZE];
+int join_succ = 0;
+int curr_group_id = -1;
 
 int connect_to_server()
 {
@@ -215,6 +218,12 @@ void *read_msg(void *param)
         case CHANGE_PASS_REQ:
             // ChangePassServer(conn_socket, &pkg);
             break;
+        case JOINT_ROOM_SUCC:
+            printf("Current room: %s \n", pkg.msg);
+            strcpy(curr_room_name, pkg.msg);
+            curr_group_id = pkg.group_id;
+            join_succ = 1;
+            break;
         // case ERR_INVALID_RECEIVER:
         //     report_err(ERR_INVALID_RECEIVER);
         //     break;
@@ -412,6 +421,18 @@ void ChangePassword(int client_socket){
      //Ngoc
 }
 
+void ViewFriend(int client_socket){
+    //Thai
+}
+
+void AddFriend(int client_socket){
+    //Thai
+}
+
+void RemoveFriend(int client_socket){
+     //Thai
+}
+
 void ShowPlayComputer(int client_socket)
 {
     Package pkg;
@@ -470,6 +491,7 @@ void ShowPlayPlayer(int client_socket)
             // show_group(client_socket);
             break;
         case 2:
+            JointRoom(client_socket);
             // new_group(client_socket);
             break;
         case 3:
@@ -536,13 +558,13 @@ void ShowFriendMenu(int client_socket)
         switch (choice)
         {
         case 1:
-            // show_group(client_socket);
+            ViewFriend(client_socket);            
             break;
         case 2:
-            // new_group(client_socket);
+            AddFriend(client_socket);            
             break;
         case 3:
-            // join_group(client_socket);
+            RemoveFriend(client_socket);            
             break;        
         default:
             return;
@@ -589,6 +611,28 @@ void CreateRoom(int client_socket)
     Package pkg;
     pkg.ctrl_signal = CREATE_ROOM;
     send(client_socket, &pkg, sizeof(pkg), 0);
+}
+
+void JointRoom(int client_socket)
+{
+    // show_group(client_socket);
+    sleep(1);
+    Package pkg;
+    pkg.ctrl_signal = JOINT_ROOM;
+    /* chon group*/
+    char room_name[ROOM_NAME_SIZE];
+    printf("Room Name (Room_n): \n");
+    fgets(room_name, ROOM_NAME_SIZE, stdin);
+    room_name[strlen(room_name) - 1] = '\0';
+    strcpy(pkg.sender, my_username);
+    strcpy(pkg.msg, room_name);
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
+    if (join_succ == 1)
+    printf("Joint success\n");
+        // handel_group_mess(client_socket);
+    else
+        return;
 }
 
 // main

@@ -317,9 +317,18 @@ void sv_user_use(int conn_socket)
         // case NEW_GROUP:
         //     sv_new_group(conn_socket, &pkg);
         //     break;
-        // case JOIN_GROUP:
-        //     sv_join_group(conn_socket, &pkg);
-        //     break;
+        case JOINT_ROOM:
+            JointRoomServer(conn_socket, &pkg);
+            break;
+        case VIEW_FRIEND:
+            ViewFriendServer(conn_socket, &pkg);        
+            break;
+        case ADD_FRIEND:
+            AddFriendServer(conn_socket, &pkg);
+            break;
+        case REMOVE_FRIEND:
+            RemoveFriendServer(conn_socket, &pkg);
+            break;
         // case HANDEL_GROUP_MESS:
         //     // hien ra thong tin phong
         //     break;
@@ -864,6 +873,62 @@ int AddPlayerInRoom(Active_user user, Room *room)
     }
     return 0;
 }
+
+void JointRoomServer(int conn_socket, Package *pkg)
+{
+    char room_name[ROOM_NAME_SIZE];
+    int room_id = -1;
+    int user_id = -1;
+
+    user_id = search_user(conn_socket);
+    strcpy(room_name, pkg->msg);
+    room_id = SearchRoom(room, user[user_id], room_name);
+    if (room_id >= 0)
+    {
+        printf("%s JOIN Room %s\n", pkg->sender, room[room_id].name);
+        strcpy(pkg->msg, room_name);
+        pkg->ctrl_signal = JOINT_ROOM_SUCC;
+        pkg->group_id = room_id;
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    }
+    else
+    {
+        pkg->ctrl_signal = ERR_ROOM_NOT_FOUND;
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    }
+}
+
+int SearchRoom(Room room[], Active_user user, char *name)
+{
+    int i;
+    int room_id = -1;
+    for (i = 0; i < MAX_ROOM; i++)
+    {
+        if (user.room_id[i] >= 0)
+        {
+            room_id = user.room_id[i];
+            if (strcmp(room[room_id].name, name) == 0)
+            {
+                // printf("%s\n",group[i].group_name);
+                return room_id;
+            }
+        }
+    }
+    return -1;
+}
+
+void ViewFriendServer(int conn_socket, Package *pkg){
+    //Thai
+}
+
+void AddFriendServer(int conn_socket, Package *pkg){
+    //Thai
+}
+
+void RemoveFriendServer(int conn_socket, Package *pkg){
+     //Thai
+}
+
 // main
 int main()
 {

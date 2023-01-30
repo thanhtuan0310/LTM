@@ -65,9 +65,11 @@
 #define PLAY_CHESS_PUZZLE 511
 #define CREATE_ROOM 512
 #define CREATE_ROOM_SUCC 512
-#define SHOW_GROUP_NAME 417
-#define SHOW_GROUP_MEM 418
-#define LEAVE_GROUP 419
+#define JOINT_ROOM 513
+#define JOINT_ROOM_SUCC 514
+#define VIEW_FRIEND 515
+#define ADD_FRIEND 516
+#define REMOVE_FRIEND 517
 #define LEAVE_GROUP_SUCC 420
 
 //* Cấu trúc gói tin

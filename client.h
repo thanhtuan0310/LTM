@@ -109,6 +109,14 @@ void ShowMatchHistoryMenu(int client_socket);
 
 void CreateRoom(int client_socket);
 
+void JointRoom(int client_socket);
+
+void ViewFriend(int client_socket);
+
+void AddFriend(int client_socket);
+
+void RemoveFriend(int client_socket);
+
 void *read_msg(void *param);
 
 #endif
