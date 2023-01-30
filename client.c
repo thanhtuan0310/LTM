@@ -425,7 +425,7 @@ void ViewFriend(int client_socket){
     //Thai
     Package pkg;
     pkg.ctrl_signal = VIEW_FRIEND;
-    pkg.sender = my_username;
+    strcpy(pkg.sender,my_username);
     send(client_socket, &pkg, sizeof(pkg), 0);
 }
 
