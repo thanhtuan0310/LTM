@@ -16,24 +16,55 @@
 void LoginMenu();
 
 /**
-* 1. Play with computer
-* 2. Play with other player
-* 3. Chess puzzle
-* 4. Add friends
-* 5. View chess ranking
-* 6. View match history
-* 7. Change password
-* 8. Log out
+  Giao diện menu chính
 */
 void UserMenu();
 
 
 /**
- * 1. Easy
- * 2. Normal
- * 3. Hard
+ Chọn độ khó của máy
 */
 void ChooseDifficultyComputer();
+
+/**
+ Giao diện chơi với người
+*/
+void PlayWithOtherPlayerMenu();
+
+/**
+ Giao diện giải thế cờ
+*/
+void ChessPuzzleMenu();
+
+/**
+ Menu bạn bè
+*/
+void FriendMenu();
+
+/**
+ Menu lịch sử đấu
+*/
+void MatchHistoryMenu();
+
+/**
+ Giải thế cờ
+*/
+void ChessPuzzle();
+
+/**
+ Xem bảng xếp hạng theo elo
+*/
+void ViewChessRank(int client_socket);
+
+/**
+ Xem bảng xếp hạng theo điểm chess puzzle
+*/
+void ViewChessPuzzleRank(int client_socket);
+
+/**
+ * Đổi mật khẩu
+ */
+void ChangePassword(int client_socket);
 
 /**
  * Đăng nhập với tên đăng nhập và mật khẩu
@@ -55,6 +86,29 @@ void user_use(int client_socket);
  * Đọc nội dung tin nhắn
  * @param param socket kết nối đến server
 */
+
+/**
+ * Xem thông tin cá nhân 
+*/
+void ViewInformation(int client_socket);
+
+//* Chức năng sau đăng nhập
+/**
+ * Cho người dùng nhập lựa chọn, thực hiện chức năng tương ứng 
+ * @param client_socket socket đã kết nối đến server
+*/
+void ShowPlayComputer(int client_socket);
+
+void ShowPlayPlayer(int client_socket);
+
+void ShowChessPuzzle(int client_socket);
+
+void ShowFriendMenu(int client_socket);
+
+void ShowMatchHistoryMenu(int client_socket);
+
+
+
 void *read_msg(void *param);
 
 #endif

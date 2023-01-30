@@ -16,12 +16,15 @@ typedef struct Account {
     char username[USERNAME_SIZE];
     char password[PASSWORD_SIZE];
     char friends[FRIEND_COUNT][USERNAME_SIZE];
+    char friend_req[30][USERNAME_SIZE];
     // historyMatch history[5];
     int elo;
     int current_puzzle;
     int puzzle_point;
     int status;
     int is_signed_in;
+    int match_count;
+    int win;
     struct Account *next;
 } Account;
 

@@ -206,9 +206,6 @@ void sv_leave_group(int conn_socket, Package *pkg);
 */
 void sv_update_port_group(Active_user *user, Group *group);
 
-
-
-
 /**
  * In ra thanh vien cua nhom
  * @param conn_socket socket kết nối đến client
@@ -227,5 +224,50 @@ int check_user_in_group(Active_user user, int group_id);
  * @param pkg con trỏ đến gói tin nhận được từ client
 */
 void sv_logout(int conn_socket, Package *pkg);
+
+/**
+ * Xử lý chức năng hiển thị thông tin cá nhân
+*/
+void ViewInformationServer(int conn_socket, Package *pkg);
+
+/**
+ * Xử lý chức năng giải thế cờ
+*/
+void ChessPuzzleServer(int conn_socket, Package *pkg);
+
+/**
+ Xử lý bảng xếp hạng theo elo
+*/
+void ViewChessRankServer(int conn_socket, Package *pkg);
+
+/**
+Xử lý bảng xếp hạng theo điểm chess puzzle
+*/
+void ViewChessPuzzleRankServer(int conn_socket, Package *pkg);
+
+/**
+Chọn độ khó của máy
+*/
+void ChooseDiffcultServer(int conn_socket, Package *pkg);
+
+/**
+Xử lý đổi mật khẩu
+*/
+void ChangePassServer(int conn_socket, Package *pkg);
+
+/**
+Chơi với người
+*/
+void ShowPlayWithPlayer();
+
+void ShowChessPuzzleServer(int conn_socket, Package *pkg);
+
+void ShowFriendServer(int conn_socket, Package *pkg);
+
+void ShowMatchHistoryServer(int conn_socket, Package *pkg);
+/**
+Xử lý kết bạn
+*/
+void AddFriendServer();
 
 #endif

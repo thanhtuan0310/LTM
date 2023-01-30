@@ -113,27 +113,46 @@ void user_use(int client_socket)
         {
         case 1:
             // private_chat(client_socket);
+            ViewInformation(client_socket);
             break;
-
         case 2:
+            ShowPlayComputer(client_socket);            
+            break;
+        case 3:
+            ShowPlayPlayer(client_socket);
             // chat_all(client_socket);
             break;
-
-        case 3:
-            // login = 0;
-            // pkg.ctrl_signal = LOG_OUT;
+        case 4:
+            ShowChessPuzzle(client_socket);
+            // chat_all(client_socket);
+            break;
+        case 5:
+            ShowFriendMenu(client_socket);
+            // chat_all(client_socket);
+            break;
+        case 6:
+            ViewChessRank(client_socket);
+            // chat_all(client_socket);
+            break;
+        case 7:
+            ShowMatchHistoryMenu(client_socket);
+            // chat_all(client_socket);
+            break;
+        case 9:
+            login = 0;
+            pkg.ctrl_signal = LOG_OUT;
             // // strcpy(pkg.sender, my_username);
-            // send(client_socket, &pkg, sizeof(pkg), 0);
-            // strcpy(my_username, "x");
+            send(client_socket, &pkg, sizeof(pkg), 0);
+            strcpy(my_username, "x");
             // strcpy(curr_group_name, "x");
             // curr_group_id = -1;
-            // sleep(1);
+            sleep(1);
             break;
-        case 4:
+        case 29:
             // see_active_user(client_socket);
             break;
         // 17/01/2023
-        case 5:
+        case 30:
             // group_chat_init(client_socket);
             break;
         default:
@@ -164,10 +183,38 @@ void *read_msg(void *param)
         //     printf("%s: %s\n", pkg.sender, pkg.msg);
         //     break;
 
-        // case CHAT_ALL:
-        //     printf("%s to all: %s\n", pkg.sender, pkg.msg);
-        //     break;
+        case CHOOSE_DIFFCULT:
+            printf("%s\n", pkg.msg);
+            break;
 
+        case SHOW_PLAY_PLAYER_MENU:
+            printf("%s\n", pkg.msg);
+            break;
+
+        case SHOW_CHESS_PUZZLE_MENU:
+            printf("%s\n", pkg.msg);
+            break;
+
+        case SHOW_FRIEND_MENU:
+            printf("%s\n", pkg.msg);
+            break;
+
+        case SHOW_MATCH_HISTORY_MENU:
+            printf("%s\n", pkg.msg);
+            break;
+        
+        case VIEW_INFORMATION:
+            printf("Your information: \n%s \n", pkg.msg);;
+            break;
+        case VIEW_CHESS_PUZZLE_RANKING:
+            printf("Chess puzzle rank: \n%s \n", pkg.msg);;
+            break;
+        case VIEW_RANKING:
+            printf("Chess rank: \n%s \n", pkg.msg);;
+            break;
+        case CHANGE_PASS_REQ:
+            // ChangePassServer(conn_socket, &pkg);
+            break;
         // case ERR_INVALID_RECEIVER:
         //     report_err(ERR_INVALID_RECEIVER);
         //     break;
@@ -296,20 +343,245 @@ void LoginMenu(){
 
 void UserMenu(){
     printf("-------Play chess menu--------\n");
-    printf("1. Play with computer\n ");
-    printf("2. Play with other player\n ");
-    printf("3. Chess puzzle\n");
-    printf("4. Add friends\n");
-    printf("5. View chess ranking\n");
-    printf("6. View match historyn");
-    printf("7. Change password\n");
-    printf("8. Log out\n\n");
+    printf("1. View information\n");
+    printf("2. Play with computer\n");
+    printf("3. Play with other player\n");
+    printf("4. Chess puzzle\n");
+    printf("5. Friends\n");
+    printf("6. View chess ranking\n");    
+    printf("7. Match history\n");
+    printf("8. Change password\n");
+    printf("9. Log out\n\n");
 }
+
 
 void ChooseDifficultyComputer(){
+    printf("-------Choose Difficulty--------\n");    
+    printf("1. Easy\n");
+    printf("2. Normal\n");
+    printf("3. Hard\n");    
+    printf("4. Return main menu\n\n");
+}
+
+void PlayWithOtherPlayerMenu(){
+    printf("-------Play With Other Player--------\n");    
+    printf("1. Create Room\n");
+    printf("2. Join Room\n");       
+    printf("3. Return main menu\n\n");
+}
+
+void ChessPuzzleMenu(){
+    printf("-------Chess Puzzle--------\n");    
+    printf("1. View chess puzzle ranking\n ");
+    printf("2. Play\n ");      
+    printf("3. Return main menu\n\n");
+}
+
+void FriendMenu(){
+    printf("-------Friend--------\n");    
+    printf("1. View Friends List\n ");
+    printf("2. Add friend\n ");   
+    printf("3. Remove friend\n ");   
+    printf("4. Return main menu\n\n");
+}
+
+void MatchHistoryMenu(){
+    printf("-------Match history--------\n");    
+    printf("1. View Friends Match history\n ");
+    printf("2. View match history\n ");       
+    printf("3. Return main menu\n\n");
+}
+
+void ViewInformation(int client_socket){
+    //Ngoc
+}
+
+void ChessPuzzle(int client_socket){
 
 }
 
+void ViewChessRank(int client_socket){
+    //Ngoc
+}
+
+void ViewChessPuzzleRank(int client_socket){
+    //Ngoc
+}
+
+void ChangePassword(int client_socket){
+     //Ngoc
+}
+
+void ShowPlayComputer(int client_socket)
+{
+    Package pkg;
+    pkg.ctrl_signal = CHOOSE_DIFFCULT;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    // xu ly
+    int choice = 0;
+
+    while (1)
+    {
+        sleep(1);
+
+        ChooseDifficultyComputer();
+        printf("Your choice: \n");
+        scanf("%d", &choice);
+        clear_stdin_buff();
+
+        switch (choice)
+        {
+        case 1:
+            // show_group(client_socket);
+            break;
+        case 2:
+            // new_group(client_socket);
+            break;
+        case 3:
+            // join_group(client_socket);
+            break;        
+        default:
+            return;
+        }
+    }
+}
+
+void ShowPlayPlayer(int client_socket)
+{
+    Package pkg;
+    pkg.ctrl_signal = SHOW_PLAY_PLAYER_MENU;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    // xu ly
+    int choice = 0;
+
+    while (1)
+    {
+        sleep(1);
+
+        PlayWithOtherPlayerMenu();
+        printf("Your choice: \n");
+        scanf("%d", &choice);
+        clear_stdin_buff();
+
+        switch (choice)
+        {
+        case 1:
+            // show_group(client_socket);
+            break;
+        case 2:
+            // new_group(client_socket);
+            break;
+        case 3:
+            // join_group(client_socket);
+            break;        
+        default:
+            return;
+        }
+    }
+}
+
+void ShowChessPuzzle(int client_socket)
+{
+    Package pkg;
+    pkg.ctrl_signal = SHOW_CHESS_PUZZLE_MENU;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    // xu ly
+    int choice = 0;
+
+    while (1)
+    {
+        sleep(1);
+
+        ChessPuzzleMenu();
+        printf("Your choice: \n");
+        scanf("%d", &choice);
+        clear_stdin_buff();
+
+        switch (choice)
+        {
+        case 1:
+            // show_group(client_socket);
+            ViewChessPuzzleRank(client_socket);
+            break;
+        case 2:
+            // new_group(client_socket);
+            break;
+        case 3:
+            // join_group(client_socket);
+            break;        
+        default:
+            return;
+        }
+    }
+}
+
+void ShowFriendMenu(int client_socket)
+{
+    Package pkg;
+    pkg.ctrl_signal = SHOW_FRIEND_MENU;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    // xu ly
+    int choice = 0;
+
+    while (1)
+    {
+        sleep(1);
+
+        FriendMenu();
+        printf("Your choice: \n");
+        scanf("%d", &choice);
+        clear_stdin_buff();
+
+        switch (choice)
+        {
+        case 1:
+            // show_group(client_socket);
+            break;
+        case 2:
+            // new_group(client_socket);
+            break;
+        case 3:
+            // join_group(client_socket);
+            break;        
+        default:
+            return;
+        }
+    }
+}
+
+void ShowMatchHistoryMenu(int client_socket)
+{
+    Package pkg;
+    pkg.ctrl_signal = SHOW_MATCH_HISTORY_MENU;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    // xu ly
+    int choice = 0;
+
+    while (1)
+    {
+        sleep(1);
+
+        MatchHistoryMenu();
+        printf("Your choice: \n");
+        scanf("%d", &choice);
+        clear_stdin_buff();
+
+        switch (choice)
+        {
+        case 1:
+            // show_group(client_socket);
+            break;
+        case 2:
+            // new_group(client_socket);
+            break;
+        case 3:
+            // join_group(client_socket);
+            break;        
+        default:
+            return;
+        }
+    }
+}
 // main
 int main()
 {
