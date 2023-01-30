@@ -32,5 +32,7 @@ node addtail(node head, node temp);
 node search(node head, char username[]);
 void printLists(node head);
 void readFileAccount(node *head);
+void updateAccountFile(node head);
+void addFileAccount(char username[]);
 
 #endif

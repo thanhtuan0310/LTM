@@ -68,6 +68,7 @@ void *pre_login_srv(void *param);
 */
 void handle_login(int conn_socket, Account *acc_list);
 
+void handle_signup(int conn_socket, node acc_list);
 /**
  * Search user by conn_socket
  * @param conn_socket socket kết nối đến client
