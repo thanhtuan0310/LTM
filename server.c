@@ -926,7 +926,7 @@ void ViewFriendServer(int conn_socket, Package *pkg){
         strcat(pkg->msg,use_friend->friends[i]);
         strcat(pkg->msg,"  ");
     }
-    strcpy(pkg->ctrl_signal,VIEW_FRIEND);
+    pkg->ctrl_signal = VIEW_FRIEND;
     send(conn_socket, pkg, sizeof(*pkg), 0);
 
 }
@@ -948,8 +948,46 @@ void AddFriendServer(int conn_socket, Package *pkg){
 
 }
 
+
+
 void RemoveFriendServer(int conn_socket, Package *pkg){
      //Thai
+    node use_friend = search(acc_list,pkg->receiver);
+    if (use_friend == NULL) {
+        pkg->ctrl_signal = ERR_INVALID_RECEIVER;
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    } else {
+        int check =1;
+        for (int i = 0; i < 10; i++)
+        {
+            if(strcmp(use_friend->friends[i],pkg->sender) == 0)
+            {
+                check = 0;
+                for (int j = i; j < 9; j++)
+                {
+                    strcpy(use_friend->friends[j],use_friend->friends[j+1]);
+                }                
+            }
+        }
+        if (check==1)
+        {
+            strcpy(pkg->msg,"Hai nguoi chua la ban cua nhau.\n");
+        }
+
+        use_friend = search(acc_list,pkg->sender);
+        for (int i = 0; i < 10; i++)
+        {
+            if(strcmp(use_friend->friends[i],pkg->receiver) == 0)
+            {
+                check = 0;
+                for (int j = i; j < 9; j++)
+                {
+                    strcpy(use_friend->friends[j],use_friend->friends[j+1]);
+                }                
+            }
+        }
+        
+    }
 }
 
 // main

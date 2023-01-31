@@ -448,6 +448,14 @@ void AddFriend(int client_socket){
 
 void RemoveFriend(int client_socket){
      //Thai
+     Package pkg;
+     char friend_name[30];
+
+    printf("Friends name: \n"); scanf("%s",friend_name);
+    pkg.ctrl_signal = REMOVE_FRIEND;
+    strcpy(pkg.sender,my_username);
+    strcpy(pkg.receiver,friend_name);
+    send(client_socket, &pkg, sizeof(pkg), 0);
 
 }
 
