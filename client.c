@@ -228,7 +228,7 @@ void *read_msg(void *param)
             join_succ = 1;
             break;
         case VIEW_FRIEND:
-            printf("Your friends: \n%s \n", pkg.msg);;
+            printf("\n%s \n", pkg.msg);;
             break;
         // case ERR_INVALID_RECEIVER:
         //     report_err(ERR_INVALID_RECEIVER);

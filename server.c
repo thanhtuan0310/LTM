@@ -170,7 +170,9 @@ void handle_signup(int conn_socket, node acc_list) {
     pkg.ctrl_signal = result;
     send(conn_socket, &pkg, sizeof(pkg), 0);
     if(result == LOGUP_SUCC) {
-        node temp = create(username, password, 1000, 1, 0, 1, 0, 0, 0);
+        char friends[FRIEND_COUNT][USERNAME_SIZE];
+        char friend_req[30][USERNAME_SIZE];
+        node temp = create(username, password, 1000, 1, 0, 1, 0, 0, 0, 0, 0, friends, friend_req);
         acc_list = addtail(acc_list, temp);
         updateAccountFile(acc_list);
         addFileAccount(username);
@@ -226,7 +228,7 @@ void handle_login(int conn_socket, node acc_list)
     {
         printf("login success\n");
         target_acc->is_signed_in = 1;
-        // updateAccountFile(acc_list);
+        updateAccountFile(acc_list);
 
         for (int i = 0; i < MAX_USER; i++)
         {
@@ -360,6 +362,7 @@ void sv_user_use(int conn_socket)
             node target_acc = search(acc_list, user[i].username);
             target_acc->is_signed_in = 0;
             user[i].socket = -1;
+            updateAccountFile(acc_list);
             for (int j = 0; j < MAX_GROUP; j++)
             {
                 if (user[i].group_id[j] >= 0)
@@ -803,7 +806,7 @@ void ViewInformationServer(int conn_socket, Package *pkg){
     sprintf(win_string, "%d", temp->win);
     char information[MAX_LENGTH];
     // user_name_active + "\n" + "elo: " + elo + "\n" + "current_puzzle: " + current_puzzle + "\n" + "puzzle_point: " + puzzle_point + "\n" + "match_count: " + match_count + "\n" + "win: " + win + "\n";
-    strcat(information, "username: ");
+    strcpy(information, "username: ");
     strcat(information, user_name_active);
     strcat(information, "\n");
     strcat(information, "elo: ");
@@ -820,6 +823,7 @@ void ViewInformationServer(int conn_socket, Package *pkg){
     strcat(information, "\n");
     strcat(information, "win: ");
     strcat(information, win_string);
+    strcat(information, "\n");
     strcpy(pkg->msg, information);
     pkg->ctrl_signal = VIEW_INFORMATION;
     send(conn_socket, pkg, sizeof(*pkg), 0);
@@ -970,12 +974,19 @@ int SearchRoom(Room room[], Active_user user, char *name)
 void ViewFriendServer(int conn_socket, Package *pkg){
     //Thai
     node use_friend = search(acc_list,pkg->sender);
-    strcpy(pkg->msg,"_");
-    for (int i = 0; i < USERNAME_SIZE; i++)
+    if (use_friend->frie_count == 0)
     {
-        strcat(pkg->msg,use_friend->friends[i]);
-        strcat(pkg->msg,"  ");
+        strcpy(pkg->msg,"No friends yet\n");
     }
+    else{
+        strcpy(pkg->msg,"Your friend\n");
+        for (int i = 0; i < use_friend->frie_count; i++)
+        {
+            strcat(pkg->msg,use_friend->friends[i]);
+            strcat(pkg->msg,"\n");
+        }
+    }
+    
     // pkg->ctrl_signal,VIEW_FRIEND);
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
