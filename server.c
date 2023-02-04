@@ -63,27 +63,28 @@ int accept_conn(int listen_socket)
 
 void make_server()
 {
-    
+
     int listen_socket;
 
     readFileAccount(&acc_list);
     // printFriendList(acc_list);
+    // printLists(acc_list);
     listen_socket = create_listen_socket();
     for (int i = 0; i < MAX_USER; i++)
     {
         user[i].socket = -1;
         // 17/01/2023
         for (int j = 0; j < MAX_GROUP; j++)
-            user[i].group_id[j] = -1;
+            user[i].room_id = -1;
     }
-    // for (int i = 0; i < MAX_GROUP; i++)
-    // {
-    //     for (int j = 0; j < MAX_USER; j++)
-    //     {
-    //         group[i].group_member[j].socket = -1;
-    //     }
-    //     group[i].curr_num = 0;
-    // }
+    for (int i = 0; i < MAX_ROOM; i++)
+    {
+        for (int j = 0; j < MAX_USER; j++)
+        {
+            room[i].member[j].socket = -1;
+        }
+        room[i].curr_num = 0;
+    }
 
     printf("Server created\n");
 
@@ -131,7 +132,8 @@ void *pre_login_srv(void *param)
     }
 }
 
-void handle_signup(int conn_socket, node acc_list) {
+void handle_signup(int conn_socket, node acc_list)
+{
     char username[USERNAME_SIZE];
     char password[PASSWORD_SIZE];
     Package pkg;
@@ -151,11 +153,14 @@ void handle_signup(int conn_socket, node acc_list) {
     printf("%s\n", password);
 
     target_account = search(acc_list, username);
-    if(target_account) result = EXISTS_ACC;
-    else result = LOGUP_SUCC;
+    if (target_account)
+        result = EXISTS_ACC;
+    else
+        result = LOGUP_SUCC;
 
-    if(result == LOGUP_SUCC) {
-        printf("Your account is registed successfully\n");
+    if (result == LOGUP_SUCC)
+    {
+        // printf("Your account is registed successfully\n");
         for (int i = 0; i < MAX_USER; i++)
         {
             if (user[i].socket < 0)
@@ -165,16 +170,20 @@ void handle_signup(int conn_socket, node acc_list) {
                 break;
             }
         }
-    } else {
+    }
+    else
+    {
         printf("This account has been existed!\n");
     }
-    
+
     pkg.ctrl_signal = result;
     send(conn_socket, &pkg, sizeof(pkg), 0);
-    if(result == LOGUP_SUCC) {
-        char friends[FRIEND_COUNT][USERNAME_SIZE];
+    if (result == LOGUP_SUCC)
+    {
+        char friends[MAX_FRIEND][USERNAME_SIZE];
         char friend_req[30][USERNAME_SIZE];
-        node temp = create(username, password, 1000, 1, 0, 1, 0, 0, 0, 0, 0, friends, friend_req);
+        char wait_add_friend[30][USERNAME_SIZE];
+        node temp = create(username, password, 1000, 1, 0, 1, 0, 0, 0, 0, 0, 0, friends, friend_req, wait_add_friend);
         acc_list = addtail(acc_list, temp);
         updateAccountFile(acc_list);
         addFileAccount(username);
@@ -255,7 +264,11 @@ void handle_login(int conn_socket, node acc_list)
     pkg.ctrl_signal = result;
     send(conn_socket, &pkg, sizeof(pkg), 0);
     if (result == LOGIN_SUCC)
+    {
+        node temp = getAccountBySocket(conn_socket);
+        CheckFriendRequest(temp, conn_socket);
         sv_user_use(conn_socket);
+    }
 }
 
 void sv_user_use(int conn_socket)
@@ -280,15 +293,15 @@ void sv_user_use(int conn_socket)
         case SHOW_PLAY_PLAYER_MENU:
             ShowPlayWithPlayer(conn_socket, &pkg);
             break;
-        
+
         case SHOW_CHESS_PUZZLE_MENU:
             ShowChessPuzzleServer(conn_socket, &pkg);
             break;
-        
+
         case SHOW_FRIEND_MENU:
             ShowFriendServer(conn_socket, &pkg);
             break;
-        
+
         case SHOW_MATCH_HISTORY_MENU:
             ShowMatchHistoryServer(conn_socket, &pkg);
             break;
@@ -310,7 +323,8 @@ void sv_user_use(int conn_socket)
         case SHOW_USER:
             sv_active_user(conn_socket, &pkg);
             break;
-        
+        case LEAVE_ROOM:
+            LeaveRoomServer(conn_socket, &pkg);
         case LOG_OUT:
             login = 0;
             sv_logout(conn_socket, &pkg);
@@ -328,7 +342,7 @@ void sv_user_use(int conn_socket)
             JointRoomServer(conn_socket, &pkg);
             break;
         case VIEW_FRIEND:
-            ViewFriendServer(conn_socket, &pkg);        
+            ViewFriendServer(conn_socket, &pkg);
             break;
         case ADD_FRIEND:
             AddFriendServer(conn_socket, &pkg);
@@ -476,7 +490,7 @@ int sv_search_id_user_group(Group group, char *user_name)
     {
         if (strcmp(group.group_member[i].username, user_name) == 0)
         {
-           // printf("%d %s\n", i, user_name);
+            // printf("%d %s\n", i, user_name);
             return i;
         }
     }
@@ -781,7 +795,6 @@ void sv_update_port_group(Active_user *user, Group *group)
     }
 }
 
-
 void sv_logout(int conn_socket, Package *pkg)
 {
     printf("%d logout\n", conn_socket);
@@ -789,8 +802,25 @@ void sv_logout(int conn_socket, Package *pkg)
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void ViewInformationServer(int conn_socket, Package *pkg){
-    //Ngoc
+void CheckFriendRequest(node user, int conn_socket)
+{
+    Package pkg;
+    pkg.ctrl_signal = NOTIFY_NEW_FRIEND_REQ;
+    printf("f: %d\n", user->frie_req_count);
+    if (user->frie_req_count > 0)
+    {
+        for (int i = 0; i < user->frie_req_count; i++)
+        {
+            strcpy(pkg.msg, "You have add friend request from ");
+            strcat(pkg.msg, user->friend_req[i]);
+            send(conn_socket, &pkg, sizeof(pkg), 0);
+        }
+    }
+}
+
+void ViewInformationServer(int conn_socket, Package *pkg)
+{
+    // Ngoc
     int user_index = search_user(conn_socket);
     // printf("%s\n", user[user_index].username);
     char user_name_active[USERNAME_SIZE];
@@ -831,8 +861,8 @@ void ViewInformationServer(int conn_socket, Package *pkg){
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void ChessPuzzleServer(int conn_socket, Package *pkg){
-    
+void ChessPuzzleServer(int conn_socket, Package *pkg)
+{
 }
 
 void ViewChessRankServer(int conn_socket, Package *pkg){
@@ -873,12 +903,20 @@ void ViewChessPuzzleRankServer(int conn_socket, Package *pkg){
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void ChangePassServer(int conn_socket, Package *pkg){
-    //Ngoc   
+node getAccountBySocket(int conn_socket)
+{
+    node temp;
     int user_index = search_user(conn_socket);
     char user_name_active[USERNAME_SIZE];
     strcpy(user_name_active, user[user_index].username);
-    node temp = search(acc_list, user_name_active);
+    temp = search(acc_list, user_name_active);
+    return temp;
+}
+
+void ChangePassServer(int conn_socket, Package *pkg)
+{
+    // Ngoc
+    node temp = getAccountBySocket(conn_socket);
     strcpy(temp->password, pkg->msg);
     updateAccountFile(acc_list);
     pkg->ctrl_signal = CHANGE_PASS_SUCC;
@@ -934,22 +972,26 @@ void ChooseDiffcultServer(int conn_socket, Package *pkg){
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void ShowPlayWithPlayer(int conn_socket, Package *pkg){
+void ShowPlayWithPlayer(int conn_socket, Package *pkg)
+{
     strcpy(pkg->msg, "Player\n");
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void ShowChessPuzzleServer(int conn_socket, Package *pkg){
+void ShowChessPuzzleServer(int conn_socket, Package *pkg)
+{
     strcpy(pkg->msg, "Chess Puzzle\n");
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void ShowFriendServer(int conn_socket, Package *pkg){
+void ShowFriendServer(int conn_socket, Package *pkg)
+{
     strcpy(pkg->msg, "Friend\n");
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void ShowMatchHistoryServer(int conn_socket, Package *pkg){
+void ShowMatchHistoryServer(int conn_socket, Package *pkg)
+{
     strcpy(pkg->msg, "Match\n");
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
@@ -970,6 +1012,7 @@ void CreateRoomServer(int conn_socket, Package *pkg)
         }
     }
     strcpy(pkg->msg, room[room_id].name);
+    pkg->group_id = room_id;
     pkg->ctrl_signal = CREATE_ROOM_SUCC;
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
@@ -978,9 +1021,9 @@ int AddRoom(Active_user *user, int room_id)
 {
     for (int i = 0; i < MAX_ROOM; i++)
     {
-        if (user->room_id[i] < 0)
+        if (user->room_id < 0)
         {
-            user->room_id[i] = room_id;
+            user->room_id = room_id;
             return 1;
         }
     }
@@ -1015,10 +1058,19 @@ void JointRoomServer(int conn_socket, Package *pkg)
     if (room_id >= 0)
     {
         printf("%s JOIN Room %s\n", pkg->sender, room[room_id].name);
+        AddRoom(&user[user_id], room_id);
+        AddPlayerInRoom(user[user_id], &room[room_id]);
         strcpy(pkg->msg, room_name);
         pkg->ctrl_signal = JOINT_ROOM_SUCC;
         pkg->group_id = room_id;
         send(conn_socket, pkg, sizeof(*pkg), 0);
+        if (room[room_id].curr_num == 2)
+        {
+            pkg->ctrl_signal = START_GAME;
+            strcpy(pkg->msg, "Start Game");
+            send(room[room_id].member[0].socket, pkg, sizeof(*pkg), 0);
+            send(room[room_id].member[1].socket, pkg, sizeof(*pkg), 0);
+        }
     }
     else
     {
@@ -1033,9 +1085,9 @@ int SearchRoom(Room room[], Active_user user, char *name)
     int room_id = -1;
     for (i = 0; i < MAX_ROOM; i++)
     {
-        if (user.room_id[i] >= 0)
+        if (user.room_id >= 0)
         {
-            room_id = user.room_id[i];
+            room_id = user.room_id;
             if (strcmp(room[room_id].name, name) == 0)
             {
                 // printf("%s\n",group[i].group_name);
@@ -1046,44 +1098,148 @@ int SearchRoom(Room room[], Active_user user, char *name)
     return -1;
 }
 
-void ViewFriendServer(int conn_socket, Package *pkg){
-    //Thai
-    node use_friend = search(acc_list,pkg->sender);
-    if (use_friend->frie_count == 0)
+void LeaveRoomServer(int conn_socket, Package *pkg)
+{
+    int room_id = pkg->group_id;
+    printf("%d\n", room_id);
+    int user_id = search_user(conn_socket);
+    int i = 0;
+    for (i = 0; i < MAX_USER; i++)
     {
-        strcpy(pkg->msg,"No friends yet\n");
-    }
-    else{
-        strcpy(pkg->msg,"Your friend\n");
-        for (int i = 0; i < use_friend->frie_count; i++)
+        Member mem = room[room_id].member[i];
+        printf("%s %s\n", user[user_id].username, mem.username);
+        if (strcmp(mem.username, user[user_id].username) == 0)
         {
-            strcat(pkg->msg,use_friend->friends[i]);
-            strcat(pkg->msg,"\n");
+            room[room_id].member[i].socket = -1;
+            room[room_id].curr_num--;
+            user[user_id].room_id = -1;
+            // gui thong bao den cho moi nguoi
+            // strcpy(pkg->msg, "LEAVE GROUP ");
+            // pkg->ctrl_signal = GROUP_CHAT;
+            // sv_group_chat(conn_socket, pkg);
+
+            // gui lai cho user
+            strcpy(pkg->msg, "LEAVE ROOM SUCCESS: ");
+            strcat(pkg->msg, room[room_id].name);
+            pkg->ctrl_signal = LEAVE_ROOM_SUCC;
+            send(conn_socket, pkg, sizeof(*pkg), 0);
         }
     }
-    
+}
+
+void ViewFriendServer(int conn_socket, Package *pkg)
+{
+    // Thai
+    node use_friend = getAccountBySocket(conn_socket);
+    if (use_friend->frie_count == 0)
+    {
+        strcpy(pkg->msg, "No friends yet\n");
+    }
+    else
+    {
+        strcpy(pkg->msg, "Your friend\n");
+        for (int i = 0; i < use_friend->frie_count; i++)
+        {
+            strcat(pkg->msg, use_friend->friends[i]);
+            strcat(pkg->msg, "\n");
+        }
+    }
+
     // pkg->ctrl_signal,VIEW_FRIEND);
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void AddFriendServer(int conn_socket, Package *pkg){
-    //Thai
 
-    node use_friend = search(acc_list,pkg->receiver);
-    if (use_friend == NULL) {
+void AddFriendServer(int conn_socket, Package *pkg)
+{
+    // Thai
+    node use_friend = search(acc_list, pkg->receiver);
+    node sender = search(acc_list, pkg->sender);
+    int i = 0;
+
+    if (use_friend == NULL)
+    {
         pkg->ctrl_signal = ERR_INVALID_RECEIVER;
         send(conn_socket, pkg, sizeof(*pkg), 0);
-    } else if (use_friend->friends[USERNAME_SIZE-1] ==NULL) {
-        pkg->ctrl_signal = ERR_FULL_MEM;
-        send(conn_socket, pkg, sizeof(*pkg), 0);
-    } else {
-
+        return;
     }
-
+    else if (use_friend->frie_count == MAX_FRIEND)
+    {
+        pkg->ctrl_signal = ERR_FULL_FRIEND;
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+        return;
+    }
+    if (use_friend->is_signed_in == 1)
+    {
+        for (i = 0; i < MAX_USER; i++)
+        {
+            if (strcmp(pkg->receiver, user[i].username) == 0)
+            {
+                if (CheckWaitRequestFriend(sender, pkg->receiver) == 0)
+                {
+                    pkg->ctrl_signal = ADD_FRIEND_REQUEST;
+                    strcpy(pkg->msg, "You have add friend request from ");
+                    strcat(pkg->msg, pkg->sender);
+                    send(user[i].socket, pkg, sizeof(*pkg), 0);
+                }
+                break;
+            }
+        }
+    }
+    if (CheckWaitRequestFriend(sender, pkg->receiver) == 0)
+    {
+        strcpy(use_friend->friend_req[use_friend->frie_req_count++], pkg->sender);
+        pkg->ctrl_signal = SENT_FRIEND_REQUEST_SUCC;
+        strcpy(pkg->msg, "Friend request has been sent successfully\n");
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    }
+    else
+    {
+        pkg->ctrl_signal = ADD_FRIEND_SUCC;
+        DeleteFriendRequest(use_friend, pkg->sender);
+        sender->frie_count++;
+        use_friend->frie_count++;
+        strcpy(use_friend->friends[use_friend->frie_count++], sender->username);
+        strcpy(sender->friends[sender->frie_count++], use_friend->username);
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    }
 }
 
-void RemoveFriendServer(int conn_socket, Package *pkg){
-     //Thai
+
+void DeleteFriendRequest(node account_friend, char sender_name[])
+{
+    for (int i = 0; i < account_friend->frie_req_count; i++)
+    {
+        if (strcmp(account_friend->friend_req[i], sender_name) == 0)
+        {
+            for (int j = i; j < account_friend->frie_req_count - 1; j++)
+            {
+                strcpy(account_friend->friend_req[i], account_friend->friend_req[i + 1]);
+            }
+            account_friend->frie_req_count--;
+            return;
+        }
+    }
+}
+
+int CheckWaitRequestFriend(node account_friend, char sender_name[])
+{
+    for (int i = 0; i < account_friend->frie_req_count; i++)
+    {
+        if (strcmp(account_friend->friend_req[i], sender_name) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+void RemoveFriendServer(int conn_socket, Package *pkg)
+{
+    // Thai
+}
+
+void ReplyFriendServer(int conn_socket, Package *pkg)
+{
+    // Thai
 }
 
 // main

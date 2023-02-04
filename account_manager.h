@@ -9,6 +9,7 @@
 #define MAX_LENGTH 1024
 #define MAX_NODE_LIST 100
 #define FRIEND_COUNT 30
+#define MAX_FRIEND 30
 #define MAX_CONSECUTIVE_FAIL 3
 
 
@@ -16,8 +17,9 @@
 typedef struct Account {    
     char username[USERNAME_SIZE];
     char password[PASSWORD_SIZE];
-    char friends[FRIEND_COUNT][USERNAME_SIZE];
+    char friends[MAX_FRIEND][USERNAME_SIZE];
     char friend_req[30][USERNAME_SIZE];
+    char wait_add_friend[30][USERNAME_SIZE];
     // historyMatch history[5];
     int elo;
     int current_puzzle;
@@ -28,6 +30,7 @@ typedef struct Account {
     int win;
     int frie_count;
     int frie_req_count;
+    int wait_add_friend_count;
     struct Account *next;
 } Account;
 
@@ -40,7 +43,7 @@ typedef struct Ranking {
 typedef struct Account *node;
 
 node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int status, int is_signed_in, int match_count, 
-            int win, int frie_count, int frie_req_count, char friend[][USERNAME_SIZE], char friend_req[][USERNAME_SIZE]);
+            int win, int frie_count, int frie_req_count, int wait_add_friend_count, char friend[][USERNAME_SIZE], char friend_req[][USERNAME_SIZE], char wait_add_friend[30][USERNAME_SIZE]);
 node addtail(node head, node temp);
 node search(node head, char username[]);
 void printFriendList(node head);

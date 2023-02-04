@@ -18,7 +18,7 @@ void LoginMenu();
 /**
   Giao diện menu chính
 */
-void UserMenu();
+void MainMenu();
 
 
 /**
@@ -111,13 +111,19 @@ void CreateRoom(int client_socket);
 
 void JointRoom(int client_socket);
 
+void LeaveRoom(int client_socket);
+
 void ViewFriend(int client_socket);
 
 void AddFriend(int client_socket);
 
 void RemoveFriend(int client_socket);
 
+void ReplyRequestFriend(int client_socket);    
+
 void InRoom(int client_socket);
+
+void RoomTutorial();
 
 void *read_msg(void *param);
 

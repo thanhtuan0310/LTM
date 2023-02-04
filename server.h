@@ -19,7 +19,7 @@ typedef struct Active_user_ {
     char username[USERNAME_SIZE]; /* Tên đăng nhập của người dùng */
     int socket; /* Socket người dùng dùng để kết nối đến server */
     int group_id[MAX_GROUP]; /*Group hien tai*/ 
-    int room_id[MAX_ROOM];
+    int room_id;
 } Active_user;
 
 //* Group
@@ -296,16 +296,22 @@ int AddPlayerInRoom(Active_user user, Room *room);
 
 void JointRoomServer(int conn_socket, Package *pkg);
 
+void LeaveRoomServer(int conn_socket, Package *pkg);
+
 void ViewFriendServer(int conn_socket, Package *pkg);
 
 void AddFriendServer(int conn_socket, Package *pkg);
 
 void RemoveFriendServer(int conn_socket, Package *pkg);
 
-int SearchRoom(Room room[], Active_user user, char *name);
-/**
-Xử lý kết bạn
-*/
-void AddFriendServer();
+void DeleteFriendRequest(node account_friend, char sender_name[]);
 
+int CheckWaitRequestFriend(node account_friend, char sender_name[]);
+
+void ReplyFriendServer(int conn_socket, Package *pkg);
+
+int SearchRoom(Room room[], Active_user user, char *name);
+
+node getAccountBySocket(int conn_socket);
+void CheckFriendRequest(node user, int conn_socket);
 #endif
