@@ -224,6 +224,9 @@ void *read_msg(void *param)
             curr_group_id = pkg.group_id;
             join_succ = 1;
             break;
+        case FRIEND_CONFIRMATION:
+            
+            break;
         // case ERR_INVALID_RECEIVER:
         //     report_err(ERR_INVALID_RECEIVER);
         //     break;
@@ -391,7 +394,8 @@ void FriendMenu(){
     printf("1. View Friends List\n ");
     printf("2. Add friend\n");   
     printf("3. Remove friend\n");   
-    printf("4. Return main menu\n\n");
+    printf("4. Friend confirmation");
+    printf("5. Return main menu\n\n");
 }
 
 void MatchHistoryMenu(){
@@ -457,6 +461,10 @@ void RemoveFriend(int client_socket){
     strcpy(pkg.receiver,friend_name);
     send(client_socket, &pkg, sizeof(pkg), 0);
 
+}
+
+void Friendconfirmation(int client_socket){
+    
 }
 
 void ShowPlayComputer(int client_socket)
@@ -591,7 +599,9 @@ void ShowFriendMenu(int client_socket)
             break;
         case 3:
             RemoveFriend(client_socket);            
-            break;        
+            break;      
+        case 4:
+            Friendconfirmation(client_socket);  
         default:
             return;
         }
