@@ -9,6 +9,7 @@ char my_username[USERNAME_SIZE];
 char curr_room_name[ROOM_NAME_SIZE];
 int join_succ = 0;
 int curr_group_id = -1;
+int playing = 0;
 
 int connect_to_server()
 {
@@ -36,7 +37,8 @@ int connect_to_server()
     return client_socket;
 }
 
-int logup(int client_socket) {
+int logup(int client_socket)
+{
     char username[USERNAME_SIZE];
     char password[PASSWORD_SIZE];
     Package pkg;
@@ -58,11 +60,15 @@ int logup(int client_socket) {
     sleep(1);
 
     if (pkg.ctrl_signal == LOGUP_SUCC)
-        strcpy(my_username, username);
+    {
+        printf("Your account is registed successfully\n");
+    }
+    // strcpy(my_username, username);
     return pkg.ctrl_signal;
 }
 
-int login(int client_socket) {
+int login(int client_socket)
+{
     char username[USERNAME_SIZE];
     char password[PASSWORD_SIZE];
     Package pkg;
@@ -107,7 +113,8 @@ void user_use(int client_socket)
 
     while (login)
     {
-        UserMenu();
+        sleep(1);
+        MainMenu();
         printf("Your choice: \n");
         scanf("%d", &choice);
         clear_stdin_buff();
@@ -119,7 +126,7 @@ void user_use(int client_socket)
             ViewInformation(client_socket);
             break;
         case 2:
-            ShowPlayComputer(client_socket);            
+            ShowPlayComputer(client_socket);
             break;
         case 3:
             ShowPlayPlayer(client_socket);
@@ -140,6 +147,9 @@ void user_use(int client_socket)
         case 7:
             ShowMatchHistoryMenu(client_socket);
             // chat_all(client_socket);
+            break;
+        case 8:
+            ChangePassword(client_socket);
             break;
         case 9:
             login = 0;
@@ -182,9 +192,12 @@ void *read_msg(void *param)
             printf("Current online users: %s \n", pkg.msg);
             break;
 
-        // case PRIVATE_CHAT:
-        //     printf("%s: %s\n", pkg.sender, pkg.msg);
-        //     break;
+        case NOTIFY_NEW_FRIEND_REQ:
+            printf("%s\n", pkg.msg);
+            break;
+            // case PRIVATE_CHAT:
+            //     printf("%s: %s\n", pkg.sender, pkg.msg);
+            //     break;
 
         case CHOOSE_DIFFCULT:
             printf("%s\n", pkg.msg);
@@ -205,18 +218,18 @@ void *read_msg(void *param)
         case SHOW_MATCH_HISTORY_MENU:
             printf("%s\n", pkg.msg);
             break;
-        
+
         case VIEW_INFORMATION:
-            printf("Your information: \n%s \n", pkg.msg);;
+            printf("Your information: \n%s \n", pkg.msg);
             break;
         case VIEW_CHESS_PUZZLE_RANKING:
-            printf("Chess puzzle rank: \n%s \n", pkg.msg);;
+            printf("Chess puzzle rank: \n%s \n", pkg.msg);
             break;
         case VIEW_RANKING:
-            printf("Chess rank: \n%s \n", pkg.msg);;
+            printf("Chess rank: \n%s \n", pkg.msg);
             break;
-        case CHANGE_PASS_REQ:
-            // ChangePassServer(conn_socket, &pkg);
+        case CHANGE_PASS_SUCC:
+            printf("%s\n", pkg.msg);
             break;
         case JOINT_ROOM_SUCC:
             printf("Current room: %s \n", pkg.msg);
@@ -224,24 +237,48 @@ void *read_msg(void *param)
             curr_group_id = pkg.group_id;
             join_succ = 1;
             break;
-        case FRIEND_CONFIRMATION:
-            
+
+
+        case VIEW_FRIEND:
+            printf("\n%s \n", pkg.msg);
             break;
-        // case ERR_INVALID_RECEIVER:
-        //     report_err(ERR_INVALID_RECEIVER);
-        //     break;
-        // case MSG_SENT_SUCC:
-        //     printf("Message sent!\n");
-        //     break;
-        // case GROUP_CHAT_INIT:
-        //     printf("%s\n", pkg.msg);
-        //     break;
-        // case SHOW_GROUP:
-        //     printf("Your group: \n%s \n", pkg.msg);
-        //     break;
+            // case ERR_INVALID_RECEIVER:
+            //     report_err(ERR_INVALID_RECEIVER);
+            //     break;
+            // case MSG_SENT_SUCC:
+            //     printf("Message sent!\n");
+            //     break;
+            // case GROUP_CHAT_INIT:
+            //     printf("%s\n", pkg.msg);
+            //     break;
+            // case SHOW_GROUP:
+            //     printf("Your group: \n%s \n", pkg.msg);
+            //     break;
+
 
         case CREATE_ROOM_SUCC:
             printf("Complete create: %s \n", pkg.msg);
+            curr_group_id = pkg.group_id;
+            join_succ = 1;
+            break;
+        case LEAVE_ROOM_SUCC:
+            printf("\n%s \n", pkg.msg);
+            join_succ = 0;
+            curr_group_id = -1;
+        case SENT_FRIEND_REQUEST_SUCC:
+            printf("\n%s \n", pkg.msg);
+            break;
+        case ADD_FRIEND_REQUEST:
+            printf("\n%s \n", pkg.msg);
+            break;
+        case ADD_FRIEND_SUCC:
+            printf("\nAdd friend sucessfully! \n");
+            break;
+        case START_GAME:
+            playing = 1;
+            break;
+        case ERR_FULL_FRIEND:
+            printf("Full Friend\n");
             break;
         // case JOIN_GROUP_SUCC:
         //     printf("Current group: %s \n", pkg.msg);
@@ -255,7 +292,7 @@ void *read_msg(void *param)
         // case ERR_GROUP_NOT_FOUND:
         //     report_err(ERR_GROUP_NOT_FOUND);
         //     break;
-        // case ERR_IVITE_MYSELF:
+        // case ERR_IVITE_MYS ELF:
         //     report_err(ERR_IVITE_MYSELF);
         //     break;
         // case ERR_USER_NOT_FOUND:
@@ -316,13 +353,16 @@ void ask_server(int client_socket)
             pkg.ctrl_signal = LOGIN_REQ;
             send(client_socket, &pkg, sizeof(pkg), 0);
             result = login(client_socket);
-            if (result == LOGIN_SUCC) {
+            if (result == LOGIN_SUCC)
+            {
                 user_use(client_socket);
             }
-            else if (result == INCORRECT_ACC) {
+            else if (result == INCORRECT_ACC)
+            {
                 report_err(ERR_INCORRECT_ACC);
             }
-            else {
+            else
+            {
                 report_err(ERR_SIGNED_IN_ACC);
             }
             break;
@@ -330,13 +370,16 @@ void ask_server(int client_socket)
             pkg.ctrl_signal = LOGUP_REQ;
             send(client_socket, &pkg, sizeof(pkg), 0);
             result = logup(client_socket);
-            if(result == LOGUP_SUCC) {
+            if (result == LOGUP_SUCC)
+            {
                 // user_use(client_socket);
                 continue;
-            } else {
+            }
+            else
+            {
                 report_err(EXISTS_ACC);
             }
-            break;    
+            break;
         case 3:
             pkg.ctrl_signal = QUIT_REQ;
             send(client_socket, &pkg, sizeof(pkg), 0);
@@ -346,125 +389,151 @@ void ask_server(int client_socket)
     }
 }
 
-void LoginMenu(){
-    printf("------ Welcome to chess ------\n");
+// Giao diện đăng nhập
+void LoginMenu()
+{
+    printf("------ Welcome to chess online------\n");
     printf("1. Login\n");
     printf("2. Sign up\n");
     printf("3. Exit\n\n");
 }
 
-void UserMenu(){
+// Menu chính
+void MainMenu()
+{
     printf("-------Play chess menu--------\n");
     printf("1. View information\n");
     printf("2. Play with computer\n");
     printf("3. Play with other player\n");
     printf("4. Chess puzzle\n");
     printf("5. Friends\n");
-    printf("6. View chess ranking\n");    
+    printf("6. View chess ranking\n");
     printf("7. Match history\n");
     printf("8. Change password\n");
     printf("9. Log out\n\n");
 }
 
-
-void ChooseDifficultyComputer(){
-    printf("-------Choose Difficulty--------\n");    
+// Chọn độ khó của máy
+void ChooseDifficultyComputer()
+{
+    printf("-------Choose Difficulty--------\n");
     printf("1. Easy\n");
     printf("2. Normal\n");
-    printf("3. Hard\n");    
+    printf("3. Hard\n");
     printf("4. Return main menu\n\n");
 }
 
-void PlayWithOtherPlayerMenu(){
-    printf("-------Play With Other Player--------\n");    
+void PlayWithOtherPlayerMenu()
+{
+    printf("-------Play With Other Player--------\n");
     printf("1. Create Room\n");
-    printf("2. Join Room\n");       
+    printf("2. Join Room\n");
     printf("3. Return main menu\n\n");
 }
 
-void ChessPuzzleMenu(){
-    printf("-------Chess Puzzle--------\n");    
+void ChessPuzzleMenu()
+{
+    printf("-------Chess Puzzle--------\n");
     printf("1. View chess puzzle ranking\n");
-    printf("2. Play\n");      
+    printf("2. Play\n");
     printf("3. Return main menu\n\n");
 }
 
-void FriendMenu(){
-    printf("-------Friend--------\n");    
-    printf("1. View Friends List\n ");
-    printf("2. Add friend\n");   
-    printf("3. Remove friend\n");   
-    printf("4. Friend confirmation");
+
+void FriendMenu()
+{
+    printf("-------Friend--------\n");
+    printf("1. View Friends List\n");
+    printf("2. Add friend\n");
+    printf("3. Remove friend\n");
+    printf("4. Reply request friend\n");
     printf("5. Return main menu\n\n");
 }
 
-void MatchHistoryMenu(){
-    printf("-------Match history--------\n");    
+void MatchHistoryMenu()
+{
+    printf("-------Match history--------\n");
     printf("1. View Friends Match history\n");
-    printf("2. View match history\n");       
+    printf("2. View match history\n");
     printf("3. Return main menu\n\n");
 }
 
-void ViewInformation(int client_socket){
-    //Ngoc
+void ViewInformation(int client_socket)
+{
+    // Ngoc
+    Package pkg;
+    pkg.ctrl_signal = VIEW_INFORMATION;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
 }
 
-void ChessPuzzle(int client_socket){
-
+void ChessPuzzle(int client_socket)
+{
 }
 
-void ViewChessRank(int client_socket){
-    //Ngoc
+void ViewChessRank(int client_socket)
+{
+    // Ngoc
 }
 
-void ViewChessPuzzleRank(int client_socket){
-    //Ngoc
+void ViewChessPuzzleRank(int client_socket)
+{
+    // Ngoc
 }
 
-void ChangePassword(int client_socket){
-     //Ngoc
+void ChangePassword(int client_socket)
+{
+    // Ngoc
+    Package pkg;
+    char newPassword[PASSWORD_SIZE];
+    pkg.ctrl_signal = CHANGE_PASS_REQ;
+    printf("New password: ");
+    scanf("%s", newPassword);
+    clear_stdin_buff();
+    strcpy(pkg.msg, newPassword);
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
 }
 
-void ViewFriend(int client_socket){
-    //Thai
+void ViewFriend(int client_socket)
+{
+    // Thai
     Package pkg;
     pkg.ctrl_signal = VIEW_FRIEND;
-    strcpy(pkg.sender,my_username);
+    strcpy(pkg.sender, my_username);
     send(client_socket, &pkg, sizeof(pkg), 0);
 }
 
-void AddFriend(int client_socket){
-    //Thai
+void AddFriend(int client_socket)
+{
+    // Thai
     Package pkg;
     char friends_name[USERNAME_SIZE];
 
-    printf("Friends name: \n");
+    printf("Friends name: ");
     fgets(friends_name, USERNAME_SIZE, stdin);
     friends_name[strlen(friends_name) - 1] = '\0';
 
     strcpy(pkg.receiver, friends_name);
     strcpy(pkg.sender, my_username);
     strcpy(pkg.msg, my_username);
-    strcat(pkg.msg, " want to makes friend with you ");
-    pkg.ctrl_signal = INVITE_FRIEND;
-    send(client_socket, &pkg, sizeof(pkg), 0);
-}
-
-void RemoveFriend(int client_socket){
-     //Thai
-     Package pkg;
-     char friend_name[30];
-
-    printf("Friends name: \n"); scanf("%s",friend_name);
-    pkg.ctrl_signal = REMOVE_FRIEND;
-    strcpy(pkg.sender,my_username);
-    strcpy(pkg.receiver,friend_name);
+    // strcat(pkg.msg, " want to makes friend with you ");
+    pkg.ctrl_signal = ADD_FRIEND;
     send(client_socket, &pkg, sizeof(pkg), 0);
 
+    sleep(1);
 }
 
-void Friendconfirmation(int client_socket){
-    
+
+void RemoveFriend(int client_socket)
+{
+    // Thai
+}
+
+void ReplyRequestFriend(int client_socket)
+{
+    // Thai
+
 }
 
 void ShowPlayComputer(int client_socket)
@@ -494,7 +563,7 @@ void ShowPlayComputer(int client_socket)
             break;
         case 3:
             // join_group(client_socket);
-            break;        
+            break;
         default:
             return;
         }
@@ -530,7 +599,7 @@ void ShowPlayPlayer(int client_socket)
             break;
         case 3:
             // join_group(client_socket);
-            break;        
+            break;
         default:
             return;
         }
@@ -565,7 +634,7 @@ void ShowChessPuzzle(int client_socket)
             break;
         case 3:
             // join_group(client_socket);
-            break;        
+            break;
         default:
             return;
         }
@@ -592,16 +661,16 @@ void ShowFriendMenu(int client_socket)
         switch (choice)
         {
         case 1:
-            ViewFriend(client_socket);            
+            ViewFriend(client_socket);
             break;
         case 2:
-            AddFriend(client_socket);            
+            AddFriend(client_socket);
             break;
         case 3:
-            RemoveFriend(client_socket);            
-            break;      
-        case 4:
-            Friendconfirmation(client_socket);  
+
+            RemoveFriend(client_socket);
+            break;
+
         default:
             return;
         }
@@ -635,7 +704,7 @@ void ShowMatchHistoryMenu(int client_socket)
             break;
         case 3:
             // join_group(client_socket);
-            break;        
+            break;
         default:
             return;
         }
@@ -647,6 +716,11 @@ void CreateRoom(int client_socket)
     Package pkg;
     pkg.ctrl_signal = CREATE_ROOM;
     send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
+    if (join_succ == 1)
+    {
+        InRoom(client_socket);
+    }
 }
 
 void JointRoom(int client_socket)
@@ -665,10 +739,53 @@ void JointRoom(int client_socket)
     send(client_socket, &pkg, sizeof(pkg), 0);
     sleep(1);
     if (join_succ == 1)
-    printf("Joint success\n");
-        // handel_group_mess(client_socket);
+    {
+        printf("Joint success\n");
+        InRoom(client_socket);
+    }
     else
         return;
+}
+
+void InRoom(int client_socket)
+{
+    int in_room = 1;
+    char msg[MSG_SIZE];
+
+    RoomTutorial();
+    while (in_room)
+    {
+        while (!playing)
+        {
+            fgets(msg, USERNAME_SIZE, stdin);
+            msg[strlen(msg) - 1] = '\0';
+            if (strcmp(msg, "leave") == 0){
+                in_room = 0;
+                break;
+            }               
+        }
+        if (strcmp(msg, "leave") == 0)
+        {
+            printf("leave\n");
+            LeaveRoom(client_socket);
+            in_room = 0;
+        }
+    }
+}
+
+void LeaveRoom(int client_socket)
+{
+    Package pkg;
+    pkg.ctrl_signal = LEAVE_ROOM;
+    pkg.group_id = curr_group_id;
+    strcpy(pkg.sender, my_username);
+    // curr_group_id = -1;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+}
+
+void RoomTutorial()
+{
+    printf("TUTORIALS\n");
 }
 
 // main
