@@ -1077,6 +1077,7 @@ void ViewFriendServer(int conn_socket, Package *pkg)
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
+
 void AddFriendServer(int conn_socket, Package *pkg)
 {
     // Thai
@@ -1131,6 +1132,7 @@ void AddFriendServer(int conn_socket, Package *pkg)
         send(conn_socket, pkg, sizeof(*pkg), 0);
     }
 }
+
 
 void DeleteFriendRequest(node account_friend, char sender_name[])
 {

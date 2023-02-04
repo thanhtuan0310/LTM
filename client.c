@@ -237,6 +237,8 @@ void *read_msg(void *param)
             curr_group_id = pkg.group_id;
             join_succ = 1;
             break;
+
+
         case VIEW_FRIEND:
             printf("\n%s \n", pkg.msg);
             break;
@@ -252,6 +254,7 @@ void *read_msg(void *param)
             // case SHOW_GROUP:
             //     printf("Your group: \n%s \n", pkg.msg);
             //     break;
+
 
         case CREATE_ROOM_SUCC:
             printf("Complete create: %s \n", pkg.msg);
@@ -436,6 +439,7 @@ void ChessPuzzleMenu()
     printf("3. Return main menu\n\n");
 }
 
+
 void FriendMenu()
 {
     printf("-------Friend--------\n");
@@ -520,6 +524,7 @@ void AddFriend(int client_socket)
     sleep(1);
 }
 
+
 void RemoveFriend(int client_socket)
 {
     // Thai
@@ -528,6 +533,7 @@ void RemoveFriend(int client_socket)
 void ReplyRequestFriend(int client_socket)
 {
     // Thai
+
 }
 
 void ShowPlayComputer(int client_socket)
@@ -661,8 +667,10 @@ void ShowFriendMenu(int client_socket)
             AddFriend(client_socket);
             break;
         case 3:
+
             RemoveFriend(client_socket);
             break;
+
         default:
             return;
         }
