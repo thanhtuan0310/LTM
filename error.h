@@ -20,6 +20,7 @@
 #define ERR_USER_NOT_FOUND -207 /*mời bản thân vào nhóm */
 #define ERR_FULL_MEM  -208 /*full nguoi*/
 #define ERR_IS_MEM  -209 /*da la thanh vien trong nhom*/
+#define ERR_FULL_FRIEND -211 /* số lượng bạn bè đã đạt tối đa */
 
 /**
  * Hiển thị thông báo lỗi

@@ -70,7 +70,15 @@
 #define VIEW_FRIEND 515
 #define ADD_FRIEND 516
 #define REMOVE_FRIEND 517
-#define LEAVE_GROUP_SUCC 420
+#define ADD_FRIEND_REQUEST 518
+#define SENT_FRIEND_REQUEST_SUCC 519
+#define ADD_FRIEND_SUCC 520
+#define NOTIFY_NEW_FRIEND_REQ 521
+#define START_GAME 522
+#define END_GAME_WIN 523
+#define END_GAME_LOSE 524
+#define LEAVE_ROOM 525
+#define LEAVE_ROOM_SUCC 526
 
 //* Cấu trúc gói tin
 typedef struct Package_ {
