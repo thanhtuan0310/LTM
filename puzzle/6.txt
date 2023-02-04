@@ -6,7 +6,5 @@
 3    .  .  .  P  k  .  K  .
 2    .  .  .  .  .  .  .  .
 1    q  .  N  .  .  .  .  .
-
-     a  b  c  d  e  f  g  h
-
+0    a  b  c  d  e  f  g  h
 MOVE f6g5

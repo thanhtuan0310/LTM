@@ -6,7 +6,5 @@
 3    k  n  .  .  .  .  .  .
 2    .  .  .  .  .  .  .  .
 1    N  K  .  .  .  .  .  .
-
-     a  b  c  d  e  f  g  h
-
+0    a  b  c  d  e  f  g  h
 MOVE a1c2

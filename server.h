@@ -41,9 +41,10 @@ typedef struct Room {
 } Room;
 
 typedef struct Puzzle {
-    char board[1024];
+    char board[9][1024];
     char move[10]; 
 } Puzzle;
+
 
 //* Khởi tạo server
 /**

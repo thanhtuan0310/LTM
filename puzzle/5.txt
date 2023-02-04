@@ -6,7 +6,5 @@
 3    .  .  .  .  .  .  .  R
 2    .  .  .  .  .  .  P  .
 1    .  .  .  .  .  .  .  .
-
-     a  b  c  d  e  f  g  h
-
+0    a  b  c  d  e  f  g  h
 MOVE g2g4

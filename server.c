@@ -11,6 +11,7 @@ Room room[MAX_ROOM];
 Puzzle puzzle[15];
 node acc_list;
 Ranking rank[MAX_NODE_LIST];
+Puzzle puzzle_list[20];
 int user_count = 0;
 
 int create_listen_socket()
