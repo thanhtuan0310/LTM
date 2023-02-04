@@ -268,6 +268,16 @@ Xử lý đổi mật khẩu
 void ChangePassServer(int conn_socket, Package *pkg);
 
 /**
+Lấy thông tin user theo elo và puzzle_point
+*/
+void getListUserRanking(node head);
+
+/**
+Sắp xếp user theo elo và puzzle_point
+*/
+void sortUserRanking(int type);
+
+/**
 Chơi với người
 */
 void ShowPlayWithPlayer();

@@ -227,6 +227,7 @@ void *read_msg(void *param)
             break;
         case VIEW_RANKING:
             printf("Chess rank: \n%s \n", pkg.msg);
+            printf("Chess rank: \n%s \n", pkg.msg);
             break;
         case CHANGE_PASS_SUCC:
             printf("%s\n", pkg.msg);
@@ -471,14 +472,20 @@ void ChessPuzzle(int client_socket)
 {
 }
 
-void ViewChessRank(int client_socket)
-{
-    // Ngoc
+void ViewChessRank(int client_socket){
+    //Ngoc
+    Package pkg;
+    pkg.ctrl_signal = VIEW_RANKING;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
 }
 
-void ViewChessPuzzleRank(int client_socket)
-{
-    // Ngoc
+void ViewChessPuzzleRank(int client_socket){
+    //Ngoc
+    Package pkg;
+    pkg.ctrl_signal = VIEW_CHESS_PUZZLE_RANKING;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
 }
 
 void ChangePassword(int client_socket)
@@ -634,7 +641,7 @@ void ShowChessPuzzle(int client_socket)
             break;
         case 3:
             // join_group(client_socket);
-            break;
+            break;        
         default:
             return;
         }

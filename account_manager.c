@@ -257,3 +257,13 @@ void addFileAccount(char username[]) {
     fprintf(file, "%s", "MATCH_HISTORY");
     fclose(file);
 }
+
+int getUserCount(node head) {
+    node p = head;
+    int i = 0;
+    while (p != NULL) {
+        i++;
+        p = p->next;
+    }
+    return i;
+}
