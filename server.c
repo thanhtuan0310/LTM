@@ -10,6 +10,8 @@ Group group[MAX_GROUP];
 Room room[MAX_ROOM];
 Puzzle puzzle[15];
 node acc_list;
+Ranking rank[MAX_NODE_LIST];
+int user_count = 0;
 
 int create_listen_socket()
 {
@@ -835,10 +837,40 @@ void ChessPuzzleServer(int conn_socket, Package *pkg){
 
 void ViewChessRankServer(int conn_socket, Package *pkg){
     //Ngoc
+    char elo_string[6];
+    char chessRank_string[MAX_LENGTH];
+    getListUserRanking(acc_list);
+    sortUserRanking(0);
+    for(int i = 0; i < getUserCount(acc_list); i++){
+        sprintf(elo_string, "%d", rank[i].elo);
+        strcat(chessRank_string, rank[i].username);
+        strcat(chessRank_string, " ");
+        strcat(chessRank_string, elo_string);
+        strcat(chessRank_string, "\n");
+    }
+    strcpy(pkg->msg, chessRank_string);
+    strcpy(chessRank_string, "");
+    pkg->ctrl_signal = VIEW_RANKING;
+    send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
 void ViewChessPuzzleRankServer(int conn_socket, Package *pkg){
     //Ngoc
+    char puzzle_point_string[5];
+    char chessPuzzleRanking[MAX_LENGTH];
+    getListUserRanking(acc_list);
+    sortUserRanking(1);
+    for(int i = 0; i < getUserCount(acc_list); i++){
+        sprintf(puzzle_point_string, "%d", rank[i].puzzle_point);
+        strcat(chessPuzzleRanking, rank[i].username);
+        strcat(chessPuzzleRanking, " ");
+        strcat(chessPuzzleRanking, puzzle_point_string);
+        strcat(chessPuzzleRanking, "\n");
+    }
+    strcpy(pkg->msg, chessPuzzleRanking);
+    strcpy(chessPuzzleRanking, "");
+    pkg->ctrl_signal = VIEW_CHESS_PUZZLE_RANKING;
+    send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
 void ChangePassServer(int conn_socket, Package *pkg){
@@ -852,6 +884,49 @@ void ChangePassServer(int conn_socket, Package *pkg){
     pkg->ctrl_signal = CHANGE_PASS_SUCC;
     strcpy(pkg->msg, "Update password successfully\n");
     send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void getListUserRanking(node head) {
+    node p = head;
+    int i = 0;
+    while(p != NULL) {
+        strcpy(rank[i].username, p->username);
+        rank[i].elo = p->elo;
+        rank[i].puzzle_point = p->puzzle_point;
+        i++;
+        p = p->next;
+    }
+}
+
+void sortUserRanking(int type) {
+    Ranking temp;
+    switch (type) {
+        case 0:
+            for (int i = 0; i < getUserCount(acc_list)-1; i++) {
+                for (int j = i+1; j < getUserCount(acc_list); j++) {
+                    if(rank[i].elo < rank[j].elo) {
+                        temp = rank[i];
+                        rank[i] = rank[j];
+                        rank[j] = temp;
+                    }
+                }
+            }
+            break;
+        case 1:
+            for (int i = 0; i < getUserCount(acc_list)-1; i++) {
+                for (int j = i+1; j < getUserCount(acc_list); j++) {
+                    if(rank[i].puzzle_point < rank[j].puzzle_point) {
+                        temp = rank[i];
+                        rank[i] = rank[j];
+                        rank[j] = temp;
+                    }
+                }
+            }
+            break;
+        default:
+            break;
+    }
+    
 }
 
 void ChooseDiffcultServer(int conn_socket, Package *pkg){
