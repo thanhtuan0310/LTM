@@ -227,7 +227,6 @@ void *read_msg(void *param)
             break;
         case VIEW_RANKING:
             printf("Chess rank: \n%s \n", pkg.msg);
-            printf("Chess rank: \n%s \n", pkg.msg);
             break;
         case CHANGE_PASS_SUCC:
             printf("%s\n", pkg.msg);

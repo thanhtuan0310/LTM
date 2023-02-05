@@ -244,6 +244,16 @@ void sv_logout(int conn_socket, Package *pkg);
 void ViewInformationServer(int conn_socket, Package *pkg);
 
 /**
+* Lưu thông tin các thế cờ
+*/
+void readFileChessPuzzle();
+
+/**
+* In thế cờ
+*/
+void printPuzzle();
+
+/**
  * Xử lý chức năng giải thế cờ
 */
 void ChessPuzzleServer(int conn_socket, Package *pkg);
