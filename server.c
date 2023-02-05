@@ -906,7 +906,7 @@ void readFileChessPuzzle() {
 void printPuzzle() {
     for(int i = 0; i < 10; i++) {
         for(int j = 0; j < 9; j++) {
-            printf("%s\n", puzzle_list[i].board[j]);
+            printf("%s", puzzle_list[i].board[j]);
         }
         printf("MOVE: %s\n", puzzle_list[i].move);
     }
@@ -1164,6 +1164,7 @@ void LeaveRoomServer(int conn_socket, Package *pkg)
             room[room_id].member[i].socket = -1;
             room[room_id].curr_num--;
             user[user_id].room_id = -1;
+            strcpy(room[room_id].member[i].username, "");
             // gui thong bao den cho moi nguoi
             // strcpy(pkg->msg, "LEAVE GROUP ");
             // pkg->ctrl_signal = GROUP_CHAT;
