@@ -24,7 +24,6 @@ typedef struct Account {
     int elo;
     int current_puzzle;
     int puzzle_point;
-    int status;
     int is_signed_in;
     int match_count;
     int win;
@@ -42,7 +41,7 @@ typedef struct Ranking {
 
 typedef struct Account *node;
 
-node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int status, int is_signed_in, int match_count, 
+node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int is_signed_in, int match_count, 
             int win, int frie_count, int frie_req_count, int wait_add_friend_count, char friend[][USERNAME_SIZE], char friend_req[][USERNAME_SIZE], char wait_add_friend[30][USERNAME_SIZE]);
 node addtail(node head, node temp);
 node search(node head, char username[]);
@@ -50,7 +49,7 @@ void printFriendList(node head);
 void printLists(node head);
 void readFileAccount(node *head);
 void updateAccountFile(node head);
-void addFileAccount(char username[]);
+void addFileAccount(node head, char username[]);
 int getUserCount(node head);
 
 #endif

@@ -12,7 +12,6 @@ Puzzle puzzle[15];
 node acc_list;
 Ranking rank[MAX_NODE_LIST];
 Puzzle puzzle_list[20];
-int user_count = 0;
 
 int create_listen_socket()
 {
@@ -68,6 +67,8 @@ void make_server()
     int listen_socket;
 
     readFileAccount(&acc_list);
+    readFileChessPuzzle();
+    // printPuzzle();
     // printFriendList(acc_list);
     // printLists(acc_list);
     listen_socket = create_listen_socket();
@@ -184,10 +185,10 @@ void handle_signup(int conn_socket, node acc_list)
         char friends[MAX_FRIEND][USERNAME_SIZE];
         char friend_req[30][USERNAME_SIZE];
         char wait_add_friend[30][USERNAME_SIZE];
-        node temp = create(username, password, 1000, 1, 0, 1, 0, 0, 0, 0, 0, 0, friends, friend_req, wait_add_friend);
+        node temp = create(username, password, 1000, 1, 0, 0, 0, 0, 0, 0, 0, friends, friend_req, wait_add_friend);
         acc_list = addtail(acc_list, temp);
         updateAccountFile(acc_list);
-        addFileAccount(username);
+        addFileAccount(acc_list, username);
     }
 }
 
@@ -240,7 +241,7 @@ void handle_login(int conn_socket, node acc_list)
     {
         printf("login success\n");
         target_acc->is_signed_in = 1;
-        updateAccountFile(acc_list);
+        // updateAccountFile(acc_list);
 
         for (int i = 0; i < MAX_USER; i++)
         {
@@ -379,7 +380,7 @@ void sv_user_use(int conn_socket)
             node target_acc = search(acc_list, user[i].username);
             target_acc->is_signed_in = 0;
             user[i].socket = -1;
-            updateAccountFile(acc_list);
+            // updateAccountFile(acc_list);
             for (int j = 0; j < MAX_GROUP; j++)
             {
                 if (user[i].group_id[j] >= 0)
@@ -858,9 +859,56 @@ void ViewInformationServer(int conn_socket, Package *pkg)
     strcat(information, win_string);
     strcat(information, "\n");
     strcpy(pkg->msg, information);
+    strcpy(information, "");
     pkg->ctrl_signal = VIEW_INFORMATION;
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
+
+void readFileChessPuzzle() {
+    char levelPuzzle[3];
+    char filePuzzle[FILENAME_SIZE];
+    char line[MAX_LENGTH];
+    for(int i = 0; i < 10; i++) {
+        sprintf(levelPuzzle, "%d", i+1);
+        strcpy(filePuzzle, "./puzzle/");
+        strcat(filePuzzle, levelPuzzle);
+        strcat(filePuzzle, ".txt");
+        FILE *file = fopen(filePuzzle, "r");
+        if(file == NULL) {
+            printf("no such file.");
+            return;
+        }
+        int j = 0;
+        while(fgets(line, sizeof(line), file) != NULL) {
+            if(strstr(line, "8") || strstr(line, "7") || strstr(line, "6") || strstr(line, "5") || strstr(line, "4") || strstr(line, "3") ||
+            strstr(line, "2") || strstr(line, "1")) {
+                strcpy(puzzle_list[i].board[j++], line);
+            }
+            if(strstr(line, "0")) {
+                line[0] = ' ';
+                strcpy(puzzle_list[i].board[j++], line);
+            }
+            if(strstr(line, "MOVE")) {
+                char *p = (char*) malloc(100 * sizeof(char));
+                p = strtok(line, " ");
+                while(p != NULL) {
+                    p = strtok(NULL, " ");
+                    if(p != NULL) strcpy(puzzle_list[i].move, p);
+                }
+            }
+        }
+        fclose(file);
+    }
+}
+
+void printPuzzle() {
+    for(int i = 0; i < 10; i++) {
+        for(int j = 0; j < 9; j++) {
+            printf("%s\n", puzzle_list[i].board[j]);
+        }
+        printf("MOVE: %s\n", puzzle_list[i].move);
+    }
+} 
 
 void ChessPuzzleServer(int conn_socket, Package *pkg)
 {
