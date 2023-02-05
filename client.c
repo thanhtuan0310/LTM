@@ -233,13 +233,12 @@ void *read_msg(void *param)
             printf("%s\n", pkg.msg);
             break;
         case JOINT_ROOM_SUCC:
-            printf("Current room: %s \n", pkg.msg);
+            printf("Joint Room %s Success\n", pkg.msg);
             strcpy(curr_room_name, pkg.msg);
             curr_group_id = pkg.group_id;
             join_succ = 1;
+            // InRoom(client_socket);
             break;
-
-
         case VIEW_FRIEND:
             printf("\n%s \n", pkg.msg);
             break;
@@ -255,17 +254,18 @@ void *read_msg(void *param)
             // case SHOW_GROUP:
             //     printf("Your group: \n%s \n", pkg.msg);
             //     break;
-
-
         case CREATE_ROOM_SUCC:
             printf("Complete create: %s \n", pkg.msg);
             curr_group_id = pkg.group_id;
+            playing = 0;
             join_succ = 1;
             break;
         case LEAVE_ROOM_SUCC:
             printf("\n%s \n", pkg.msg);
             join_succ = 0;
             curr_group_id = -1;
+            playing = 0;
+            break;
         case SENT_FRIEND_REQUEST_SUCC:
             printf("\n%s \n", pkg.msg);
             break;
@@ -276,6 +276,7 @@ void *read_msg(void *param)
             printf("\nAdd friend sucessfully! \n");
             break;
         case START_GAME:
+        printf("\n%s \n", pkg.msg);
             playing = 1;
             break;
         case ERR_FULL_FRIEND:
@@ -462,6 +463,7 @@ void MatchHistoryMenu()
 void ViewInformation(int client_socket)
 {
     // Ngoc
+    printf("INFORMATION\n");
     Package pkg;
     pkg.ctrl_signal = VIEW_INFORMATION;
     send(client_socket, &pkg, sizeof(pkg), 0);
@@ -470,6 +472,7 @@ void ViewInformation(int client_socket)
 
 void ChessPuzzle(int client_socket)
 {
+
 }
 
 void ViewChessRank(int client_socket){
@@ -733,7 +736,7 @@ void CreateRoom(int client_socket)
 void JointRoom(int client_socket)
 {
     // show_group(client_socket);
-    sleep(1);
+    // sleep(1);
     Package pkg;
     pkg.ctrl_signal = JOINT_ROOM;
     /* chon group*/
@@ -747,7 +750,7 @@ void JointRoom(int client_socket)
     sleep(1);
     if (join_succ == 1)
     {
-        printf("Joint success\n");
+        // printf("Joint success\n");
         InRoom(client_socket);
     }
     else
@@ -757,8 +760,7 @@ void JointRoom(int client_socket)
 void InRoom(int client_socket)
 {
     int in_room = 1;
-    char msg[MSG_SIZE];
-
+    char msg[MSG_SIZE] = "";    
     RoomTutorial();
     while (in_room)
     {
@@ -769,7 +771,8 @@ void InRoom(int client_socket)
             if (strcmp(msg, "leave") == 0){
                 in_room = 0;
                 break;
-            }               
+            } else
+        printf("%s\n", msg);              
         }
         if (strcmp(msg, "leave") == 0)
         {
@@ -777,6 +780,8 @@ void InRoom(int client_socket)
             LeaveRoom(client_socket);
             in_room = 0;
         }
+        else
+        printf("%s\n", msg);
     }
 }
 
@@ -793,6 +798,7 @@ void LeaveRoom(int client_socket)
 void RoomTutorial()
 {
     printf("TUTORIALS\n");
+    printf("Wait other player\n");
 }
 
 // main

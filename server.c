@@ -307,6 +307,7 @@ void sv_user_use(int conn_socket)
             ShowMatchHistoryServer(conn_socket, &pkg);
             break;
         case VIEW_INFORMATION:
+            printf("View information\n");
             ViewInformationServer(conn_socket, &pkg);
             break;
         case VIEW_CHESS_PUZZLE_RANKING:
@@ -326,6 +327,7 @@ void sv_user_use(int conn_socket)
             break;
         case LEAVE_ROOM:
             LeaveRoomServer(conn_socket, &pkg);
+            break;
         case LOG_OUT:
             login = 0;
             sv_logout(conn_socket, &pkg);
@@ -1065,8 +1067,10 @@ void JointRoomServer(int conn_socket, Package *pkg)
         pkg->ctrl_signal = JOINT_ROOM_SUCC;
         pkg->group_id = room_id;
         send(conn_socket, pkg, sizeof(*pkg), 0);
+        printf("Num: %d\n", room[room_id].curr_num);
         if (room[room_id].curr_num == 2)
         {
+            sleep(1);
             pkg->ctrl_signal = START_GAME;
             strcpy(pkg->msg, "Start Game");
             send(room[room_id].member[0].socket, pkg, sizeof(*pkg), 0);
@@ -1085,16 +1089,14 @@ int SearchRoom(Room room[], Active_user user, char *name)
     int i;
     int room_id = -1;
     for (i = 0; i < MAX_ROOM; i++)
-    {
-        if (user.room_id >= 0)
-        {
-            room_id = user.room_id;
-            if (strcmp(room[room_id].name, name) == 0)
+    {        
+        printf("Room %s %s\n", room[i].name, name);
+            if (strcmp(room[i].name, name) == 0)
             {
+                room_id = i;
                 // printf("%s\n",group[i].group_name);
                 return room_id;
-            }
-        }
+            }        
     }
     return -1;
 }
