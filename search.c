@@ -2,6 +2,7 @@
 
 #include "stdio.h"
 #include "defs.h"
+#include "string.h"
 
 
 int rootDepth;
@@ -286,13 +287,15 @@ static int AlphaBeta(int alpha, int beta, int depth, S_BOARD *pos, S_SEARCHINFO 
 	return alpha;
 }
 
-void SearchPosition(S_BOARD *pos, S_SEARCHINFO *info) {
+char *SearchPosition(S_BOARD *pos, S_SEARCHINFO *info) {
 
 	int bestMove = NOMOVE;
 	int bestScore = -INFINITE;
 	int currentDepth = 0;
 	int pvMoves = 0;
 	int pvNum = 0;
+
+	char search[1024];
 
 	ClearForSearch(pos,info);
 	
@@ -341,16 +344,19 @@ void SearchPosition(S_BOARD *pos, S_SEARCHINFO *info) {
 		}
 	}
 
-	if(info->GAME_MODE == UCIMODE) {
-		printf("bestmove %s\n",PrMove(bestMove));
-	} else if(info->GAME_MODE == XBOARDMODE) {
-		printf("move %s\n",PrMove(bestMove));
-		MakeMove(pos, bestMove);
-	} else {
+	// if(info->GAME_MODE == UCIMODE) {
+	// 	printf("bestmove %s\n",PrMove(bestMove));
+	// } else if(info->GAME_MODE == XBOARDMODE) {
+	// 	printf("move %s\n",PrMove(bestMove));
+	// 	MakeMove(pos, bestMove);
+	// } else {
 		printf("\n\n\tComputer move: %s !\n\n",PrMove(bestMove));
+		strcpy(search, "Computer move: ");
+		strcat(search, PrMove(bestMove));
+		printf("bye\n");
 		MakeMove(pos, bestMove);
-		PrintBoard(pos);
-	}
+		strcat(search, PrintBoard(pos));
+	// }
 
 }
 

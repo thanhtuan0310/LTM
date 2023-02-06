@@ -12,6 +12,10 @@ Puzzle puzzle[15];
 node acc_list;
 Ranking rank[MAX_NODE_LIST];
 Puzzle puzzle_list[20];
+S_BOARD pos[30];
+S_SEARCHINFO info[30];
+int depth = MAXDEPTH, movetime = 3000;
+int play_with_computer_count = 0;
 
 int create_listen_socket()
 {
@@ -63,7 +67,6 @@ int accept_conn(int listen_socket)
 
 void make_server()
 {
-
     int listen_socket;
 
     readFileAccount(&acc_list);
@@ -87,6 +90,8 @@ void make_server()
         }
         room[i].curr_num = 0;
     }
+
+    AllInit();
 
     printf("Server created\n");
 
@@ -329,6 +334,12 @@ void sv_user_use(int conn_socket)
         case LEAVE_ROOM:
             LeaveRoomServer(conn_socket, &pkg);
             break;
+        case CREATE_MATCH_WITH_COMPUTER:
+            CreateMatchWithPlayer(conn_socket, &pkg);
+            break;
+        case PLAY_MOVE:
+            PlayWithPlayer(conn_socket, &pkg);
+            break;
         case LOG_OUT:
             login = 0;
             sv_logout(conn_socket, &pkg);
@@ -383,7 +394,7 @@ void sv_user_use(int conn_socket)
             target_acc->is_signed_in = 0;
             user[i].socket = -1;
             // updateAccountFile(acc_list);
-            for (int j = 0; j < MAX_GROUP; j++)
+            for (int j = 0; j < MAX_ROOM; j++)
             {
                 if (user[i].group_id[j] >= 0)
                 {
@@ -1044,7 +1055,66 @@ void ShowFriendServer(int conn_socket, Package *pkg)
 void ShowMatchHistoryServer(int conn_socket, Package *pkg)
 {
     strcpy(pkg->msg, "Match\n");
-    send(conn_socket, pkg, sizeof(*pkg), 0);
+    send(conn_socket, pkg, sizeof(*pkg), 0);    
+}
+
+void CreateMatchWithPlayer(int conn_socket, Package *pkg){       	
+    int user_id = search_user(conn_socket);
+    user[user_id].computer_id = play_with_computer_count++;
+    int current_id = user[user_id].computer_id;
+    CreateNewBoard(current_id); 
+    info[current_id].GAME_MODE = CONSOLEMODE;
+	info[current_id].POST_THINKING = TRUE;
+    	
+	setbuf(stdin, NULL);
+    setbuf(stdout, NULL);
+    printf("Create Match Complete\n");
+	// int depth = MAXDEPTH, movetime = 3000;
+	int engineSide = BOTH;	
+
+	engineSide = BLACK;
+	ParseFen(START_FEN, &pos[current_id]);
+    pkg->ctrl_signal = CREATE_MATCH_SUCC;  
+    strcpy(pkg->msg, PrintBoard(&pos[current_id])); 
+    send(conn_socket, pkg, sizeof(*pkg), 0);                
+}
+
+void PlayWithPlayer(int conn_socket, Package *pkg){    
+    char inBuf[80], command[80];
+    int move = NOMOVE;	 
+    strcpy(inBuf, pkg->msg);
+
+    int user_id = search_user(conn_socket);   
+    int current_id = user[user_id].computer_id;
+
+    move = ParseMove(inBuf, &pos[current_id]);
+		if(move == NOMOVE) {
+            pkg->ctrl_signal = ERR_MOVE;
+            send(conn_socket, pkg, sizeof(*pkg), 0);
+			// printf("Command unknown:%s\n",inBuf);
+			return;
+		}    
+    MakeMove(&pos[current_id], move);      
+	pos[current_id].ply=0;
+
+    if ((checkresult(&pos[current_id]) == FALSE))
+    {
+        info[current_id].starttime = GetTimeMs();
+		info[current_id].depth = depth;
+
+			if(movetime != 0) {
+				info[current_id].timeset = TRUE;
+				info[current_id].stoptime = info[current_id].starttime + movetime;
+			}        
+        strcpy(pkg->msg, SearchPosition(&pos[current_id], &info[current_id]));
+        pkg->ctrl_signal = PLAY_MOVE_SUCC;
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    }
+    else{
+        pkg->ctrl_signal = PLAY_MOVE_SUCC;
+        strcpy(pkg->msg, "End Game\n");
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    }
 }
 
 void CreateRoomServer(int conn_socket, Package *pkg)
@@ -1294,6 +1364,14 @@ void ReplyFriendServer(int conn_socket, Package *pkg)
     // Thai
 }
 
+void CreateNewBoard(int current_id){
+    // AllInit();	
+    info[current_id].quit = FALSE;
+	pos[current_id].HashTable->pTable = NULL;
+    InitHashTable(pos[current_id].HashTable, 64);
+	setbuf(stdin, NULL);
+    setbuf(stdout, NULL);
+}
 // main
 int main()
 {

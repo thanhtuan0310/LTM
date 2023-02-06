@@ -261,7 +261,7 @@ extern U64 GeneratePosKey(const S_BOARD *pos);
 // board.c
 extern void ResetBoard(S_BOARD *pos);
 extern int ParseFen(char *fen, S_BOARD *pos);
-extern void PrintBoard(const S_BOARD *pos);
+extern char *PrintBoard(const S_BOARD *pos);
 extern void UpdateListsMaterial(S_BOARD *pos);
 extern int CheckBoard(const S_BOARD *pos);
 extern void MirrorBoard(S_BOARD *pos);
@@ -304,7 +304,7 @@ extern void TakeNullMove(S_BOARD *pos);
 extern void PerftTest(int depth, S_BOARD *pos);
 
 // search.c
-extern void SearchPosition(S_BOARD *pos, S_SEARCHINFO *info);
+extern char *SearchPosition(S_BOARD *pos, S_SEARCHINFO *info);
 
 // misc.c
 extern int GetTimeMs();
@@ -328,6 +328,7 @@ extern void Uci_Loop(S_BOARD *pos, S_SEARCHINFO *info);
 // xboard.c
 extern void XBoard_Loop(S_BOARD *pos, S_SEARCHINFO *info);
 extern void Console_Loop(S_BOARD *pos, S_SEARCHINFO *info);
+extern int checkresult(S_BOARD *pos);
 
 // polybook.c
 extern int GetBookMove(S_BOARD *board);

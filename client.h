@@ -6,12 +6,8 @@
 #include "error.h"
 #include "util.h"
 
-//* Menu
 /**
  * Menu đăng nhập
- * 1. Login
- * 2. CreateAccount
- * 3. Quit
 */
 void LoginMenu();
 
@@ -106,6 +102,10 @@ void ShowChessPuzzle(int client_socket);
 void ShowFriendMenu(int client_socket);
 
 void ShowMatchHistoryMenu(int client_socket);
+
+void PlayWithComputer(int client_socket);
+
+void InRoomWithComputer(int client_socket);
 
 void CreateRoom(int client_socket);
 

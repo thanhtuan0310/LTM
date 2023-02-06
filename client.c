@@ -238,6 +238,11 @@ void *read_msg(void *param)
             join_succ = 1;
             // InRoom(client_socket);
             break;
+        case CREATE_MATCH_SUCC:
+            printf("Start Game!\n");
+            printf("\n%s \n", pkg.msg);
+            join_succ = 1;
+            break;
         case VIEW_FRIEND:
             printf("\n%s \n", pkg.msg);
             break;
@@ -278,52 +283,15 @@ void *read_msg(void *param)
         printf("\n%s \n", pkg.msg);
             playing = 1;
             break;
+        case PLAY_MOVE_SUCC:
+            printf("\n%s \n", pkg.msg);
+            break;
         case ERR_FULL_FRIEND:
             printf("Full Friend\n");
             break;
-        // case JOIN_GROUP_SUCC:
-        //     printf("Current group: %s \n", pkg.msg);
-        //     strcpy(curr_group_name, pkg.msg);
-        //     curr_group_id = pkg.group_id;
-        //     join_succ = 1;
-        //     break;
-        // case INVITE_FRIEND:
-        //     printf("Attention: %s \n", pkg.msg);
-        //     break;
-        // case ERR_GROUP_NOT_FOUND:
-        //     report_err(ERR_GROUP_NOT_FOUND);
-        //     break;
-        // case ERR_IVITE_MYS ELF:
-        //     report_err(ERR_IVITE_MYSELF);
-        //     break;
-        // case ERR_USER_NOT_FOUND:
-        //     report_err(ERR_USER_NOT_FOUND);
-        //     break;
-        // case ERR_FULL_MEM:
-        //     report_err(ERR_FULL_MEM);
-        //     break;
-        // case INVITE_FRIEND_SUCC:
-        //     printf("%s\n", pkg.msg);
-        //     break;
-        // case GROUP_CHAT:
-        //     if (curr_group_id == pkg.group_id)
-        //     {
-        //         printf("%s: %s\n", pkg.sender, pkg.msg);
-        //     }
-        //     else
-        //     {
-        //         printf("%s sent to Group_%d: %s\n", pkg.sender, pkg.group_id, pkg.msg);
-        //     }
-        //     break;
-        // case SHOW_GROUP_NAME:
-        //     printf("GROUP NAME: %s\n", pkg.msg);
-        //     break;
-        // case SHOW_GROUP_MEM:
-        //     printf("%s\n", pkg.msg);
-        //     break;
-        // case LEAVE_GROUP_SUCC:
-        //     printf("%s\n", pkg.msg);
-        //     break;
+        case ERR_MOVE:
+            printf("Command unknown:\n");
+            break;
         case LOG_OUT:
             sleep(1);
             pthread_exit(NULL);
@@ -565,6 +533,7 @@ void ShowPlayComputer(int client_socket)
         switch (choice)
         {
         case 1:
+            PlayWithComputer(client_socket);
             // show_group(client_socket);
             break;
         case 2:
@@ -720,6 +689,17 @@ void ShowMatchHistoryMenu(int client_socket)
     }
 }
 
+void PlayWithComputer(int client_socket){
+    Package pkg;
+    pkg.ctrl_signal = CREATE_MATCH_WITH_COMPUTER;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
+    if (join_succ == 1)
+    {
+        InRoomWithComputer(client_socket);
+    }
+}
+
 void CreateRoom(int client_socket)
 {
     Package pkg;
@@ -754,6 +734,35 @@ void JointRoom(int client_socket)
     }
     else
         return;
+}
+
+void InRoomWithComputer(int client_socket){
+    Package pkg;
+    int in_room = 1;
+    char msg[MSG_SIZE];
+
+    RoomTutorial();
+    while (in_room)
+    {    
+        printf("\nYour turn: ");
+		fflush(stdout);
+		memset(&msg[0], 0, sizeof(msg));
+		fflush(stdout);
+		if (!fgets(msg, 80, stdin))
+		continue;   
+        if (strcmp(msg, "leave") == 0)
+        {
+            printf("leave\n");
+            LeaveRoom(client_socket);
+            in_room = 0;
+            break;
+        }        
+        
+        pkg.ctrl_signal = PLAY_MOVE;
+        strcpy(pkg.msg, msg);
+        send(client_socket, &pkg, sizeof(pkg), 0);
+        sleep(1);
+    }
 }
 
 void InRoom(int client_socket)
