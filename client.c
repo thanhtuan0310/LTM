@@ -323,6 +323,12 @@ void *read_msg(void *param)
         case FRIEND_REQUEST_SUCC:
             printf("\n%s \n", pkg.msg);
             break;
+        case PLAY_CHESS_PUZZLE:
+            printf("\n%s \n", pkg.msg);
+            break;
+        case CHECK_TURN_PUZZLE_SUCC:
+            printf("\n%s \n", pkg.msg);
+            break;
         // case JOIN_GROUP_SUCC:
         //     printf("Current group: %s \n", pkg.msg);
         //     strcpy(curr_group_name, pkg.msg);
@@ -525,6 +531,25 @@ void ViewInformation(int client_socket)
 void ChessPuzzle(int client_socket)
 {
     //Thai
+    Package pkg;
+    pkg.ctrl_signal = PLAY_CHESS_PUZZLE;
+    strcpy(pkg.sender,my_username);
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
+    ChessPuzzleTurn(client_socket);
+}
+
+void ChessPuzzleTurn(int client_socket)
+{
+    Package pkg;
+    char turn[10];
+    printf("Your turn : ");
+    fgets(turn, 10, stdin);
+    turn[strlen(turn) - 1] = '\0';
+    pkg.ctrl_signal = CHECK_TURN_PUZZLE;
+    strcpy(pkg.sender,my_username);
+    strcpy(pkg.msg,turn);
+    send(client_socket, &pkg, sizeof(pkg), 0);
 }
 
 void ViewChessRank(int client_socket){

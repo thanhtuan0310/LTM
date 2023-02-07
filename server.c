@@ -329,6 +329,9 @@ void sv_user_use(int conn_socket)
         case PLAY_CHESS_PUZZLE:
             ChessPuzzleServer(conn_socket, &pkg);
             break;
+        case CHECK_TURN_PUZZLE:
+            ChessPuzzleTurnServer(conn_socket,&pkg);
+            break;
         case VIEW_RANKING:
             ViewChessRankServer(conn_socket, &pkg);
             break;
@@ -948,7 +951,33 @@ void printPuzzle() {
 void ChessPuzzleServer(int conn_socket, Package *pkg)
 {
     //Thai
-    
+    node user_name = search(acc_list,pkg->sender);
+    strcpy(pkg->msg,"Your level : ");
+    pkg->msg[strlen(pkg->msg)] = user_name->current_puzzle;
+    //strcat(pkg->msg,user_name->current_puzzle);
+    strcat(pkg->msg,"/n");
+    for(int j = 0; j < 9; j++) 
+    {
+        strcat(pkg->msg,puzzle_list[user_name->current_puzzle].board[j]);
+        strcat(pkg->msg,"/n");
+    }
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void ChessPuzzleTurnServer(int conn_socket, Package *pkg)
+{
+    node user_name = search(acc_list,pkg->sender);
+    if (strcmp(pkg->msg,puzzle_list[user_name->current_puzzle-1].move)==0)
+    {
+        strcpy(pkg->msg,"Congratulations, You win...!");
+        user_name->puzzle_point = user_name->puzzle_point + user_name->current_puzzle;
+        user_name->current_puzzle++;
+    } else {
+        strcpy(pkg->msg,"Wrong !! You lost..!");
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    }
+    pkg->ctrl_signal = CHECK_TURN_PUZZLE_SUCC;
+    send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
 void ViewChessRankServer(int conn_socket, Package *pkg){
