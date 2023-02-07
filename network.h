@@ -113,6 +113,7 @@
 #define FRIEND_CONFIRMATION_10 610
 #define YES_TO_ADD_FRIEND 611
 #define DELETE_REQUEST 612
+#define END_PUZZLE 613
 
 //* Cấu trúc gói tin
 typedef struct Package_ {

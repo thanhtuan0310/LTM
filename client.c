@@ -330,6 +330,9 @@ void *read_msg(void *param)
         case CHECK_TURN_PUZZLE_SUCC:
             printf("\n%s \n", pkg.msg);
             break;
+        case END_PUZZLE:
+            printf("\n%s \n", pkg.msg);
+            break;
         // case JOIN_GROUP_SUCC:
         //     printf("Current group: %s \n", pkg.msg);
         //     strcpy(curr_group_name, pkg.msg);

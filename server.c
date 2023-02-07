@@ -960,6 +960,13 @@ void ChessPuzzleServer(int conn_socket, Package *pkg)
     //Thai
     node user_name = search(acc_list,pkg->sender);
     strcpy(pkg->msg,"Your level : ");
+    if(user_name->current_puzzle > 9)
+    {
+        pkg->ctrl_signal=END_PUZZLE;
+        strcpy(pkg->msg,"You have passed all levels of the puzlle. Congratulations");
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+        return;
+    }
     pkg->msg[strlen(pkg->msg)] = user_name->current_puzzle + 49;
     //strcat(pkg->msg,user_name->current_puzzle);
     strcat(pkg->msg,"\n");
