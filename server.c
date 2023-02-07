@@ -1437,7 +1437,14 @@ void RemoveFriendServer(int conn_socket, Package *pkg)
     // Thai
     node use_friend = search(acc_list, pkg->receiver);
     node sender = search(acc_list, pkg->sender);
+    if(use_friend == NULL){
+        strcpy(pkg->msg,"Don't see this person in your friend list.");
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+        return;
+    }
+
     int check = DeleteFriend(use_friend,pkg->sender);
+    // pkg->ctrl_signal = REMOVE_FRIEND;
     if(check == -1)
     {
         strcpy(pkg->msg,"Don't see this person in your friend list.");

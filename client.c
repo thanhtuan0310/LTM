@@ -246,9 +246,12 @@ void *read_msg(void *param)
         case VIEW_FRIEND:
             printf("\n%s \n", pkg.msg);
             break;
-            // case ERR_INVALID_RECEIVER:
-            //     report_err(ERR_INVALID_RECEIVER);
-            //     break;
+        case REMOVE_FRIEND:
+            printf("\n%s \n", pkg.msg);
+            break;
+        case ERR_INVALID_RECEIVER:
+            report_err(ERR_INVALID_RECEIVER);
+            break;
             // case MSG_SENT_SUCC:
             //     printf("Message sent!\n");
             //     break;
@@ -285,7 +288,8 @@ void *read_msg(void *param)
             printf("\nAdd friend sucessfully! \n");
             break;
         case SHOW_FRIEND_REQUEST:
-            ReplyRequestFriend2(client_socket);
+            printf("\n%s \n", pkg.msg);
+            // ReplyRequestFriend2(client_socket);
             break;
         case SHOW_FRIEND_REQUEST_ERROR:
             printf("\n%s \n", pkg.msg);
@@ -593,6 +597,8 @@ void ReplyRequestFriend(int client_socket)
     pkg.ctrl_signal = SHOW_FRIEND_REQUEST;
     strcpy(pkg.sender, my_username);
     send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
+    ReplyRequestFriend2(client_socket);
 }
 
 void ReplyRequestFriend2(int client_socket)
@@ -797,6 +803,7 @@ void ShowFriendMenu(int client_socket)
             break;
         case 4:
             ReplyRequestFriend(client_socket);
+            break;
         default:
             return;
         }
