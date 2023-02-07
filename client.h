@@ -121,6 +121,8 @@ void RemoveFriend(int client_socket);
 
 void ReplyRequestFriend(int client_socket);    
 
+void ReplyRequestFriend2(int client_socket);    
+
 void InRoom(int client_socket);
 
 void RoomTutorial();

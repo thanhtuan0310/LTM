@@ -296,9 +296,15 @@ void RemoveFriendServer(int conn_socket, Package *pkg);
 
 void DeleteFriendRequest(node account_friend, char sender_name[]);
 
+int DeleteFriend(node account_friend, char sender_name[]);
+
 int CheckWaitRequestFriend(node account_friend, char sender_name[]);
 
 void ReplyFriendServer(int conn_socket, Package *pkg);
+
+void AcceptFriend(int conn_socket, Package *pkg);
+
+void NotAcceptFriend(int conn_socket, Package *pkg);
 
 int SearchRoom(Room room[], Active_user user, char *name);
 
