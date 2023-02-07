@@ -267,6 +267,9 @@ void ChessPuzzleServer(int conn_socket, Package *pkg);
 /**
  Xử lý bảng xếp hạng theo elo
 */
+
+void ChessPuzzleTurnServer(int conn_socket, Package *pkg);
+
 void ViewChessRankServer(int conn_socket, Package *pkg);
 
 /**

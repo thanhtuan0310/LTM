@@ -50,7 +50,9 @@ void MatchHistoryMenu();
 /**
  Giải thế cờ
 */
-void ChessPuzzle();
+void ChessPuzzle(int client_socket);
+
+void ChessPuzzleTurn(int client_socket);
 
 /**
  Xem bảng xếp hạng theo elo
