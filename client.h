@@ -98,44 +98,105 @@ void ViewInformation(int client_socket);
  * Cho người dùng nhập lựa chọn, thực hiện chức năng tương ứng 
  * @param client_socket socket đã kết nối đến server
 */
+
+/**
+* Hiển thị các chức năng khi chơi với máy
+*/
 void ShowPlayComputer(int client_socket);
 
+/**
+* Hiển thị chức năng khi chơi với người chơi khác
+*/
 void ShowPlayPlayer(int client_socket);
 
+/**
+* Hiển thị các chức năng giải thế cờ
+*/
 void ShowChessPuzzle(int client_socket);
 
+/**
+* Hiển thị chức năng friend
+*/
 void ShowFriendMenu(int client_socket);
 
+/**
+* Hiển thị các chức năng xem lịch sử đấu
+*/
 void ShowMatchHistoryMenu(int client_socket);
 
+/**
+* Chọn màu quân cờ
+*/
 void ShowChooseColor(int client_socket, int diffcult);
 
+/**
+* Xử lý chơi với máy tính
+*/
 void PlayWithComputer(int client_socket, int diffcult, int color);
 
+/**
+* Đang chơi với máy
+*/
 void InRoomWithComputer(int client_socket);
 
+/**
+* Rời phòng chơi với máy
+*/
 void LeavePlayComputer(int client_socket);
 
+/**
+* Tạo phòng chơi
+*/
 void CreateRoom(int client_socket);
 
+/**
+* Tham gia vào phòng chơi
+*/
 void JointRoom(int client_socket);
 
+/**
+* Rời khỏi phòng chơi
+*/
 void LeaveRoom(int client_socket);
 
+/**
+* Xem danh sách người chơi đã kết bạn
+*/
 void ViewFriend(int client_socket);
 
+/**
+* Chức năng gửi lời mời kết bạn
+*/
 void AddFriend(int client_socket);
 
+/**
+* Xóa kết bạn
+*/
 void RemoveFriend(int client_socket);
 
+/**
+* Phản hồi yêu cầu kết bạn từ người chơi khác
+*/
 void ReplyRequestFriend(int client_socket);    
 
+/**
+* Gửi danh sách người chơi yêu cầu kết bạn
+*/
 void ReplyRequestFriend2(int client_socket);    
 
+/**
+* Đang chơi với người
+*/
 void InRoom(int client_socket);
 
+/**
+* Hướng dẫn người chơi sử dụng các lệnh để chơi
+*/
 void RoomTutorial();
 
+/**
+* Nhận các message gửi từ server, in ra kết quả
+*/
 void *read_msg(void *param);
 
 #endif

@@ -33,23 +33,60 @@ typedef struct Account {
     struct Account *next;
 } Account;
 
+// Cấu trúc bảng xếp hạng người chơi theo elo hoặc puzzle point
 typedef struct Ranking {
     char username[USERNAME_SIZE];
     int elo;
     int puzzle_point;
 } Ranking;
 
-typedef struct Account *node;
+typedef struct Account *node;  // Định nghĩa node
 
+/**
+* Hàm khởi tạo một node trong danh sách
+*/
 node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int is_signed_in, int match_count, 
             int win, int frie_count, int frie_req_count, int wait_add_friend_count, char friend[][USERNAME_SIZE], char friend_req[][USERNAME_SIZE], char wait_add_friend[30][USERNAME_SIZE]);
+/**
+* Thêm một node vào danh sách liên kết chứa thông tin tất cả các người chơi
+*/
 node addtail(node head, node temp);
+
+/**
+* Tìm thông tin người chơi trong danh sách liên kết theo username
+*/
 node search(node head, char username[]);
+
+/**
+* In thông tin tất cả bạn bè
+*/
 void printFriendList(node head);
+
+/**
+* Duyệt danh sách và in ra thông tin tất cả người chơi
+*/
 void printLists(node head);
+
+/**
+* Đọc file account.txt lấy thông tin username và password của tất cả người chơi lưu vào danh sách
+* Đọc các file thông tin của từng người chơi lưu vào danh sách: player1.txt, player2.txt...
+*/
 void readFileAccount(node *head);
+
+/**
+* Cập nhật file account.txt khi change password
+*/
 void updateAccountFile(node head);
+
+/**
+* Cập nhật thông tin từng file người chơi khi dữ liệu thay đổi
+* Cập nhật vào file lấy thông tin từ danh sách
+*/
 void addFileAccount(node head, char username[]);
+
+/**
+* Lấy số lượng account
+*/
 int getUserCount(node head);
 
 #endif

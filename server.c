@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <pthread.h>
 
 Active_user user[MAX_USER];
@@ -12,6 +13,7 @@ Puzzle puzzle[15];
 node acc_list;
 Ranking rank[MAX_NODE_LIST];
 Puzzle puzzle_list[20];
+
 S_BOARD pos[30];
 S_SEARCHINFO info[30];
 int movetime = 3000;
@@ -995,6 +997,37 @@ node getAccountBySocket(int conn_socket)
     strcpy(user_name_active, user[user_index].username);
     temp = search(acc_list, user_name_active);
     return temp;
+}
+
+node searchRecommendFriendByElo(int conn_socket, Package *pkg) {
+    node temp = getAccountBySocket(conn_socket);
+    Ranking compareElo[100];
+    Ranking tmp;
+    int count = 0;
+    getListUserRanking(acc_list);
+    sortUserRanking(0);
+    for(int i = 0; i < getUserCount(acc_list); i++) {
+        strcpy(compareElo[i].username, rank[i].username);
+        compareElo[i].elo = abs(rank[i].elo - temp->elo);
+    }
+    for(int i = 0; i < getUserCount(acc_list) - 1; i++) {
+        for(int j = i+1; j < getUserCount(acc_list); j++) {
+            if(compareElo[i].elo > compareElo[j].elo) {
+                tmp = compareElo[i];
+                compareElo[i] = compareElo[j];
+                compareElo[j] = tmp;
+            }
+        }
+    }
+    while(count < 5) {
+        if(strcmp(temp->username, compareElo[count].username) == 0) {
+            continue;
+        } 
+        strcat(pkg->msg, compareElo[count].username);
+        strcat(pkg->msg, "\n");
+        count++;
+    }
+    send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
 void ChangePassServer(int conn_socket, Package *pkg)
