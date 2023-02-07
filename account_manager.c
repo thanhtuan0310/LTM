@@ -6,13 +6,14 @@
 
 // Lưu dữ liệu vào link list
 
-node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int is_signed_in, int match_count, 
-int win, int frie_count, int frie_req_count, int wait_add_friend_count, char friend[][USERNAME_SIZE], char friend_req[][USERNAME_SIZE], char wait_add_friend[][USERNAME_SIZE]) {
+node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int is_signed_in, int match_count,
+            int win, int frie_count, int frie_req_count, int wait_add_friend_count, char friend[][USERNAME_SIZE], char friend_req[][USERNAME_SIZE], char wait_add_friend[][USERNAME_SIZE])
+{
     node temp;
-	temp = (node)malloc(sizeof(struct Account));
-	temp->next = NULL;
-	strcpy(temp->username, username);
-	strcpy(temp->password, password);
+    temp = (node)malloc(sizeof(struct Account));
+    temp->next = NULL;
+    strcpy(temp->username, username);
+    strcpy(temp->password, password);
     temp->elo = elo;
     temp->current_puzzle = current_puzzle;
     temp->puzzle_point = puzzle_point;
@@ -35,43 +36,56 @@ int win, int frie_count, int frie_req_count, int wait_add_friend_count, char fri
     {
         strcpy(temp->wait_add_friend[i], wait_add_friend[i]);
     }
-	return temp;
+    return temp;
 }
 
-node addtail(node head, node temp) {   // Them một node vào cuối danh sách liên kết
-	node p;
-	if (head == NULL) {
-		head = temp;
-	} else {
-		p = head; 
-		while (p->next != NULL) {
-			p = p->next;
-		}
-		p->next = temp;
-	}
-	return head;
+node addtail(node head, node temp)
+{ // Them một node vào cuối danh sách liên kết
+    node p;
+    if (head == NULL)
+    {
+        head = temp;
+    }
+    else
+    {
+        p = head;
+        while (p->next != NULL)
+        {
+            p = p->next;
+        }
+        p->next = temp;
+    }
+    return head;
 }
 
-node search(node head, char username[]) {
+node search(node head, char username[])
+{
     // tìm kiếm account theo username
-	node p = head;
-	if (strcmp(p->username, username) == 0) {
-		return p;
-	}
-	while (p->next->next != NULL && strcmp(p->next->username, username) != 0) p = p->next;
-	if (strcmp(p->next->username, username) == 0) return p->next;
-	else return NULL;
+    node p = head;
+    if (strcmp(p->username, username) == 0)
+    {
+        return p;
+    }
+    while (p->next->next != NULL && strcmp(p->next->username, username) != 0)
+        p = p->next;
+    if (strcmp(p->next->username, username) == 0)
+        return p->next;
+    else
+        return NULL;
 }
 
-void printLists(node head) {
+void printLists(node head)
+{
     node p = head;
-    while(p != NULL) {
+    while (p != NULL)
+    {
         printf("%s %s %d %d %d %d %d %d %d\n", p->username, p->password, p->elo, p->current_puzzle, p->puzzle_point, p->is_signed_in, p->match_count, p->win, p->frie_count);
-        p = p -> next;
+        p = p->next;
     }
 }
 
-void printFriendList(node head) {
+void printFriendList(node head)
+{
     node p = head;
     // int i = 0;
     printf("Your friend\n");
@@ -80,7 +94,7 @@ void printFriendList(node head) {
         /* code */
         printf("%s\n", p->friends[i]);
     }
-    
+
     // while(p != NULL) {
     //     while(p->friends[i]) {
     //         printf("%s\n", p->friends[i++]);
@@ -90,9 +104,10 @@ void printFriendList(node head) {
     // }
 }
 
-void readFileAccount(node *head) {
+void readFileAccount(node *head)
+{
     char username[USERNAME_SIZE];
-    char password[PASSWORD_SIZE];    
+    char password[PASSWORD_SIZE];
     int st;
     int elo;
     int match_count;
@@ -113,104 +128,141 @@ void readFileAccount(node *head) {
     int j = 0, k = 0;
     int m = 0;
     FILE *file = fopen("account.txt", "r");
-    if(file == NULL) {
+    if (file == NULL)
+    {
         printf("no such file.");
         return;
     }
-	while (!feof(file)) {
-		fscanf(file, "%s %s\n", username, password);
+    while (!feof(file))
+    {
+        fscanf(file, "%s %s\n", username, password);
         char fileName[FILENAME_SIZE] = "./account/";
         char line[MAX_LENGTH];
         strcat(fileName, username);
         strcat(fileName, ".txt");
         FILE *f = fopen(fileName, "r");
-        if(f == NULL) {
+        if (f == NULL)
+        {
             printf("No such file.");
             return;
         }
-        while(fgets(line, sizeof(line), f) != NULL) {
-            i = 0; j = 0; k = 0;
+        while (fgets(line, sizeof(line), f) != NULL)
+        {
+            i = 0;
+            j = 0;
+            k = 0;
             char *p;
-            p = (char*) malloc(100 * sizeof(char));
-            if(strstr(line, "ELO")) {
+            p = (char *)malloc(100 * sizeof(char));
+            if (strstr(line, "ELO"))
+            {
                 p = strtok(line, " ");
-                while(p != NULL) {
+                while (p != NULL)
+                {
                     p = strtok(NULL, " ");
-                    if(p != NULL) elo = atoi(p);
+                    if (p != NULL)
+                        elo = atoi(p);
                 }
             }
-            if(strstr(line, "PUZZLE")) {
+            if (strstr(line, "PUZZLE"))
+            {
                 p = strtok(line, " ");
-                if(p != NULL) {
+                if (p != NULL)
+                {
                     p = strtok(NULL, " ");
-                    if(p != NULL) current_puzzle = atoi(p);
+                    if (p != NULL)
+                        current_puzzle = atoi(p);
                 }
-                if(p != NULL) {
+                if (p != NULL)
+                {
                     p = strtok(NULL, " ");
-                    if(p != NULL) puzzle_point = atoi(p);
-                }
-            }
-            if(strstr(line, "MATCH_COUNT")) {
-                p = strtok(line, " ");
-                while(p != NULL) {
-                    p = strtok(NULL, " ");
-                    if(p != NULL) match_count = atoi(p);
+                    if (p != NULL)
+                        puzzle_point = atoi(p);
                 }
             }
-            if(strstr(line, "WINS")) {
+            if (strstr(line, "MATCH_COUNT"))
+            {
                 p = strtok(line, " ");
-                while(p != NULL) {
+                while (p != NULL)
+                {
                     p = strtok(NULL, " ");
-                    if(p != NULL) win = atoi(p);
+                    if (p != NULL)
+                        match_count = atoi(p);
                 }
             }
-            if(strstr(line, "FRIES_COUNT")) {
+            if (strstr(line, "WINS"))
+            {
                 p = strtok(line, " ");
-                while(p != NULL) {
+                while (p != NULL)
+                {
                     p = strtok(NULL, " ");
-                    if(p != NULL) frie_count = atoi(p);
+                    if (p != NULL)
+                        win = atoi(p);
+                    // printf("%d\n", win);
+                }
+            }
+
+            if (strstr(line, "FRIES_COUNT"))
+            {
+                p = strtok(line, " ");
+                while (p != NULL)
+                {
+                    p = strtok(NULL, " ");
+                    if (p != NULL)
+                        frie_count = atoi(p);
                     // printf("%d", frie_count);
                 }
             }
-            if(strstr(line, "FRIE_REQ_COUNT")) {
+            if (strstr(line, "FRIE_REQ_COUNT"))
+            {
                 p = strtok(line, " ");
-                while(p != NULL) {
+                while (p != NULL)
+                {
                     p = strtok(NULL, " ");
-                    if(p != NULL) frie_req_count = atoi(p);
+                    if (p != NULL)
+                        frie_req_count = atoi(p);
                 }
             }
-            if(strstr(line, "WAIT_ADD_FRIE_COUNT")) {
+            if (strstr(line, "WAIT_ADD_FRIE_COUNT"))
+            {
                 p = strtok(line, " ");
-                while(p != NULL) {
+                while (p != NULL)
+                {
                     p = strtok(NULL, " ");
-                    if(p != NULL) wait_add_friend_count= atoi(p);
+                    if (p != NULL)
+                        wait_add_friend_count = atoi(p);
                 }
             }
-            if(strstr(line, "FRIENDS")) {
+            if (strstr(line, "FRIENDS"))
+            {
                 p = strtok(line, " ");
-                while(p != NULL) {
+                while (p != NULL)
+                {
                     p = strtok(NULL, " ");
-                    if(p != NULL) {
+                    if (p != NULL)
+                    {
                         // printf("%s\n", p);
-                        p[strlen(p)] = '\0'; 
+                        p[strlen(p)] = '\0';
                         if (p[strlen(p) - 1] == '\n')
                         {
                             p[strlen(p) - 1] = '\0';
                         }
-                                               
+
                         // printf("i: %d\n", i);
                         strcpy(friends[i++], p);
                     }
-                }                
+                }
                 // frie_count = i;
             }
-            if(strstr(line, "FRIEND_REQUEST")) {
+            if (strstr(line, "FRIEND_REQUEST"))
+            {
                 p = strtok(line, " ");
-                while(p != NULL) {
+                while (p != NULL)
+                {
                     p = strtok(NULL, " ");
-                    if(p != NULL) {
+                    if (p != NULL)
+                    {
                         // printf("%s\n", p);
-                        p[strlen(p)] = '\0'; 
+                        p[strlen(p)] = '\0';
                         if (p[strlen(p) - 1] == '\n')
                         {
                             p[strlen(p) - 1] = '\0';
@@ -220,13 +272,16 @@ void readFileAccount(node *head) {
                 }
                 // frie_req_count = j;
             }
-            if(strstr(line, "WAIT_ADD_FRIEND")) {
+            if (strstr(line, "WAIT_ADD_FRIEND"))
+            {
                 p = strtok(line, " ");
-                while(p != NULL) {
+                while (p != NULL)
+                {
                     p = strtok(NULL, " ");
-                    if(p != NULL) {
+                    if (p != NULL)
+                    {
                         // printf("%s\n", p);
-                        p[strlen(p)] = '\0'; 
+                        p[strlen(p)] = '\0';
                         if (p[strlen(p) - 1] == '\n')
                         {
                             p[strlen(p) - 1] = '\0';
@@ -255,21 +310,24 @@ void readFileAccount(node *head) {
                 
             }
         }
-        temp = create(username, password, elo, current_puzzle, puzzle_point, 0, match_count, 
-        win, frie_count, frie_req_count, wait_add_friend_count, friends, friend_req, wait_add_friend);
-		*head = addtail(*head, temp);
-	}
+        temp = create(username, password, elo, current_puzzle, puzzle_point, 0, match_count,
+                      win, frie_count, frie_req_count, wait_add_friend_count, friends, friend_req, wait_add_friend);
+        *head = addtail(*head, temp);
+    }
 }
 
-void updateAccountFile(node head) {
+void updateAccountFile(node head)
+{
     FILE *file = fopen("account.txt", "w");
-    for (node p = head; p != NULL; p = p->next) {
-		fprintf(file, "%s %s\n", p->username, p->password);
-	}
-	fclose(file);
+    for (node p = head; p != NULL; p = p->next)
+    {
+        fprintf(file, "%s %s\n", p->username, p->password);
+    }
+    fclose(file);
 }
 
-void addFileAccount(node head, char username[]) {
+void addFileAccount(node head, char username[])
+{
     char friends[MAX_LENGTH];
     char friendRequest[MAX_LENGTH];
     char waitAddFriend[MAX_LENGTH];
@@ -281,33 +339,44 @@ void addFileAccount(node head, char username[]) {
     fprintf(file, "%s %d\n", "ELO", temp->elo);
     fprintf(file, "%s %d %d\n", "PUZZLE", temp->current_puzzle, temp->puzzle_point);
     fprintf(file, "%s %d\n", "MATCH_COUNT", temp->match_count);
-    fprintf(file, "%s %d\n", "WIN", temp->win);
+    fprintf(file, "%s %d\n", "WINS", temp->win);
     fprintf(file, "%s %d\n", "FRIES_COUNT", temp->frie_count);
-    for(int i = 0; i < temp->frie_count; i++) {
+    for (int i = 0; i < temp->frie_count; i++)
+    {
         strcat(friends, temp->friends[i]);
+        if(i != temp->frie_count-1)
         strcat(friends, " ");
-    }
+    }    
     fprintf(file, "%s %s\n", "FRIENDS", friends);
+    strcpy(friends, "");
     fprintf(file, "%s %d\n", "FRIE_REQ_COUNT", temp->frie_req_count);
-    for(int i = 0; i < temp->frie_req_count; i++) {
+    for (int i = 0; i < temp->frie_req_count; i++)
+    {
         strcat(friendRequest, temp->friend_req[i]);
+        if(i != temp->frie_req_count-1)
         strcat(friendRequest, " ");
     }
     fprintf(file, "%s %s\n", "FRIEND_REQUEST", friendRequest);
+    strcpy(friendRequest, "");
     fprintf(file, "%s %d\n", "WAIT_ADD_FRIE_COUNT", temp->wait_add_friend_count);
-    for(int i = 0; i < temp->wait_add_friend_count; i++) {
+    for (int i = 0; i < temp->wait_add_friend_count; i++)
+    {
         strcat(waitAddFriend, temp->wait_add_friend[i]);
+        if(i != temp->wait_add_friend_count-1)
         strcat(waitAddFriend, " ");
     }
     fprintf(file, "%s %s\n", "WAIT_ADD_FRIEND", waitAddFriend);
+    strcpy(waitAddFriend, "");
     fprintf(file, "%s", "MATCH_HISTORY");
     fclose(file);
 }
 
-int getUserCount(node head) {
+int getUserCount(node head)
+{
     node p = head;
     int i = 0;
-    while (p != NULL) {
+    while (p != NULL)
+    {
         i++;
         p = p->next;
     }
