@@ -15,7 +15,7 @@ Puzzle puzzle_list[20];
 S_BOARD pos[30];
 S_SEARCHINFO info[30];
 int movetime = 3000;
-int play_with_computer_count = 0;
+int play_with_computer[30];
 int engineSide[30];
 int depth[30]; 
 
@@ -93,9 +93,12 @@ void make_server()
         room[i].curr_num = 0;
     }
 
-    AllInit();
-
+    for(int i = 0; i < 30; i++){
+        play_with_computer[i] = -1;
+    }    
+     
     printf("Server created\n");
+    AllInit();
 
     while (1)
     {
@@ -321,6 +324,9 @@ void sv_user_use(int conn_socket)
         case VIEW_CHESS_PUZZLE_RANKING:
             ViewChessPuzzleRankServer(conn_socket, &pkg);
             break;
+        case PLAY_CHESS_PUZZLE:
+            ChessPuzzleServer(conn_socket, &pkg);
+            break;
         case VIEW_RANKING:
             ViewChessRankServer(conn_socket, &pkg);
             break;
@@ -335,6 +341,9 @@ void sv_user_use(int conn_socket)
             break;
         case LEAVE_ROOM:
             LeaveRoomServer(conn_socket, &pkg);
+            break;
+        case LEAVE_COMPUTER_MATCH:
+            LeavePlayComputerServer(conn_socket, &pkg);
             break;
         case CREATE_MATCH_WITH_COMPUTER:
             CreateMatchWithPlayer(conn_socket, &pkg);
@@ -927,6 +936,8 @@ void printPuzzle() {
 
 void ChessPuzzleServer(int conn_socket, Package *pkg)
 {
+    //Thai
+    
 }
 
 void ViewChessRankServer(int conn_socket, Package *pkg){
@@ -1060,27 +1071,25 @@ void ShowMatchHistoryServer(int conn_socket, Package *pkg)
     send(conn_socket, pkg, sizeof(*pkg), 0);    
 }
 
-void CreateMatchWithPlayer(int conn_socket, Package *pkg){
-   p = strtok(line, " ");
-                while(p != NULL) {
-                    p = strtok(NULL, " ");
-                    if(p != NULL) {
-                        // printf("%s\n", p);
-                        p[strlen(p)] = '\0'; 
-                        if (p[strlen(p) - 1] == '\n')
-                        {
-                            p[strlen(p) - 1] = '\0';
-                        }
-                                               
-                        // printf("i: %d\n", i);
-                        strcpy(friends[i++], p);
-                    }
-                }      
-    int diffcult = (int)pkg->msg[0] - 48;
-    int color = (int)pkg->msg[1] - 48;       	
-    int user_id = search_user(conn_socket);
+int SearchRoomPlayComputer(){
+    for (int i = 0; i < 30; i++)
+    {
+        if(play_with_computer[i] < 0){
+           play_with_computer[i] = 1;
+           return i;
+        }
+    }
+    return -1;    
+}
 
-    user[user_id].computer_id = play_with_computer_count++;
+void CreateMatchWithPlayer(int conn_socket, Package *pkg){
+   
+    int difficult;
+    int color;
+    sscanf(pkg->msg, "%d %d", &difficult, &color);
+       	
+    int user_id = search_user(conn_socket);
+    user[user_id].computer_id = SearchRoomPlayComputer();
     int current_id = user[user_id].computer_id;
 
     CreateNewBoard(current_id); 
@@ -1091,17 +1100,16 @@ void CreateMatchWithPlayer(int conn_socket, Package *pkg){
     setbuf(stdout, NULL);
     printf("Create Match Complete\n");
 
-    printf("MSG: %d %d\n", diffcult, color);
-	// int depth = MAXDEPTH, movetime = 3000;
+    // printf("MSG: %d %d\n", difficult, color);	
 		
-
-	engineSide[current_id] = color;
+	engineSide[current_id] = !color;
+    depth[current_id] = difficult;
 	ParseFen(START_FEN, &pos[current_id]);
     pkg->ctrl_signal = CREATE_MATCH_SUCC;  
     strcpy(pkg->msg, PrintBoard(&pos[current_id])); 
     send(conn_socket, pkg, sizeof(*pkg), 0); 
 
-    if(pos[current_id].side == color){
+    if(pos[current_id].side == engineSide[current_id]){
         info[current_id].starttime = GetTimeMs();
 		info[current_id].depth = depth[current_id];
 
@@ -1152,6 +1160,13 @@ void PlayWithPlayer(int conn_socket, Package *pkg){
         strcpy(pkg->msg, "End Game\n");
         send(conn_socket, pkg, sizeof(*pkg), 0);
     }
+}
+
+void LeavePlayComputerServer(int conn_socket, Package *pkg){
+    int user_id = search_user(conn_socket);
+    play_with_computer[user[user_id].computer_id] = -1; 
+    pkg->ctrl_signal = LEAVE_COMPUTER_MATCH_SUCC;
+    send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
 void CreateRoomServer(int conn_socket, Package *pkg)

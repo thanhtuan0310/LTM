@@ -4,6 +4,14 @@
 #include "defs.h"
 #include "string.h"
 
+#define WHITE_MATE 1 
+#define BLACK_MATE 2 
+#define DRAW_STATEMENT 3
+#define DRAW_FIFTY_MOVE 4
+#define DRAW_FOLD_REPITION 5
+#define DRAW_INSUFISIENT 6
+
+
 int ThreeFoldRep(const S_BOARD *pos) {
 
 	ASSERT(CheckBoard(pos));
@@ -34,15 +42,15 @@ int checkresult(S_BOARD *pos) {
 	ASSERT(CheckBoard(pos));
 
     if (pos->fiftyMove > 100) {
-     printf("1/2-1/2 {fifty move rule (claimed by Vice)}\n"); return TRUE;
+     printf("1/2-1/2 {fifty move rule (claimed by Vice)}\n"); return DRAW_FIFTY_MOVE;
     }
 
     if (ThreeFoldRep(pos) >= 2) {
-     printf("1/2-1/2 {3-fold repetition (claimed by Vice)}\n"); return TRUE;
+     printf("1/2-1/2 {3-fold repetition (claimed by Vice)}\n"); return DRAW_FOLD_REPITION;
     }
 
 	if (DrawMaterial(pos) == TRUE) {
-     printf("1/2-1/2 {insufficient material (claimed by Vice)}\n"); return TRUE;
+     printf("1/2-1/2 {insufficient material (claimed by Vice)}\n"); return DRAW_INSUFISIENT;
     }
 
 	S_MOVELIST list[1];
@@ -66,12 +74,12 @@ int checkresult(S_BOARD *pos) {
 
 	if(InCheck == TRUE)	{
 	    if(pos->side == WHITE) {
-	      printf("0-1 {black mates (claimed by Vice)}\n");return TRUE;
+	      printf("0-1 {black mates (claimed by Vice)}\n");return BLACK_MATE;
         } else {
-	      printf("0-1 {white mates (claimed by Vice)}\n");return TRUE;
+	      printf("0-1 {white mates (claimed by Vice)}\n");return WHITE_MATE;
         }
     } else {
-      printf("\n1/2-1/2 {stalemate (claimed by Vice)}\n");return TRUE;
+      printf("\n1/2-1/2 {stalemate (claimed by Vice)}\n");return DRAW_STATEMENT;
     }
 	return FALSE;
 }

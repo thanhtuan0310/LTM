@@ -5,20 +5,14 @@
 #include "error.h"
 #include "account_manager.h"
 #include "defs.h"
-// #include "Chess/xboard.c"
-// #include "Chess/vice.c"
-// #include "Chess/uci.c"
-// #include "Chess/evaluate.c"
-// #include "Chess/pvtable.c"
-// #include "Chess/init.c"
-// #include "Chess/bitboards.c"
+
 
 #define WAC1 "r1b1k2r/ppppnppp/2n2q2/2b5/3NP3/2P1B3/PP3PPP/RN1QKB1R w KQkq - 0 1"
 #define PERFT "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 8080
-#define MAX_USER 2
+#define MAX_USER 30
 #define MAX_GROUP 10
 #define MAX_ROOM 10
 #define EMPTY_STRING "EMPTY_STRING"
@@ -314,6 +308,8 @@ void ShowMatchHistoryServer(int conn_socket, Package *pkg);
 void CreateMatchWithPlayer(int conn_socket, Package *pkg);
 
 void PlayWithPlayer(int conn_socket, Package *pkg);
+
+void LeavePlayComputerServer(int conn_socket, Package *pkg);
 
 void CreateRoomServer(int conn_socket, Package *pkg);
 

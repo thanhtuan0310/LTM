@@ -114,6 +114,8 @@ void PlayWithComputer(int client_socket, int diffcult, int color);
 
 void InRoomWithComputer(int client_socket);
 
+void LeavePlayComputer(int client_socket);
+
 void CreateRoom(int client_socket);
 
 void JointRoom(int client_socket);

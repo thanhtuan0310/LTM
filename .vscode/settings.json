@@ -3,6 +3,7 @@
         "stdio.h": "c",
         "server.h": "c",
         "defs.h": "c",
-        "account_manager.h": "c"
+        "account_manager.h": "c",
+        "string.h": "c"
     }
 }

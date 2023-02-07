@@ -270,6 +270,11 @@ void *read_msg(void *param)
             curr_group_id = -1;
             playing = 0;
             break;
+        case LEAVE_COMPUTER_MATCH_SUCC:
+            printf("\nLeave Match Success \n");
+            playing = 0;
+            join_succ = 0;
+            break;
         case SENT_FRIEND_REQUEST_SUCC:
             printf("\n%s \n", pkg.msg);
             break;
@@ -447,7 +452,7 @@ void ViewInformation(int client_socket)
 
 void ChessPuzzle(int client_socket)
 {
-
+    //Thai
 }
 
 void ViewChessRank(int client_socket){
@@ -569,8 +574,8 @@ void ShowChooseColor(int client_socket, int diffcult)
     // send(client_socket, &pkg, sizeof(pkg), 0);
     // xu ly
     int choice = 0;    
-    while (1)
-    {
+    // while (1)
+    // {
         sleep(1);
 
         ChooseColorMenu();
@@ -592,7 +597,7 @@ void ShowChooseColor(int client_socket, int diffcult)
         default:
             return;
         }
-    }
+    // }
 }
 
 void ShowPlayPlayer(int client_socket)
@@ -655,6 +660,7 @@ void ShowChessPuzzle(int client_socket)
             ViewChessPuzzleRank(client_socket);
             break;
         case 2:
+            ChessPuzzle(client_socket);
             // new_group(client_socket);
             break;
         case 3:
@@ -804,11 +810,14 @@ void InRoomWithComputer(int client_socket){
 		fflush(stdout);
 		if (!fgets(msg, 80, stdin))
 		continue;   
+        if(msg[strlen(msg) - 1] == '\n')
+        msg[strlen(msg) - 1] = '\0';
+        printf("%s\n", msg);
         if (strcmp(msg, "leave") == 0)
         {
             printf("leave\n");
-            LeaveRoom(client_socket);
             in_room = 0;
+            LeavePlayComputer(client_socket);                        
             break;
         }        
         
@@ -817,6 +826,14 @@ void InRoomWithComputer(int client_socket){
         send(client_socket, &pkg, sizeof(pkg), 0);
         sleep(1);
     }
+}
+
+void LeavePlayComputer(int client_socket)
+{
+    Package pkg;
+    pkg.ctrl_signal = LEAVE_COMPUTER_MATCH;            
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);    
 }
 
 void InRoom(int client_socket)
