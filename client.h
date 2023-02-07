@@ -6,12 +6,8 @@
 #include "error.h"
 #include "util.h"
 
-//* Menu
 /**
  * Menu đăng nhập
- * 1. Login
- * 2. CreateAccount
- * 3. Quit
 */
 void LoginMenu();
 
@@ -25,6 +21,11 @@ void MainMenu();
  Chọn độ khó của máy
 */
 void ChooseDifficultyComputer();
+
+/**
+ Menu chọn màu quân
+*/
+void ChooseColorMenu();
 
 /**
  Giao diện chơi với người
@@ -107,6 +108,14 @@ void ShowFriendMenu(int client_socket);
 
 void ShowMatchHistoryMenu(int client_socket);
 
+void ShowChooseColor(int client_socket, int diffcult);
+
+void PlayWithComputer(int client_socket, int diffcult, int color);
+
+void InRoomWithComputer(int client_socket);
+
+void LeavePlayComputer(int client_socket);
+
 void CreateRoom(int client_socket);
 
 void JointRoom(int client_socket);
@@ -120,6 +129,8 @@ void AddFriend(int client_socket);
 void RemoveFriend(int client_socket);
 
 void ReplyRequestFriend(int client_socket);    
+
+void ReplyRequestFriend2(int client_socket);    
 
 void InRoom(int client_socket);
 

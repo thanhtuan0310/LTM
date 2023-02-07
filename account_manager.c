@@ -190,7 +190,12 @@ void readFileAccount(node *head) {
                     p = strtok(NULL, " ");
                     if(p != NULL) {
                         // printf("%s\n", p);
-                        p[strlen(p)] = '\0';                        
+                        p[strlen(p)] = '\0'; 
+                        if (p[strlen(p) - 1] == '\n')
+                        {
+                            p[strlen(p) - 1] = '\0';
+                        }
+                                               
                         // printf("i: %d\n", i);
                         strcpy(friends[i++], p);
                     }
@@ -203,6 +208,11 @@ void readFileAccount(node *head) {
                     p = strtok(NULL, " ");
                     if(p != NULL) {
                         // printf("%s\n", p);
+                        p[strlen(p)] = '\0'; 
+                        if (p[strlen(p) - 1] == '\n')
+                        {
+                            p[strlen(p) - 1] = '\0';
+                        }
                         strcpy(friend_req[j++], p);
                     }
                 }
@@ -214,6 +224,11 @@ void readFileAccount(node *head) {
                     p = strtok(NULL, " ");
                     if(p != NULL) {
                         // printf("%s\n", p);
+                        p[strlen(p)] = '\0'; 
+                        if (p[strlen(p) - 1] == '\n')
+                        {
+                            p[strlen(p) - 1] = '\0';
+                        }
                         strcpy(wait_add_friend[k++], p);
                     }
                 }

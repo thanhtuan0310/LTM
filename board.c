@@ -1,7 +1,10 @@
 // board.c
 
 #include "stdio.h"
+#include "string.h"
 #include "defs.h"
+
+char board[1024];
 
 int PceListOk(const S_BOARD *pos) {
 	int pce = wP;
@@ -292,27 +295,44 @@ void ResetBoard(S_BOARD *pos) {
 	pos->posKey = 0ULL;
 
 }
-void PrintBoard(const S_BOARD *pos) {
+char *PrintBoard(const S_BOARD *pos) {
 
-	int sq,file,rank,piece;
-
-	printf("\nGame Board:\n\n");
+	int sq,file,rank,piece;	
+    char tmp[30];
+	char tmp2[20];
+	// printf("\nGame Board:\n\n");
+    strcpy(board, "\nGame Board:\n\n");
 
 	for(rank = RANK_8; rank >= RANK_1; rank--) {
-		printf("%d  ",rank+1);
+		// printf("%d  ",rank+1);
+		sprintf(tmp, "%d", rank+1);
+		strcat(board, tmp);
+		strcat(board, "  ");
 		for(file = FILE_A; file <= FILE_H; file++) {
 			sq = FR2SQ(file,rank);
 			piece = pos->pieces[sq];
-			printf("%3c",PceChar[piece]);
+			// printf("%3c",PceChar[piece]);
+			tmp2[0] = PceChar[piece];
+			tmp2[1] = '\0';
+			strcat(board, tmp2);
+			strcat(board, "  ");
 		}
-		printf("\n");
+		strcat(board, "\n");
 	}
 
-	printf("\n   ");
+	// printf("\n   ");
+	strcat(board, "\n   ");
+
 	for(file = FILE_A; file <= FILE_H; file++) {
-		printf("%3c",'a'+file);
+		// printf("%3c",'a'+file);
+		tmp2[0] = 'a'+file;
+		tmp2[1] = '\0';
+		strcat(board, tmp2);
+		strcat(board, "  ");
 	}
-	printf("\n\n\n");
+	// printf("\n\n\n");
+	strcat(board, "\n\n");
+	return board;
 	// printf("side:%c\n",SideChar[pos->side]);
 	// printf("enPas:%d\n",pos->enPas);
 	// printf("castle:%c%c%c%c\n",

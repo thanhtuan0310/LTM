@@ -21,7 +21,7 @@
 #define ERR_FULL_MEM  -208 /*full nguoi*/
 #define ERR_IS_MEM  -209 /*da la thanh vien trong nhom*/
 #define ERR_FULL_FRIEND -211 /* số lượng bạn bè đã đạt tối đa */
-
+#define ERR_MOVE -212
 /**
  * Hiển thị thông báo lỗi
  * @param err_code mã lỗi

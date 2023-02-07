@@ -232,13 +232,17 @@ void *read_msg(void *param)
             printf("%s\n", pkg.msg);
             break;
         case JOINT_ROOM_SUCC:
-            printf("Current room: %s \n", pkg.msg);
+            printf("Joint Room %s Success\n", pkg.msg);
             strcpy(curr_room_name, pkg.msg);
             curr_group_id = pkg.group_id;
             join_succ = 1;
+            // InRoom(client_socket);
             break;
-
-
+        case CREATE_MATCH_SUCC:
+            printf("Start Game!\n");
+            printf("\n%s \n", pkg.msg);
+            join_succ = 1;
+            break;
         case VIEW_FRIEND:
             printf("\n%s \n", pkg.msg);
             break;
@@ -254,17 +258,23 @@ void *read_msg(void *param)
             // case SHOW_GROUP:
             //     printf("Your group: \n%s \n", pkg.msg);
             //     break;
-
-
         case CREATE_ROOM_SUCC:
             printf("Complete create: %s \n", pkg.msg);
             curr_group_id = pkg.group_id;
+            playing = 0;
             join_succ = 1;
             break;
         case LEAVE_ROOM_SUCC:
             printf("\n%s \n", pkg.msg);
             join_succ = 0;
             curr_group_id = -1;
+            playing = 0;
+            break;
+        case LEAVE_COMPUTER_MATCH_SUCC:
+            printf("\nLeave Match Success \n");
+            playing = 0;
+            join_succ = 0;
+            break;
         case SENT_FRIEND_REQUEST_SUCC:
             printf("\n%s \n", pkg.msg);
             break;
@@ -274,11 +284,28 @@ void *read_msg(void *param)
         case ADD_FRIEND_SUCC:
             printf("\nAdd friend sucessfully! \n");
             break;
+        case SHOW_FRIEND_REQUEST:
+            ReplyRequestFriend2(client_socket);
+            break;
+        case SHOW_FRIEND_REQUEST_ERROR:
+            printf("\n%s \n", pkg.msg);
+            break;
+        case SHOW_FRIEND_REQUEST_2:
+            printf("\n%s \n", pkg.msg);
+            //add or delete request
+            break;
         case START_GAME:
+        printf("\n%s \n", pkg.msg);
             playing = 1;
+            break;
+        case PLAY_MOVE_SUCC:
+            printf("\n%s \n", pkg.msg);
             break;
         case ERR_FULL_FRIEND:
             printf("Full Friend\n");
+            break;
+        case FRIEND_REQUEST_SUCC:
+            printf("\n%s \n", pkg.msg);
             break;
         // case JOIN_GROUP_SUCC:
         //     printf("Current group: %s \n", pkg.msg);
@@ -323,6 +350,9 @@ void *read_msg(void *param)
         // case LEAVE_GROUP_SUCC:
         //     printf("%s\n", pkg.msg);
         //     break;
+        case ERR_MOVE:
+            printf("Command unknown:\n");
+            break;
         case LOG_OUT:
             sleep(1);
             pthread_exit(NULL);
@@ -423,6 +453,14 @@ void ChooseDifficultyComputer()
     printf("4. Return main menu\n\n");
 }
 
+void ChooseColorMenu()
+{
+    printf("-------Choose Color--------\n");
+    printf("1. White\n");
+    printf("2. Black\n");    
+    printf("3. Return Choose Difficulty\n\n");
+}
+
 void PlayWithOtherPlayerMenu()
 {
     printf("-------Play With Other Player--------\n");
@@ -461,6 +499,7 @@ void MatchHistoryMenu()
 void ViewInformation(int client_socket)
 {
     // Ngoc
+    printf("INFORMATION\n");
     Package pkg;
     pkg.ctrl_signal = VIEW_INFORMATION;
     send(client_socket, &pkg, sizeof(pkg), 0);
@@ -469,6 +508,7 @@ void ViewInformation(int client_socket)
 
 void ChessPuzzle(int client_socket)
 {
+    //Thai
 }
 
 void ViewChessRank(int client_socket){
@@ -534,13 +574,51 @@ void AddFriend(int client_socket)
 void RemoveFriend(int client_socket)
 {
     // Thai
+    Package pkg;
+    char unfriend_name[USERNAME_SIZE]; 
+
+    printf("Enter you friend to delete: ");
+    fgets(unfriend_name, USERNAME_SIZE, stdin);
+    unfriend_name[strlen(unfriend_name) - 1] = '\0';
+    strcpy(pkg.sender,my_username);
+    strcpy(pkg.receiver,unfriend_name);
+    pkg.ctrl_signal = REMOVE_FRIEND;
+    send(client_socket, &pkg, sizeof(pkg), 0);
 }
 
 void ReplyRequestFriend(int client_socket)
 {
     // Thai
-
+    Package pkg;
+    pkg.ctrl_signal = SHOW_FRIEND_REQUEST;
+    strcpy(pkg.sender, my_username);
+    send(client_socket, &pkg, sizeof(pkg), 0);
 }
+
+void ReplyRequestFriend2(int client_socket)
+{
+    // Thai
+    Package pkg;
+    pkg.ctrl_signal = SHOW_FRIEND_REQUEST_2;
+    char friend_request[USERNAME_SIZE];
+    printf("Enter name: ");
+    fgets(friend_request, USERNAME_SIZE, stdin);
+    friend_request[strlen(friend_request) - 1] = '\0';
+    strcpy(pkg.sender, my_username);
+    strcpy(pkg.receiver,friend_request);
+    char check;
+    printf("Do you want to be friends with this person? Y/n : ");
+    scanf("%c",&check);
+    if (check=='Y')
+    {
+        pkg.ctrl_signal = ACCEPT;
+    } else {
+        pkg.ctrl_signal = NO_ACCEPT;
+    }
+    
+    send(client_socket, &pkg, sizeof(pkg), 0);
+}
+
 
 void ShowPlayComputer(int client_socket)
 {
@@ -549,7 +627,7 @@ void ShowPlayComputer(int client_socket)
     send(client_socket, &pkg, sizeof(pkg), 0);
     // xu ly
     int choice = 0;
-
+    int diffcult = 0;
     while (1)
     {
         sleep(1);
@@ -562,18 +640,58 @@ void ShowPlayComputer(int client_socket)
         switch (choice)
         {
         case 1:
+            // PlayWithComputer(client_socket);
+            diffcult = COMPUTER_EASY;
+            ShowChooseColor(client_socket, diffcult);
             // show_group(client_socket);
             break;
         case 2:
+            diffcult = COMPUTER_NORMAL;
             // new_group(client_socket);
+            ShowChooseColor(client_socket, diffcult);
             break;
         case 3:
             // join_group(client_socket);
+            diffcult = COMPUTER_HARD;
+            ShowChooseColor(client_socket, diffcult);
             break;
         default:
             return;
         }
     }
+}
+
+void ShowChooseColor(int client_socket, int diffcult)
+{
+    Package pkg;
+    // pkg.ctrl_signal = CHOOSE_DIFFCULT;
+    // send(client_socket, &pkg, sizeof(pkg), 0);
+    // xu ly
+    int choice = 0;    
+    // while (1)
+    // {
+        sleep(1);
+
+        ChooseColorMenu();
+        printf("Your choice: \n");
+        scanf("%d", &choice);
+        clear_stdin_buff();
+
+        switch (choice)
+        {
+        case 1:
+            PlayWithComputer(client_socket, diffcult, 0);
+            break;
+        case 2:
+            PlayWithComputer(client_socket, diffcult, 1);             
+            break;
+        case 3:
+                       
+            break;
+        default:
+            return;
+        }
+    // }
 }
 
 void ShowPlayPlayer(int client_socket)
@@ -636,6 +754,7 @@ void ShowChessPuzzle(int client_socket)
             ViewChessPuzzleRank(client_socket);
             break;
         case 2:
+            ChessPuzzle(client_socket);
             // new_group(client_socket);
             break;
         case 3:
@@ -676,7 +795,8 @@ void ShowFriendMenu(int client_socket)
 
             RemoveFriend(client_socket);
             break;
-
+        case 4:
+            ReplyRequestFriend(client_socket);
         default:
             return;
         }
@@ -717,6 +837,24 @@ void ShowMatchHistoryMenu(int client_socket)
     }
 }
 
+void PlayWithComputer(int client_socket, int diffcult, int color){
+    char diff[3], colo[3];
+    Package pkg;
+    pkg.ctrl_signal = CREATE_MATCH_WITH_COMPUTER;
+    sprintf(diff, "%d", diffcult);
+    strcpy(pkg.msg, diff);
+    sprintf(colo, "%d", color);
+    strcat(pkg.msg, " ");
+    strcat(pkg.msg, colo);
+    printf("MSG: %s\n", pkg.msg);
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
+    if (join_succ == 1)
+    {
+        InRoomWithComputer(client_socket);
+    }
+}
+
 void CreateRoom(int client_socket)
 {
     Package pkg;
@@ -732,7 +870,7 @@ void CreateRoom(int client_socket)
 void JointRoom(int client_socket)
 {
     // show_group(client_socket);
-    sleep(1);
+    // sleep(1);
     Package pkg;
     pkg.ctrl_signal = JOINT_ROOM;
     /* chon group*/
@@ -746,18 +884,57 @@ void JointRoom(int client_socket)
     sleep(1);
     if (join_succ == 1)
     {
-        printf("Joint success\n");
+        // printf("Joint success\n");
         InRoom(client_socket);
     }
     else
         return;
 }
 
-void InRoom(int client_socket)
-{
+void InRoomWithComputer(int client_socket){
+    Package pkg;
     int in_room = 1;
     char msg[MSG_SIZE];
 
+    RoomTutorial();
+    while (in_room)
+    {    
+        printf("\nYour turn: ");
+		fflush(stdout);
+		memset(&msg[0], 0, sizeof(msg));
+		fflush(stdout);
+		if (!fgets(msg, 80, stdin))
+		continue;   
+        if(msg[strlen(msg) - 1] == '\n')
+        msg[strlen(msg) - 1] = '\0';
+        printf("%s\n", msg);
+        if (strcmp(msg, "leave") == 0)
+        {
+            printf("leave\n");
+            in_room = 0;
+            LeavePlayComputer(client_socket);                        
+            break;
+        }        
+        
+        pkg.ctrl_signal = PLAY_MOVE;
+        strcpy(pkg.msg, msg);
+        send(client_socket, &pkg, sizeof(pkg), 0);
+        sleep(1);
+    }
+}
+
+void LeavePlayComputer(int client_socket)
+{
+    Package pkg;
+    pkg.ctrl_signal = LEAVE_COMPUTER_MATCH;            
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);    
+}
+
+void InRoom(int client_socket)
+{
+    int in_room = 1;
+    char msg[MSG_SIZE] = "";    
     RoomTutorial();
     while (in_room)
     {
@@ -768,7 +945,8 @@ void InRoom(int client_socket)
             if (strcmp(msg, "leave") == 0){
                 in_room = 0;
                 break;
-            }               
+            } else
+        printf("%s\n", msg);              
         }
         if (strcmp(msg, "leave") == 0)
         {
@@ -776,6 +954,8 @@ void InRoom(int client_socket)
             LeaveRoom(client_socket);
             in_room = 0;
         }
+        else
+        printf("%s\n", msg);
     }
 }
 
@@ -792,6 +972,7 @@ void LeaveRoom(int client_socket)
 void RoomTutorial()
 {
     printf("TUTORIALS\n");
+    printf("Wait other player\n");
 }
 
 // main

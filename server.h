@@ -4,10 +4,15 @@
 #include "network.h"
 #include "error.h"
 #include "account_manager.h"
+#include "defs.h"
+
+
+#define WAC1 "r1b1k2r/ppppnppp/2n2q2/2b5/3NP3/2P1B3/PP3PPP/RN1QKB1R w KQkq - 0 1"
+#define PERFT "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 8080
-#define MAX_USER 2
+#define MAX_USER 30
 #define MAX_GROUP 10
 #define MAX_ROOM 10
 #define EMPTY_STRING "EMPTY_STRING"
@@ -20,6 +25,7 @@ typedef struct Active_user_ {
     int socket; /* Socket người dùng dùng để kết nối đến server */
     int group_id[MAX_GROUP]; /*Group hien tai*/ 
     int room_id;
+    int computer_id; /*Id dùng để chơi với máy hiện tại*/
 } Active_user;
 
 //* Group
@@ -299,6 +305,12 @@ void ShowFriendServer(int conn_socket, Package *pkg);
 
 void ShowMatchHistoryServer(int conn_socket, Package *pkg);
 
+void CreateMatchWithPlayer(int conn_socket, Package *pkg);
+
+void PlayWithPlayer(int conn_socket, Package *pkg);
+
+void LeavePlayComputerServer(int conn_socket, Package *pkg);
+
 void CreateRoomServer(int conn_socket, Package *pkg);
 
 int AddRoom(Active_user *user, int room_id);
@@ -317,11 +329,19 @@ void RemoveFriendServer(int conn_socket, Package *pkg);
 
 void DeleteFriendRequest(node account_friend, char sender_name[]);
 
+int DeleteFriend(node account_friend, char sender_name[]);
+
 int CheckWaitRequestFriend(node account_friend, char sender_name[]);
 
 void ReplyFriendServer(int conn_socket, Package *pkg);
 
+void AcceptFriend(int conn_socket, Package *pkg);
+
+void NotAcceptFriend(int conn_socket, Package *pkg);
+
 int SearchRoom(Room room[], Active_user user, char *name);
+
+void CreateNewBoard();
 
 node getAccountBySocket(int conn_socket);
 void CheckFriendRequest(node user, int conn_socket);
