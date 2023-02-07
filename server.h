@@ -299,50 +299,129 @@ Chơi với người
 */
 void ShowPlayWithPlayer();
 
+/**
+Giải thế cờ 
+*/
 void ShowChessPuzzleServer(int conn_socket, Package *pkg);
 
+/**
+Hiển thị danh sách bạn bè đến client 
+*/
 void ShowFriendServer(int conn_socket, Package *pkg);
 
+/**
+Hiển thị lịch sử chơi cờ đến client
+*/
 void ShowMatchHistoryServer(int conn_socket, Package *pkg);
 
+/**
+Tạo trận đấu khi bắt cặp thành công người chơi
+*/
 void CreateMatchWithPlayer(int conn_socket, Package *pkg);
 
+/**
+Chơi cờ người giữa người với người
+*/
 void PlayWithPlayer(int conn_socket, Package *pkg);
 
+/**
+Thoát trận đấu ở chế độ chơi với máy 
+*/
 void LeavePlayComputerServer(int conn_socket, Package *pkg);
 
+/**
+Server tạo phòng chơi khi nhận yêu cầu từ phía client
+*/
 void CreateRoomServer(int conn_socket, Package *pkg);
 
+/**
+Thêm id phòng cho người chơi
+*/
 int AddRoom(Active_user *user, int room_id);
 
+/**
+Thêm người chơi vào phòng
+*/
 int AddPlayerInRoom(Active_user user, Room *room);
 
+/**
+Thêm người chơi vào phòng khi nhận yêu cầu từ phía client
+*/
 void JointRoomServer(int conn_socket, Package *pkg);
 
+/**
+Rời phòng chơi
+*/
 void LeaveRoomServer(int conn_socket, Package *pkg);
 
+/**
+Gửi danh sách bạn bè đến client
+*/
 void ViewFriendServer(int conn_socket, Package *pkg);
 
+/**
+Gửi yêu cầu kết bạn đến client khác khi nhận yêu cầu kết bạn
+*/
 void AddFriendServer(int conn_socket, Package *pkg);
 
+/**
+Hủy kết bạn khi nhận yêu cầu từ client
+*/
 void RemoveFriendServer(int conn_socket, Package *pkg);
 
+/**
+Xóa yêu cầu kết bạn
+*/
 void DeleteFriendRequest(node account_friend, char sender_name[]);
 
+/**
+Xóa bạn bè khi nhận yêu cầu từ phía client
+*/
 int DeleteFriend(node account_friend, char sender_name[]);
 
+/**
+Kiểm tra xem có yêu cầu kết bạn nào không
+*/
 int CheckWaitRequestFriend(node account_friend, char sender_name[]);
 
+/**
+Phản hồi yêu cầu kết bạn
+*/
 void ReplyFriendServer(int conn_socket, Package *pkg);
 
+/**
+Chấp nhận lời mời kết bạn
+*/
 void AcceptFriend(int conn_socket, Package *pkg);
 
+/**
+Không chấp nhận lời mời kết bạn
+*/
 void NotAcceptFriend(int conn_socket, Package *pkg);
 
+/**
+Tìm kiếm phòng chơi
+*/
 int SearchRoom(Room room[], Active_user user, char *name);
 
+/**
+Tạo bàn cờ mới
+*/
 void CreateNewBoard();
 
+/**
+Lấy tài khoản người chơi thông qua socket
+*/
 node getAccountBySocket(int conn_socket);
+
+/**
+Check yêu cầu kết bạn và gửi đến client thông báo lời mời kết bạn
+*/
 void CheckFriendRequest(node user, int conn_socket);
+
+/**
+Tìm người chơi gợi ý kết bạn theo elo
+*/
+node searchRecommendFriendByElo(int conn_socket, Package *pkg);
+
 #endif
