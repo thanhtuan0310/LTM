@@ -77,7 +77,7 @@ void make_server()
     readFileChessPuzzle();
     // printPuzzle();
     // printFriendList(acc_list);
-    printLists(acc_list);
+    // printLists(acc_list);
     listen_socket = create_listen_socket();
     for (int i = 0; i < MAX_USER; i++)
     {
@@ -296,10 +296,7 @@ void sv_user_use(int conn_socket)
         if (recv(conn_socket, &pkg, sizeof(pkg), 0) > 0) // printf("Receive from %d\n", conn_socket);
             printf("%d chooses %d \n", conn_socket, pkg.ctrl_signal);
         switch (pkg.ctrl_signal)
-        {
-        case PRIVATE_CHAT:
-            sv_private_chat(conn_socket, &pkg);
-            break;
+        {        
 
         case CHOOSE_DIFFCULT:
             ChooseDiffcultServer(conn_socket, &pkg);
@@ -341,10 +338,7 @@ void sv_user_use(int conn_socket)
             break;
         case CREATE_ROOM:
             CreateRoomServer(conn_socket, &pkg);
-            break;
-        case SHOW_USER:
-            sv_active_user(conn_socket, &pkg);
-            break;
+            break;        
         case LEAVE_ROOM:
             LeaveRoomServer(conn_socket, &pkg);
             break;
@@ -363,16 +357,7 @@ void sv_user_use(int conn_socket)
         case LOG_OUT:
             login = 0;
             sv_logout(conn_socket, &pkg);
-            break;
-        // case GROUP_CHAT_INIT:
-        //     sv_group_chat_init(conn_socket, &pkg);
-        //     break;
-        // case SHOW_GROUP:
-        //     sv_show_group(conn_socket, &pkg);
-        //     break;
-        // case NEW_GROUP:
-        //     sv_new_group(conn_socket, &pkg);
-        //     break;
+            break;       
         case JOINT_ROOM:
             JointRoomServer(conn_socket, &pkg);
             break;
@@ -393,22 +378,7 @@ void sv_user_use(int conn_socket)
             break;
         case NO_ACCEPT:
             NotAcceptFriend(conn_socket, &pkg);
-            break;
-        // case HANDEL_GROUP_MESS:
-        //     // hien ra thong tin phong
-        //     break;
-        // case INVITE_FRIEND:
-        //     sv_invite_friend(conn_socket, &pkg);
-        //     break;
-        // case GROUP_CHAT:
-        //     sv_group_chat(conn_socket, &pkg);
-        //     break;
-        // case GROUP_INFO:
-        //     sv_show_group_info(conn_socket, &pkg);
-        //     break;
-        // case LEAVE_GROUP:
-        //     sv_leave_group(conn_socket, &pkg);
-        //     break;
+            break;        
         default:
             break;
         }
@@ -443,66 +413,7 @@ void sv_user_use(int conn_socket)
     }
 }
 
-void sv_active_user(int conn_socket, Package *pkg)
-{
 
-    char user_list[MSG_SIZE] = {0};
-    for (int i = 0; i < MAX_USER; i++)
-    {
-        if (user[i].socket > 0)
-        {
-            strcat(user_list, user[i].username);
-            int len = strlen(user_list);
-            user_list[len] = ' ';
-        }
-    }
-    strcpy(pkg->msg, user_list);
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-void sv_private_chat(int conn_socket, Package *pkg)
-{
-
-    printf("%d: %s to %s: %s\n", pkg->ctrl_signal, pkg->sender, pkg->receiver, pkg->msg);
-
-    int i = 0;
-
-    for (i = 0; i < MAX_USER; i++)
-    {
-        if (strcmp(pkg->receiver, user[i].username) == 0 && user[i].socket > 0)
-        {
-            // recv_socket = user[i].socket;
-            send(user[i].socket, pkg, sizeof(*pkg), 0);
-            break;
-        }
-    }
-
-    if (i == MAX_USER)
-        pkg->ctrl_signal = ERR_INVALID_RECEIVER;
-    else
-        pkg->ctrl_signal = MSG_SENT_SUCC;
-
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-void sv_chat_all(int conn_socket, Package *pkg)
-{
-    printf("%d: %s to all: %s\n", pkg->ctrl_signal, pkg->sender, pkg->msg);
-
-    int i = 0;
-
-    for (i = 0; i < MAX_USER; i++)
-    {
-        if (user[i].socket > 0)
-            send(user[i].socket, pkg, sizeof(*pkg), 0);
-    }
-
-    pkg->ctrl_signal = MSG_SENT_SUCC;
-
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-// 17/1/2023
 int search_user(int conn_socket)
 {
     int i = 0;
@@ -513,70 +424,20 @@ int search_user(int conn_socket)
     }
     return -1;
 }
-int sv_search_id_user(Active_user user[], char *user_name)
-{
-    int user_id = -1;
-    int i = 0;
-    for (i = 0; i < MAX_USER; i++)
-    {
-        if (strcmp(user[i].username, user_name) == 0 && user[i].socket >= 0)
-        {
-            user_id = i;
-            return user_id;
-        }
-    }
-    return -1;
-}
+
 int sv_search_id_user_group(Group group, char *user_name)
 {
     int i = 0;
     for (i = 0; i < MAX_USER; i++)
     {
         if (strcmp(group.group_member[i].username, user_name) == 0)
-        {
-            // printf("%d %s\n", i, user_name);
+        {            
             return i;
         }
     }
     return -1;
 }
 
-void sv_group_chat_init(int conn_socket, Package *pkg)
-{
-    strcpy(pkg->msg, "CHUC NANG CHAT NHOM\n");
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-void sv_show_group(int conn_socket, Package *pkg)
-{
-    int user_id = search_user(conn_socket);
-    char group_list[MSG_SIZE] = {0};
-    int group_id;
-    for (int i = 0; i < MAX_GROUP; i++)
-    {
-        if (user[user_id].group_id[i] >= 0)
-        {
-            int group_id = user[user_id].group_id[i];
-            strcat(group_list, group[group_id].group_name);
-            int len = strlen(group_list);
-            group_list[len] = '\n';
-        }
-    }
-    strcpy(pkg->msg, group_list);
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-// new group
-
-int check_user_in_group(Active_user user, int group_id)
-{
-    int i = 0;
-    for (i = 0; i < MAX_GROUP; i++)
-    {
-        if (user.group_id[i] == group_id)
-            return 1;
-    }
-    return 0;
-}
 int sv_add_group_user(Active_user *user, int group_id)
 {
     for (int i = 0; i < MAX_GROUP; i++)
@@ -590,239 +451,6 @@ int sv_add_group_user(Active_user *user, int group_id)
     return 0;
 }
 
-int sv_add_user(Active_user user, Group *group)
-{
-    int i = 0;
-    for (i = 0; i < MAX_USER; i++)
-    {
-        if (group->group_member[i].socket < 0)
-        {
-            group->group_member[i].socket = user.socket;
-            strcpy(group->group_member[i].username, user.username);
-            group->curr_num++;
-            return i;
-        }
-    }
-    return 0;
-}
-
-void print_members(Group group)
-{
-    printf("MEMBERS OF GROUP %s: \n", group.group_name);
-    for (int i = 0; i < MAX_USER; i++)
-    {
-        if (group.group_member[i].socket > 0)
-        {
-            printf("%s\n", group.group_member[i].username);
-        }
-    }
-}
-void sv_new_group(int conn_socket, Package *pkg)
-{
-    int user_id = search_user(conn_socket);
-    int group_id = -1;
-    for (int i = 0; i < MAX_GROUP; i++)
-    {
-        if (group[i].curr_num == 0)
-        {
-            group_id = i;
-            sv_add_group_user(&user[user_id], group_id);
-            sv_add_user(user[user_id], &group[i]);
-            sprintf(group[i].group_name, "Group_%d", group_id);
-            break;
-        }
-    }
-    strcpy(pkg->msg, group[group_id].group_name);
-    pkg->ctrl_signal = MSG_MAKE_GROUP_SUCC;
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-// join group
-int sv_search_id_group(Group group[], Active_user user, char *group_name)
-{
-    int i;
-    int group_id = -1;
-    for (i = 0; i < MAX_GROUP; i++)
-    {
-        if (user.group_id[i] >= 0)
-        {
-            group_id = user.group_id[i];
-            if (strcmp(group[group_id].group_name, group_name) == 0)
-            {
-                // printf("%s\n",group[i].group_name);
-                return group_id;
-            }
-        }
-    }
-    return -1;
-}
-
-void sv_join_group(int conn_socket, Package *pkg)
-{
-    char group_name[GROUP_NAME_SIZE];
-    int group_id = -1;
-    int user_id = -1;
-
-    user_id = search_user(conn_socket);
-    strcpy(group_name, pkg->msg);
-    group_id = sv_search_id_group(group, user[user_id], group_name);
-    if (group_id >= 0)
-    {
-        printf("%s JOIN GROUP %s\n", pkg->sender, group[group_id].group_name);
-        strcpy(pkg->msg, group_name);
-        pkg->ctrl_signal = JOIN_GROUP_SUCC;
-        pkg->group_id = group_id;
-        send(conn_socket, pkg, sizeof(*pkg), 0);
-    }
-    else
-    {
-        pkg->ctrl_signal = ERR_GROUP_NOT_FOUND;
-        send(conn_socket, pkg, sizeof(*pkg), 0);
-    }
-}
-
-void sv_invite_friend(int conn_socket, Package *pkg)
-{
-    char friend_name[USERNAME_SIZE];
-    int user_id = search_user(conn_socket);
-    int friend_id;
-    int group_id;
-
-    group_id = pkg->group_id;
-    strcpy(friend_name, pkg->receiver);
-    friend_id = sv_search_id_user(user, friend_name);
-    if (friend_id >= 0)
-    {
-        if (friend_id == user_id)
-        {
-            pkg->ctrl_signal = ERR_IVITE_MYSELF;
-            send(conn_socket, pkg, sizeof(*pkg), 0);
-            return;
-        }
-        else if (group[group_id].curr_num > MAX_USER - 1)
-        {
-            pkg->ctrl_signal = ERR_FULL_MEM;
-            send(conn_socket, pkg, sizeof(*pkg), 0);
-            return;
-        }
-        else if (check_user_in_group(user[friend_id], group_id))
-        {
-            pkg->ctrl_signal = ERR_FULL_MEM;
-            send(conn_socket, pkg, sizeof(*pkg), 0);
-            return;
-        }
-        else // thanh cong
-        {
-            send(user[friend_id].socket, pkg, sizeof(*pkg), 0);
-            printf("%s add %s to %s\n", user[user_id].username,
-                   user[friend_id].username, group[group_id].group_name);
-            sv_add_group_user(&user[friend_id], group_id);
-            sv_add_user(user[friend_id], &group[group_id]);
-
-            strcpy(pkg->msg, "Successful invite");
-            pkg->ctrl_signal = INVITE_FRIEND_SUCC;
-            send(conn_socket, pkg, sizeof(*pkg), 0);
-        }
-    }
-
-    else
-    {
-        pkg->ctrl_signal = ERR_USER_NOT_FOUND;
-        send(conn_socket, pkg, sizeof(*pkg), 0);
-        return;
-    }
-}
-
-// chat trong nhom
-void sv_group_chat(int conn_socket, Package *pkg)
-{
-    int group_id = pkg->group_id;
-
-    int i = 0;
-    for (i = 0; i < MAX_USER; i++)
-    {
-        if (group[group_id].group_member[i].socket > 0 && group[group_id].group_member[i].socket != conn_socket)
-        {
-            send(group[group_id].group_member[i].socket, pkg, sizeof(*pkg), 0);
-        }
-    }
-    pkg->ctrl_signal = MSG_SENT_SUCC;
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-// group info
-void sv_show_group_info(int conn_socket, Package *pkg)
-{
-    int group_id = pkg->group_id;
-    printf("Group name: %s\n", group[group_id].group_name);
-    // gui group name
-    strcpy(pkg->msg, group[group_id].group_name);
-    pkg->ctrl_signal = SHOW_GROUP_NAME;
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-
-    // gui ten thanh vien
-    print_members(group[group_id]);
-
-    sprintf(pkg->msg, "NUMBER OF MEMBERS: %d", group[group_id].curr_num);
-    pkg->ctrl_signal = SHOW_GROUP_MEM;
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-
-    strcpy(pkg->msg, "MEMBERS OF GROUP:");
-    pkg->ctrl_signal = SHOW_GROUP_MEM;
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-    for (int i = 0; i < MAX_USER; i++)
-    {
-        if (group[group_id].group_member[i].socket >= 0)
-        {
-            strcpy(pkg->msg, group[group_id].group_member[i].username);
-            pkg->ctrl_signal = SHOW_GROUP_MEM;
-            send(conn_socket, pkg, sizeof(*pkg), 0);
-        }
-    }
-}
-
-// thoat nhom
-void sv_leave_group(int conn_socket, Package *pkg)
-{
-    int group_id = pkg->group_id;
-    int user_id = search_user(conn_socket);
-    int i = 0;
-    for (i = 0; i < MAX_USER; i++)
-    {
-        Member mem = group[group_id].group_member[i];
-        if (strcmp(mem.username, user[user_id].username) == 0)
-        {
-            group[group_id].group_member[i].socket = -1;
-            group[group_id].curr_num--;
-            if (sv_leave_group_user(&user[user_id], group_id))
-            {
-                // gui thong bao den cho moi nguoi
-                strcpy(pkg->msg, "LEAVE GROUP ");
-                pkg->ctrl_signal = GROUP_CHAT;
-                sv_group_chat(conn_socket, pkg);
-
-                // gui lai cho user
-                strcpy(pkg->msg, "LEAVE GROUP SUCCESS: ");
-                strcat(pkg->msg, group[group_id].group_name);
-                pkg->ctrl_signal = LEAVE_GROUP_SUCC;
-                send(conn_socket, pkg, sizeof(*pkg), 0);
-            }
-        }
-    }
-}
-
-int sv_leave_group_user(Active_user *user, int group_id)
-{
-    for (int i = 0; i < MAX_GROUP; i++)
-    {
-        if (user->group_id[i] == group_id)
-        {
-            user->group_id[i] = -1;
-            return 1;
-        }
-    }
-    return 0;
-}
 
 void sv_update_port_group(Active_user *user, Group *group)
 {
