@@ -7,7 +7,7 @@
 // Lưu dữ liệu vào link list
 
 node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int is_signed_in, int match_count,
-            int win, int frie_count, int frie_req_count, int wait_add_friend_count, char friend[][USERNAME_SIZE], char friend_req[][USERNAME_SIZE], char wait_add_friend[][USERNAME_SIZE])
+            int win, int frie_count, int frie_req_count, int wait_add_friend_count, char friend[][USERNAME_SIZE], char friend_req[][USERNAME_SIZE], char wait_add_friend[][USERNAME_SIZE], Match match[])
 {
     node temp;
     temp = (node)malloc(sizeof(struct Account));
@@ -35,6 +35,17 @@ node create(char username[], char password[], int elo, int current_puzzle, int p
     for (int i = 0; i < wait_add_friend_count; i++)
     {
         strcpy(temp->wait_add_friend[i], wait_add_friend[i]);
+    }
+    if(match_count <= 5) {
+        for(int i = 0; i < match_count; i++) {
+            strcpy(temp->match[i].competitor_name, match[i].competitor_name);
+            strcpy(temp->match[i].state, match[i].state);
+        }
+    } else {
+        for(int i = 0; i < 5; i++) {
+            strcpy(temp->match[i].competitor_name, match[i].competitor_name);
+            strcpy(temp->match[i].state, match[i].state);
+        }
     }
     return temp;
 }
@@ -311,7 +322,7 @@ void readFileAccount(node *head)
             }
         }
         temp = create(username, password, elo, current_puzzle, puzzle_point, 0, match_count,
-                      win, frie_count, frie_req_count, wait_add_friend_count, friends, friend_req, wait_add_friend);
+                      win, frie_count, frie_req_count, wait_add_friend_count, friends, friend_req, wait_add_friend, match);
         *head = addtail(*head, temp);
     }
 }
@@ -331,6 +342,7 @@ void addFileAccount(node head, char username[])
     char friends[MAX_LENGTH];
     char friendRequest[MAX_LENGTH];
     char waitAddFriend[MAX_LENGTH];
+    char num[2];
     char fileName[FILENAME_SIZE] = "./account/";
     strcat(fileName, username);
     strcat(fileName, ".txt");
@@ -368,6 +380,23 @@ void addFileAccount(node head, char username[])
     fprintf(file, "%s %s\n", "WAIT_ADD_FRIEND", waitAddFriend);
     strcpy(waitAddFriend, "");
     fprintf(file, "%s", "MATCH_HISTORY");
+    if(temp->match_count <= 5) {
+        for(int i = 0; i < temp->match_count; i++) {
+            char number_match[10];
+            strcpy(number_match, "MATCH_");
+            sprintf(num, "%d", i+1);
+            strcat(number_match, num);
+            fprintf(file, "%s %s %s\n", number_match, temp->match[i].competitor_name, temp->match[i].state);
+        }
+    } else {
+        for(int i = 0; i < 5; i++) {
+            char number_match[10];
+            strcpy(number_match, "MATCH_");
+            sprintf(num, "%d", i+1);
+            strcat(number_match, num);
+            fprintf(file, "%s %s %s\n", number_match, temp->match[i].competitor_name, temp->match[i].state);
+        }
+    }
     fclose(file);
 }
 

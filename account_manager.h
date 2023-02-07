@@ -55,7 +55,7 @@ typedef struct Account *node;  // Định nghĩa node
 * Hàm khởi tạo một node trong danh sách
 */
 node create(char username[], char password[], int elo, int current_puzzle, int puzzle_point, int is_signed_in, int match_count, 
-            int win, int frie_count, int frie_req_count, int wait_add_friend_count, char friend[][USERNAME_SIZE], char friend_req[][USERNAME_SIZE], char wait_add_friend[30][USERNAME_SIZE]);
+            int win, int frie_count, int frie_req_count, int wait_add_friend_count, char friend[][USERNAME_SIZE], char friend_req[][USERNAME_SIZE], char wait_add_friend[30][USERNAME_SIZE], Match match[MAX_MATCH]);
 /**
 * Thêm một node vào danh sách liên kết chứa thông tin tất cả các người chơi
 */
