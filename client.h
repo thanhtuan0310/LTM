@@ -23,6 +23,11 @@ void MainMenu();
 void ChooseDifficultyComputer();
 
 /**
+ Menu chọn màu quân
+*/
+void ChooseColorMenu();
+
+/**
  Giao diện chơi với người
 */
 void PlayWithOtherPlayerMenu();
@@ -103,7 +108,9 @@ void ShowFriendMenu(int client_socket);
 
 void ShowMatchHistoryMenu(int client_socket);
 
-void PlayWithComputer(int client_socket);
+void ShowChooseColor(int client_socket, int diffcult);
+
+void PlayWithComputer(int client_socket, int diffcult, int color);
 
 void InRoomWithComputer(int client_socket);
 

@@ -392,6 +392,14 @@ void ChooseDifficultyComputer()
     printf("4. Return main menu\n\n");
 }
 
+void ChooseColorMenu()
+{
+    printf("-------Choose Color--------\n");
+    printf("1. White\n");
+    printf("2. Black\n");    
+    printf("3. Return Choose Difficulty\n\n");
+}
+
 void PlayWithOtherPlayerMenu()
 {
     printf("-------Play With Other Player--------\n");
@@ -520,7 +528,7 @@ void ShowPlayComputer(int client_socket)
     send(client_socket, &pkg, sizeof(pkg), 0);
     // xu ly
     int choice = 0;
-
+    int diffcult = 0;
     while (1)
     {
         sleep(1);
@@ -533,14 +541,53 @@ void ShowPlayComputer(int client_socket)
         switch (choice)
         {
         case 1:
-            PlayWithComputer(client_socket);
+            // PlayWithComputer(client_socket);
+            diffcult = COMPUTER_EASY;
+            ShowChooseColor(client_socket, diffcult);
             // show_group(client_socket);
             break;
         case 2:
+            diffcult = COMPUTER_NORMAL;
             // new_group(client_socket);
+            ShowChooseColor(client_socket, diffcult);
             break;
         case 3:
             // join_group(client_socket);
+            diffcult = COMPUTER_HARD;
+            ShowChooseColor(client_socket, diffcult);
+            break;
+        default:
+            return;
+        }
+    }
+}
+
+void ShowChooseColor(int client_socket, int diffcult)
+{
+    Package pkg;
+    // pkg.ctrl_signal = CHOOSE_DIFFCULT;
+    // send(client_socket, &pkg, sizeof(pkg), 0);
+    // xu ly
+    int choice = 0;    
+    while (1)
+    {
+        sleep(1);
+
+        ChooseColorMenu();
+        printf("Your choice: \n");
+        scanf("%d", &choice);
+        clear_stdin_buff();
+
+        switch (choice)
+        {
+        case 1:
+            PlayWithComputer(client_socket, diffcult, 0);
+            break;
+        case 2:
+            PlayWithComputer(client_socket, diffcult, 1);             
+            break;
+        case 3:
+                       
             break;
         default:
             return;
@@ -689,9 +736,16 @@ void ShowMatchHistoryMenu(int client_socket)
     }
 }
 
-void PlayWithComputer(int client_socket){
+void PlayWithComputer(int client_socket, int diffcult, int color){
+    char diff[3], colo[3];
     Package pkg;
     pkg.ctrl_signal = CREATE_MATCH_WITH_COMPUTER;
+    sprintf(diff, "%d", diffcult);
+    strcpy(pkg.msg, diff);
+    sprintf(colo, "%d", color);
+    strcat(pkg.msg, " ");
+    strcat(pkg.msg, colo);
+    printf("MSG: %s\n", pkg.msg);
     send(client_socket, &pkg, sizeof(pkg), 0);
     sleep(1);
     if (join_succ == 1)
