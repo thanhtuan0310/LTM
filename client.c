@@ -284,6 +284,16 @@ void *read_msg(void *param)
         case ADD_FRIEND_SUCC:
             printf("\nAdd friend sucessfully! \n");
             break;
+        case SHOW_FRIEND_REQUEST:
+            ReplyRequestFriend2(client_socket);
+            break;
+        case SHOW_FRIEND_REQUEST_ERROR:
+            printf("\n%s \n", pkg.msg);
+            break;
+        case SHOW_FRIEND_REQUEST_2:
+            printf("\n%s \n", pkg.msg);
+            //add or delete request
+            break;
         case START_GAME:
         printf("\n%s \n", pkg.msg);
             playing = 1;
@@ -294,6 +304,52 @@ void *read_msg(void *param)
         case ERR_FULL_FRIEND:
             printf("Full Friend\n");
             break;
+        case FRIEND_REQUEST_SUCC:
+            printf("\n%s \n", pkg.msg);
+            break;
+        // case JOIN_GROUP_SUCC:
+        //     printf("Current group: %s \n", pkg.msg);
+        //     strcpy(curr_group_name, pkg.msg);
+        //     curr_group_id = pkg.group_id;
+        //     join_succ = 1;
+        //     break;
+        // case INVITE_FRIEND:
+        //     printf("Attention: %s \n", pkg.msg);
+        //     break;
+        // case ERR_GROUP_NOT_FOUND:
+        //     report_err(ERR_GROUP_NOT_FOUND);
+        //     break;
+        // case ERR_IVITE_MYS ELF:
+        //     report_err(ERR_IVITE_MYSELF);
+        //     break;
+        // case ERR_USER_NOT_FOUND:
+        //     report_err(ERR_USER_NOT_FOUND);
+        //     break;
+        // case ERR_FULL_MEM:
+        //     report_err(ERR_FULL_MEM);
+        //     break;
+        // case INVITE_FRIEND_SUCC:
+        //     printf("%s\n", pkg.msg);
+        //     break;
+        // case GROUP_CHAT:
+        //     if (curr_group_id == pkg.group_id)
+        //     {
+        //         printf("%s: %s\n", pkg.sender, pkg.msg);
+        //     }
+        //     else
+        //     {
+        //         printf("%s sent to Group_%d: %s\n", pkg.sender, pkg.group_id, pkg.msg);
+        //     }
+        //     break;
+        // case SHOW_GROUP_NAME:
+        //     printf("GROUP NAME: %s\n", pkg.msg);
+        //     break;
+        // case SHOW_GROUP_MEM:
+        //     printf("%s\n", pkg.msg);
+        //     break;
+        // case LEAVE_GROUP_SUCC:
+        //     printf("%s\n", pkg.msg);
+        //     break;
         case ERR_MOVE:
             printf("Command unknown:\n");
             break;
@@ -518,13 +574,51 @@ void AddFriend(int client_socket)
 void RemoveFriend(int client_socket)
 {
     // Thai
+    Package pkg;
+    char unfriend_name[USERNAME_SIZE]; 
+
+    printf("Enter you friend to delete: ");
+    fgets(unfriend_name, USERNAME_SIZE, stdin);
+    unfriend_name[strlen(unfriend_name) - 1] = '\0';
+    strcpy(pkg.sender,my_username);
+    strcpy(pkg.receiver,unfriend_name);
+    pkg.ctrl_signal = REMOVE_FRIEND;
+    send(client_socket, &pkg, sizeof(pkg), 0);
 }
 
 void ReplyRequestFriend(int client_socket)
 {
     // Thai
-
+    Package pkg;
+    pkg.ctrl_signal = SHOW_FRIEND_REQUEST;
+    strcpy(pkg.sender, my_username);
+    send(client_socket, &pkg, sizeof(pkg), 0);
 }
+
+void ReplyRequestFriend2(int client_socket)
+{
+    // Thai
+    Package pkg;
+    pkg.ctrl_signal = SHOW_FRIEND_REQUEST_2;
+    char friend_request[USERNAME_SIZE];
+    printf("Enter name: ");
+    fgets(friend_request, USERNAME_SIZE, stdin);
+    friend_request[strlen(friend_request) - 1] = '\0';
+    strcpy(pkg.sender, my_username);
+    strcpy(pkg.receiver,friend_request);
+    char check;
+    printf("Do you want to be friends with this person? Y/n : ");
+    scanf("%c",&check);
+    if (check=='Y')
+    {
+        pkg.ctrl_signal = ACCEPT;
+    } else {
+        pkg.ctrl_signal = NO_ACCEPT;
+    }
+    
+    send(client_socket, &pkg, sizeof(pkg), 0);
+}
+
 
 void ShowPlayComputer(int client_socket)
 {
@@ -701,7 +795,8 @@ void ShowFriendMenu(int client_socket)
 
             RemoveFriend(client_socket);
             break;
-
+        case 4:
+            ReplyRequestFriend(client_socket);
         default:
             return;
         }

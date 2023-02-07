@@ -376,6 +376,15 @@ void sv_user_use(int conn_socket)
         case REMOVE_FRIEND:
             RemoveFriendServer(conn_socket, &pkg);
             break;
+        case SHOW_FRIEND_REQUEST:
+            ReplyFriendServer(conn_socket,&pkg);
+            break;
+        case ACCEPT:
+            AcceptFriend(conn_socket,&pkg);
+            break;
+        case NO_ACCEPT:
+            NotAcceptFriend(conn_socket,&pkg);
+            break;
         // case HANDEL_GROUP_MESS:
         //     // hien ra thong tin phong
         //     break;
@@ -1396,6 +1405,23 @@ void DeleteFriendRequest(node account_friend, char sender_name[])
     }
 }
 
+int DeleteFriend(node account_friend, char sender_name[])
+{
+    for (int i = 0; i < account_friend->frie_count; i++)
+    {
+        if (strcmp(account_friend->friends[i], sender_name) == 0)
+        {
+            for (int j = i; j < account_friend->frie_count - 1; j++)
+            {
+                strcpy(account_friend->friends[i], account_friend->friends[i + 1]); 
+            }
+            account_friend->frie_count--;
+            return 1;
+        }
+    }
+    return -1;
+}
+
 int CheckWaitRequestFriend(node account_friend, char sender_name[])
 {
     for (int i = 0; i < account_friend->frie_req_count; i++)
@@ -1409,11 +1435,106 @@ int CheckWaitRequestFriend(node account_friend, char sender_name[])
 void RemoveFriendServer(int conn_socket, Package *pkg)
 {
     // Thai
+    node use_friend = search(acc_list, pkg->receiver);
+    node sender = search(acc_list, pkg->sender);
+    int check = DeleteFriend(use_friend,pkg->sender);
+    if(check == -1)
+    {
+        strcpy(pkg->msg,"Don't see this person in your friend list.");
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    } else {
+        check = DeleteFriend(sender,pkg->receiver);
+        strcpy(pkg->msg,"Deleted.");
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    }
+
 }
 
 void ReplyFriendServer(int conn_socket, Package *pkg)
 {
     // Thai
+    node use_friend = getAccountBySocket(conn_socket);
+    if (use_friend->frie_req_count == 0)
+    {
+        strcpy(pkg->msg, "No friend request yet\n");
+    }
+    else
+    {
+        strcpy(pkg->msg, "Your friend request\n");
+        for (int i = 0; i < use_friend->frie_req_count; i++)
+        {
+            strcat(pkg->msg, use_friend->friend_req[i]);
+            strcat(pkg->msg, "\n");
+        }
+    }
+
+    // pkg->ctrl_signal,VIEW_FRIEND);
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void AcceptFriend(int conn_socket, Package *pkg)
+{
+    int check =-1;
+    node user_name = search(acc_list,pkg->sender);
+    node use_friend = search(acc_list, pkg->receiver);
+    for (int i = 0; i < user_name->frie_req_count; i++)
+    {
+        if (strcmp(user_name->friend_req[i],pkg->receiver)==0)
+        {
+            check=1;
+            break;
+        }
+        
+    }
+    if (check == -1)
+    {
+        pkg->ctrl_signal = SHOW_FRIEND_REQUEST_ERROR;
+        strcpy(pkg->msg,"Not found this person in your list request.\n");
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    } else {
+        if (user_name->frie_count==10)
+        {
+            pkg->ctrl_signal = SHOW_FRIEND_REQUEST_ERROR;
+            strcpy(pkg->msg,"Full friend.\n");
+            send(conn_socket, pkg, sizeof(*pkg), 0);
+        } else {
+            strcpy(user_name->friends[user_name->frie_count],pkg->receiver);
+            user_name->frie_count++;
+            strcpy(use_friend->friends[use_friend->frie_count],pkg->sender);
+            use_friend->frie_count++;
+            DeleteFriendRequest(user_name,pkg->receiver);
+            strcpy(pkg->msg,"Make friends successfully.");
+            pkg->ctrl_signal = FRIEND_REQUEST_SUCC;
+            send(conn_socket, pkg, sizeof(*pkg), 0);
+        }        
+    }    
+}
+
+void NotAcceptFriend(int conn_socket, Package *pkg)
+{
+    int check =-1;
+    node user_name = search(acc_list,pkg->sender);
+    node use_friend = search(acc_list, pkg->receiver);
+    for (int i = 0; i < user_name->frie_req_count; i++)
+    {
+        if (strcmp(user_name->friend_req[i],pkg->receiver)==0)
+        {
+            check=1;
+            break;
+        }
+        
+    }
+    if (check == -1)
+    {
+        pkg->ctrl_signal = SHOW_FRIEND_REQUEST_ERROR;
+        strcpy(pkg->msg,"Not found this person in your list request.\n");
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    } else {
+        DeleteFriendRequest(user_name,pkg->receiver);
+        strcpy(pkg->msg,"Deleted.");
+        pkg->ctrl_signal = FRIEND_REQUEST_SUCC;
+        send(conn_socket, pkg, sizeof(*pkg), 0);       
+    }    
 }
 
 void CreateNewBoard(int current_id){
