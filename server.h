@@ -323,9 +323,14 @@ Tạo trận đấu khi bắt cặp thành công người chơi
 void CreateMatchWithPlayer(int conn_socket, Package *pkg);
 
 /**
-Chơi cờ người giữa người với người
+Chơi cờ người giữa người với máy
 */
 void PlayWithPlayer(int conn_socket, Package *pkg);
+
+/**
+Chơi cờ người giữa người với người
+*/
+void PlayWithOtherPlayer(int conn_socket, Package *pkg);
 
 /**
 Thoát trận đấu ở chế độ chơi với máy 
