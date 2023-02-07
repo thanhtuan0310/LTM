@@ -68,7 +68,7 @@ void make_server()
 
     readFileAccount(&acc_list);
     readFileChessPuzzle();
-    // printPuzzle();
+    printPuzzle();
     // printFriendList(acc_list);
     // printLists(acc_list);
     listen_socket = create_listen_socket();
@@ -904,7 +904,7 @@ void readFileChessPuzzle() {
 void printPuzzle() {
     for(int i = 0; i < 10; i++) {
         for(int j = 0; j < 9; j++) {
-            printf("%s\n", puzzle_list[i].board[j]);
+            printf("%s", puzzle_list[i].board[j]);
         }
         printf("MOVE: %s\n", puzzle_list[i].move);
     }
