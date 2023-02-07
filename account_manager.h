@@ -8,6 +8,8 @@
 #define FILENAME_SIZE 30
 #define MAX_LENGTH 1024
 #define MAX_NODE_LIST 100
+#define MAX_MOVE 100
+#define MAX_MATCH 5
 #define FRIEND_COUNT 30
 #define MAX_FRIEND 30
 #define MAX_CONSECUTIVE_FAIL 3
@@ -30,6 +32,7 @@ typedef struct Account {
     int frie_count;
     int frie_req_count;
     int wait_add_friend_count;
+    Match[MAX_MATCH] match;
     struct Account *next;
 } Account;
 
@@ -38,6 +41,14 @@ typedef struct Ranking {
     int elo;
     int puzzle_point;
 } Ranking;
+
+typedef struct Match {
+    char move[MAX_MOVE][5];
+    char competitor_name[30];
+    int move_count;
+    char[10] state; 
+    char [10] color;
+} Match;
 
 typedef struct Account *node;
 

@@ -249,6 +249,18 @@ void *read_msg(void *param)
         case REMOVE_FRIEND:
             printf("\n%s \n", pkg.msg);
             break;
+        case END_GAME_DRAW:
+            printf("\n%s \n", pkg.msg);
+            playing = 0;
+            break;
+        case END_GAME_LOSE:
+            printf("\n%s \n", pkg.msg);
+            playing = 0;
+            break;
+        case END_GAME_WIN:
+            printf("\n%s \n", pkg.msg);
+            playing = 0;
+            break;
         case ERR_INVALID_RECEIVER:
             report_err(ERR_INVALID_RECEIVER);
             break;
@@ -900,11 +912,11 @@ void JointRoom(int client_socket)
 
 void InRoomWithComputer(int client_socket){
     Package pkg;
-    int in_room = 1;
+    playing = 1;
     char msg[MSG_SIZE];
 
     RoomTutorial();
-    while (in_room)
+    while (playing)
     {    
         printf("\nYour turn: ");
 		fflush(stdout);
@@ -918,7 +930,7 @@ void InRoomWithComputer(int client_socket){
         if (strcmp(msg, "leave") == 0)
         {
             printf("leave\n");
-            in_room = 0;
+            playing = 0;
             LeavePlayComputer(client_socket);                        
             break;
         }        

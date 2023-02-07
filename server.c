@@ -1134,7 +1134,8 @@ void CreateMatchWithPlayer(int conn_socket, Package *pkg){
 
 void PlayWithPlayer(int conn_socket, Package *pkg){    
     char inBuf[80], command[80];
-    int move = NOMOVE;	 
+    int move = NOMOVE;
+    int result;
     strcpy(inBuf, pkg->msg);
 
     int user_id = search_user(conn_socket);   
@@ -1162,12 +1163,65 @@ void PlayWithPlayer(int conn_socket, Package *pkg){
         strcpy(pkg->msg, SearchPosition(&pos[current_id], &info[current_id]));
         pkg->ctrl_signal = PLAY_MOVE_SUCC;
         send(conn_socket, pkg, sizeof(*pkg), 0);
+        result = checkresult(&pos[current_id]);
+
+        if(result >= 3 && result <= 6){
+           pkg->ctrl_signal = END_GAME_DRAW;
+           strcpy(pkg->msg, "Draw\n");
+           send(conn_socket, pkg, sizeof(*pkg), 0);
+        }else
+        if(result == 1){
+            if (pos[current_id].side)
+            {
+                pkg->ctrl_signal = END_GAME_LOSE;
+                strcpy(pkg->msg, "You Lose\n");
+            }else{
+                pkg->ctrl_signal = END_GAME_WIN;
+                strcpy(pkg->msg, "You Win\n");
+            }                    
+            send(conn_socket, pkg, sizeof(*pkg), 0);            
+        }else{
+        if(result == 2){
+            if (pos[current_id].side)
+            {
+                pkg->ctrl_signal = END_GAME_WIN;
+                strcpy(pkg->msg, "You Win\n");
+            }else{
+                pkg->ctrl_signal = END_GAME_LOSE;
+                strcpy(pkg->msg, "You Lose\n");
+            } 
+            send(conn_socket, pkg, sizeof(*pkg), 0);             
+        }            
+        }        
     }
     else{
-
-        pkg->ctrl_signal = PLAY_MOVE_SUCC;
-        strcpy(pkg->msg, "End Game\n");
-        send(conn_socket, pkg, sizeof(*pkg), 0);
+        result = checkresult(&pos[current_id]);
+        if(result >= 3 && result <= 6){
+           pkg->ctrl_signal = END_GAME_DRAW;
+           strcpy(pkg->msg, "Draw 1\n");
+           send(conn_socket, pkg, sizeof(*pkg), 0);
+        }else
+        if(result == 1){
+            if (pos[current_id].side)
+            {
+                pkg->ctrl_signal = END_GAME_LOSE;
+                strcpy(pkg->msg, "You Lose\n");
+            }else{
+                pkg->ctrl_signal = END_GAME_WIN;
+                strcpy(pkg->msg, "You Win\n");
+            }                    
+            send(conn_socket, pkg, sizeof(*pkg), 0);        
+        }else{
+            if (pos[current_id].side)
+            {
+                pkg->ctrl_signal = END_GAME_WIN;
+                strcpy(pkg->msg, "You Win\n");
+            }else{
+                pkg->ctrl_signal = END_GAME_LOSE;
+                strcpy(pkg->msg, "You Lose\n");
+            }                    
+            send(conn_socket, pkg, sizeof(*pkg), 0);   
+        }        
     }
 }
 
@@ -1476,6 +1530,7 @@ void ReplyFriendServer(int conn_socket, Package *pkg)
     }
 
     // pkg->ctrl_signal,VIEW_FRIEND);
+
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
