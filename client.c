@@ -10,6 +10,7 @@ char curr_room_name[ROOM_NAME_SIZE];
 int join_succ = 0;
 int curr_group_id = -1;
 int playing = 0;
+int waiting = 0;
 
 int connect_to_server()
 {
@@ -992,6 +993,11 @@ void InRoom(int client_socket)
             } else
         printf("%s\n", msg);              
         }
+        while (waiting)
+        {
+            
+        }
+        
         if (strcmp(msg, "leave") == 0)
         {
             printf("leave\n");

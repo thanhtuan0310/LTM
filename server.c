@@ -75,7 +75,7 @@ void make_server()
 
     readFileAccount(&acc_list);
     readFileChessPuzzle();
-    printPuzzle();
+    // printPuzzle();
     // printFriendList(acc_list);
     // printLists(acc_list);
     listen_socket = create_listen_socket();
@@ -931,7 +931,14 @@ void readFileChessPuzzle() {
                 p = strtok(line, " ");
                 while(p != NULL) {
                     p = strtok(NULL, " ");
-                    if(p != NULL) strcpy(puzzle_list[i].move, p);
+                    if(p != NULL){
+                        p[strlen(p)] = '\0'; 
+                        if (p[strlen(p) - 1] == '\n')
+                        {
+                            p[strlen(p) - 1] = '\0';
+                        }
+                        strcpy(puzzle_list[i].move, p);
+                    } 
                 }
             }
         }
@@ -953,13 +960,13 @@ void ChessPuzzleServer(int conn_socket, Package *pkg)
     //Thai
     node user_name = search(acc_list,pkg->sender);
     strcpy(pkg->msg,"Your level : ");
-    pkg->msg[strlen(pkg->msg)] = user_name->current_puzzle;
+    pkg->msg[strlen(pkg->msg)] = user_name->current_puzzle + 49;
     //strcat(pkg->msg,user_name->current_puzzle);
-    strcat(pkg->msg,"/n");
+    strcat(pkg->msg,"\n");
     for(int j = 0; j < 9; j++) 
     {
         strcat(pkg->msg,puzzle_list[user_name->current_puzzle].board[j]);
-        strcat(pkg->msg,"/n");
+        // strcat(pkg->msg,"\n");
     }
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
@@ -967,11 +974,12 @@ void ChessPuzzleServer(int conn_socket, Package *pkg)
 void ChessPuzzleTurnServer(int conn_socket, Package *pkg)
 {
     node user_name = search(acc_list,pkg->sender);
-    if (strcmp(pkg->msg,puzzle_list[user_name->current_puzzle-1].move)==0)
+    if (strcmp(pkg->msg,puzzle_list[user_name->current_puzzle].move)==0)
     {
         strcpy(pkg->msg,"Congratulations, You win...!");
         user_name->puzzle_point = user_name->puzzle_point + user_name->current_puzzle;
         user_name->current_puzzle++;
+        addFileAccount(acc_list, user_name->username);
     } else {
         strcpy(pkg->msg,"Wrong !! You lost..!");
         send(conn_socket, pkg, sizeof(*pkg), 0);
@@ -1367,6 +1375,7 @@ void JointRoomServer(int conn_socket, Package *pkg)
         {
             sleep(1);
             pkg->ctrl_signal = START_GAME;
+            //Tuan
             strcpy(pkg->msg, "Start Game");
             send(room[room_id].member[0].socket, pkg, sizeof(*pkg), 0);
             send(room[room_id].member[1].socket, pkg, sizeof(*pkg), 0);
