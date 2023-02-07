@@ -100,123 +100,11 @@ int search_user(int conn_socket);
 void sv_user_use(int conn_socket);
 
 /**
- * Gửi cho người dùng danh sách người dùng đang online
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-void sv_active_user(int conn_socket, Package *pkg);
-
-/**
- * Xử lý chức năng chat riêng
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-void sv_private_chat(int conn_socket, Package *pkg);
-
-/**
- * Xử lý chức năng chat all
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-void sv_chat_all(int conn_socket, Package *pkg);
-
-/**
- * Xử lý chức năng chat nhóm
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-void sv_group_chat_init(int conn_socket, Package *pkg);
-
-/**
- * Gửi cho người dùng nhóm hiện tại
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-void sv_show_group(int conn_socket, Package *pkg);
-
-/**
- * Tạo group mới
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-void sv_new_group(int conn_socket, Package *pkg);
-
-/**
- * Thêm group cho user
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-int sv_add_group_user(Active_user *user, int group_id);
-
-/**
- * Xoa group cho user
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-int sv_leave_group_user(Active_user *user, int group_id);
-
-/**
- * Thêm user vao group
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-int sv_add_user(Active_user user, Group *group);
-
-/**
- * user join group
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-void sv_join_group(int conn_socket, Package *pkg);
-
-/**
- * Tìm ID group theo tên
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-int  sv_search_id_group(Group group[],Active_user user, char *group_name);
-
-/**
- * Tìm ID user theo tên
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-int  sv_search_id_user(Active_user user[], char *user_name);
-
-/**
  * Tìm ID user theo tên
  * @param conn_socket socket kết nối đến client
  * @param pkg con trỏ đến gói tin nhận được từ client
 */
 int  sv_search_id_user_group(Group group, char *user_name);
-
-/**
- * Moi ban
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-void sv_invite_friend(int conn_socket, Package *pkg);
-
-/**
- * Chat trong nhom
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-void sv_group_chat(int conn_socket, Package *pkg);
-
-/**
- * Hiển thị thông tin phòng
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-void sv_show_group_info(int conn_socket, Package *pkg);
-
-/**
- * Thoat phòng
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-void sv_leave_group(int conn_socket, Package *pkg);
 
 /**
  * Cap nhat cong cac group khi moi dang nhap
@@ -225,17 +113,6 @@ void sv_leave_group(int conn_socket, Package *pkg);
 */
 void sv_update_port_group(Active_user *user, Group *group);
 
-/**
- * In ra thanh vien cua nhom
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
-void print_members(Group group);
-/**
- * Kiem tra nguoi dung co o trong nhom khong
- * @param conn_socket socket kết nối đến client
- * @param pkg con trỏ đến gói tin nhận được từ client
-*/
 int check_user_in_group(Active_user user, int group_id);
 /**
  * Xử lý chức năng đăng xuất

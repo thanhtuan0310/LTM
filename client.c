@@ -63,8 +63,7 @@ int logup(int client_socket)
     if (pkg.ctrl_signal == LOGUP_SUCC)
     {
         printf("Your account is registed successfully\n");
-    }
-    // strcpy(my_username, username);
+    }    
     return pkg.ctrl_signal;
 }
 
@@ -108,9 +107,7 @@ void user_use(int client_socket)
         report_err(ERR_CREATE_THREAD);
         exit(0);
     }
-    pthread_detach(read_st);
-
-    // see_active_user(client_socket);
+    pthread_detach(read_st);    
 
     while (login)
     {
@@ -122,55 +119,39 @@ void user_use(int client_socket)
 
         switch (choice)
         {
-        case 1:
-            // private_chat(client_socket);
+        case 1:            
             ViewInformation(client_socket);
             break;
         case 2:
             ShowPlayComputer(client_socket);
             break;
         case 3:
-            ShowPlayPlayer(client_socket);
-            // chat_all(client_socket);
+            ShowPlayPlayer(client_socket);            
             break;
         case 4:
-            ShowChessPuzzle(client_socket);
-            // chat_all(client_socket);
+            ShowChessPuzzle(client_socket);            
             break;
         case 5:
-            ShowFriendMenu(client_socket);
-            // chat_all(client_socket);
+            ShowFriendMenu(client_socket);            
             break;
         case 6:
-            ViewChessRank(client_socket);
-            // chat_all(client_socket);
+            ViewChessRank(client_socket);            
             break;
         case 7:
-            ShowMatchHistoryMenu(client_socket);
-            // chat_all(client_socket);
+            ShowMatchHistoryMenu(client_socket);            
             break;
         case 8:
             ChangePassword(client_socket);
             break;
         case 9:
             login = 0;
-            pkg.ctrl_signal = LOG_OUT;
-            // // strcpy(pkg.sender, my_username);
+            pkg.ctrl_signal = LOG_OUT;            
             send(client_socket, &pkg, sizeof(pkg), 0);
-            strcpy(my_username, "x");
-            // strcpy(curr_group_name, "x");
-            // curr_group_id = -1;
+            strcpy(my_username, "x");            
             sleep(1);
-            break;
-        case 29:
-            // see_active_user(client_socket);
-            break;
-        // 17/01/2023
-        case 30:
-            // group_chat_init(client_socket);
-            break;
+            break;        
         default:
-            printf("Ban nhap sai roi !\n");
+            printf("Incorrect !\n");
             break;
         }
     }
@@ -179,14 +160,11 @@ void user_use(int client_socket)
 void *read_msg(void *param)
 {
     int *c_socket = (int *)param;
-    int client_socket = *c_socket;
-    // printf("\nmysoc: %d\n", client_socket);
-    // int client_socket = my_socket;
+    int client_socket = *c_socket;    
     Package pkg;
     while (1)
     {
-        recv(client_socket, &pkg, sizeof(pkg), 0);
-        // printf("receive %d from server\n", pkg.ctrl_signal);
+        recv(client_socket, &pkg, sizeof(pkg), 0);        
         switch (pkg.ctrl_signal)
         {
         case SHOW_USER:
@@ -195,10 +173,7 @@ void *read_msg(void *param)
 
         case NOTIFY_NEW_FRIEND_REQ:
             printf("%s\n", pkg.msg);
-            break;
-            // case PRIVATE_CHAT:
-            //     printf("%s: %s\n", pkg.sender, pkg.msg);
-            //     break;
+            break;            
 
         case CHOOSE_DIFFCULT:
             printf("%s\n", pkg.msg);
@@ -280,15 +255,7 @@ void *read_msg(void *param)
         case ERR_INVALID_RECEIVER:
             report_err(ERR_INVALID_RECEIVER);
             break;
-            // case MSG_SENT_SUCC:
-            //     printf("Message sent!\n");
-            //     break;
-            // case GROUP_CHAT_INIT:
-            //     printf("%s\n", pkg.msg);
-            //     break;
-            // case SHOW_GROUP:
-            //     printf("Your group: \n%s \n", pkg.msg);
-            //     break;
+           
         case CREATE_ROOM_SUCC:
             printf("Complete create: %s \n", pkg.msg);
             curr_group_id = pkg.group_id;
@@ -349,50 +316,7 @@ void *read_msg(void *param)
             break;
         case CHECK_TURN_PUZZLE_SUCC:
             printf("\n%s \n", pkg.msg);
-            break;
-        // case JOIN_GROUP_SUCC:
-        //     printf("Current group: %s \n", pkg.msg);
-        //     strcpy(curr_group_name, pkg.msg);
-        //     curr_group_id = pkg.group_id;
-        //     join_succ = 1;
-        //     break;
-        // case INVITE_FRIEND:
-        //     printf("Attention: %s \n", pkg.msg);
-        //     break;
-        // case ERR_GROUP_NOT_FOUND:
-        //     report_err(ERR_GROUP_NOT_FOUND);
-        //     break;
-        // case ERR_IVITE_MYS ELF:
-        //     report_err(ERR_IVITE_MYSELF);
-        //     break;
-        // case ERR_USER_NOT_FOUND:
-        //     report_err(ERR_USER_NOT_FOUND);
-        //     break;
-        // case ERR_FULL_MEM:
-        //     report_err(ERR_FULL_MEM);
-        //     break;
-        // case INVITE_FRIEND_SUCC:
-        //     printf("%s\n", pkg.msg);
-        //     break;
-        // case GROUP_CHAT:
-        //     if (curr_group_id == pkg.group_id)
-        //     {
-        //         printf("%s: %s\n", pkg.sender, pkg.msg);
-        //     }
-        //     else
-        //     {
-        //         printf("%s sent to Group_%d: %s\n", pkg.sender, pkg.group_id, pkg.msg);
-        //     }
-        //     break;
-        // case SHOW_GROUP_NAME:
-        //     printf("GROUP NAME: %s\n", pkg.msg);
-        //     break;
-        // case SHOW_GROUP_MEM:
-        //     printf("%s\n", pkg.msg);
-        //     break;
-        // case LEAVE_GROUP_SUCC:
-        //     printf("%s\n", pkg.msg);
-        //     break;
+            break;        
         case ERR_MOVE:
             printf("Command unknown:\n");
             break;
@@ -444,8 +368,7 @@ void ask_server(int client_socket)
             send(client_socket, &pkg, sizeof(pkg), 0);
             result = logup(client_socket);
             if (result == LOGUP_SUCC)
-            {
-                // user_use(client_socket);
+            {                
                 continue;
             }
             else
