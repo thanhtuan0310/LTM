@@ -75,9 +75,9 @@ void make_server()
 
     readFileAccount(&acc_list);
     readFileChessPuzzle();
-    printPuzzle();
+    // printPuzzle();
     // printFriendList(acc_list);
-    // printLists(acc_list);
+    printLists(acc_list);
     listen_socket = create_listen_socket();
     for (int i = 0; i < MAX_USER; i++)
     {

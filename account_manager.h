@@ -16,11 +16,8 @@
 
 
 typedef struct Match {
-    char move[MAX_MOVE][5];
     char competitor_name[30];
-    int move_count;
     char state[10]; 
-    char color[10];
 } Match;
 
 //Cau truc mot account

@@ -103,6 +103,7 @@ void readFileAccount(node *head) {
     char friends[MAX_FRIEND][USERNAME_SIZE];
     char friend_req[30][USERNAME_SIZE];
     char wait_add_friend[30][USERNAME_SIZE];
+    Match match[MAX_MATCH];
 
     // char friends[FRIEND_COUNT][USERNAME_SIZE];
     int current_puzzle;
@@ -110,6 +111,7 @@ void readFileAccount(node *head) {
     node temp;
     int i = 0;
     int j = 0, k = 0;
+    int m = 0;
     FILE *file = fopen("account.txt", "r");
     if(file == NULL) {
         printf("no such file.");
@@ -155,7 +157,7 @@ void readFileAccount(node *head) {
                     if(p != NULL) match_count = atoi(p);
                 }
             }
-            if(strstr(line, "WIN")) {
+            if(strstr(line, "WINS")) {
                 p = strtok(line, " ");
                 while(p != NULL) {
                     p = strtok(NULL, " ");
@@ -236,6 +238,22 @@ void readFileAccount(node *head) {
             }
             // printf("%d\n", frie_count);
             // free(p);
+            if(strstr(line, "MATCH_HISTORY")) {
+                while (fgets(line, sizeof(line), f) != NULL)
+                {
+                    p = strtok(line, " ");
+                    if(p != NULL) {
+                        p = strtok(NULL, " ");
+                        if(p != NULL) strcpy(match[m].competitor_name, p);
+                    }
+                    if(p != NULL) {
+                        p = strtok(NULL, " ");
+                        if(p != NULL) strcpy(match[m].state, p);
+                    }
+                    m++;
+                }
+                
+            }
         }
         temp = create(username, password, elo, current_puzzle, puzzle_point, 0, match_count, 
         win, frie_count, frie_req_count, wait_add_friend_count, friends, friend_req, wait_add_friend);
