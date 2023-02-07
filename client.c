@@ -802,10 +802,12 @@ void ShowChessPuzzle(int client_socket)
             // new_group(client_socket);
             break;
         case 3:
+            return;
             // join_group(client_socket);
             break;        
         default:
-            return;
+            printf("Input is not incorrect!\n");
+            break;
         }
     }
 }

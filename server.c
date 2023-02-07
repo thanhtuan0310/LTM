@@ -197,7 +197,8 @@ void handle_signup(int conn_socket, node acc_list)
         char friends[MAX_FRIEND][USERNAME_SIZE];
         char friend_req[30][USERNAME_SIZE];
         char wait_add_friend[30][USERNAME_SIZE];
-        node temp = create(username, password, 1000, 1, 0, 0, 0, 0, 0, 0, 0, friends, friend_req, wait_add_friend);
+        Match match[MAX_MATCH];
+        node temp = create(username, password, 1000, 1, 0, 0, 0, 0, 0, 0, 0, friends, friend_req, wait_add_friend, match);
         acc_list = addtail(acc_list, temp);
         updateAccountFile(acc_list);
         addFileAccount(acc_list, username);
