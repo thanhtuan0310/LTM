@@ -15,6 +15,14 @@
 #define MAX_CONSECUTIVE_FAIL 3
 
 
+typedef struct Match {
+    char move[MAX_MOVE][5];
+    char competitor_name[30];
+    int move_count;
+    char state[10]; 
+    char color[10];
+} Match;
+
 //Cau truc mot account
 typedef struct Account {    
     char username[USERNAME_SIZE];
@@ -32,7 +40,7 @@ typedef struct Account {
     int frie_count;
     int frie_req_count;
     int wait_add_friend_count;
-    Match[MAX_MATCH] match;
+    Match match[MAX_MATCH];
     struct Account *next;
 } Account;
 
@@ -42,13 +50,6 @@ typedef struct Ranking {
     int puzzle_point;
 } Ranking;
 
-typedef struct Match {
-    char move[MAX_MOVE][5];
-    char competitor_name[30];
-    int move_count;
-    char[10] state; 
-    char [10] color;
-} Match;
 
 typedef struct Account *node;
 
