@@ -19,7 +19,7 @@ S_SEARCHINFO info[30];
 int movetime = 3000;
 int play_with_computer[30];
 int engineSide[30];
-int depth[30]; 
+int depth[30];
 
 int create_listen_socket()
 {
@@ -78,7 +78,7 @@ void make_server()
     printHistoryMatch(acc_list);
     // printPuzzle();
     // printFriendList(acc_list);
-    printLists(acc_list);
+    // printLists(acc_list);
     listen_socket = create_listen_socket();
     for (int i = 0; i < MAX_USER; i++)
     {
@@ -96,10 +96,11 @@ void make_server()
         room[i].curr_num = 0;
     }
 
-    for(int i = 0; i < 30; i++){
+    for (int i = 0; i < 30; i++)
+    {
         play_with_computer[i] = -1;
-    }    
-     
+    }
+
     printf("Server created\n");
     AllInit();
 
@@ -297,10 +298,7 @@ void sv_user_use(int conn_socket)
         if (recv(conn_socket, &pkg, sizeof(pkg), 0) > 0) // printf("Receive from %d\n", conn_socket);
             printf("%d chooses %d \n", conn_socket, pkg.ctrl_signal);
         switch (pkg.ctrl_signal)
-        {
-        case PRIVATE_CHAT:
-            sv_private_chat(conn_socket, &pkg);
-            break;
+        {        
 
         case CHOOSE_DIFFCULT:
             ChooseDiffcultServer(conn_socket, &pkg);
@@ -336,7 +334,7 @@ void sv_user_use(int conn_socket)
             ChessPuzzleServer(conn_socket, &pkg);
             break;
         case CHECK_TURN_PUZZLE:
-            ChessPuzzleTurnServer(conn_socket,&pkg);
+            ChessPuzzleTurnServer(conn_socket, &pkg);
             break;
         case VIEW_RANKING:
             ViewChessRankServer(conn_socket, &pkg);
@@ -346,10 +344,7 @@ void sv_user_use(int conn_socket)
             break;
         case CREATE_ROOM:
             CreateRoomServer(conn_socket, &pkg);
-            break;
-        case SHOW_USER:
-            sv_active_user(conn_socket, &pkg);
-            break;
+            break;        
         case LEAVE_ROOM:
             LeaveRoomServer(conn_socket, &pkg);
             break;
@@ -362,19 +357,13 @@ void sv_user_use(int conn_socket)
         case PLAY_MOVE:
             PlayWithPlayer(conn_socket, &pkg);
             break;
+        case OTHER_PLAYER_MOVE:
+            PlayWithOtherPlayer(conn_socket, &pkg);
+            break;
         case LOG_OUT:
             login = 0;
             sv_logout(conn_socket, &pkg);
-            break;
-        // case GROUP_CHAT_INIT:
-        //     sv_group_chat_init(conn_socket, &pkg);
-        //     break;
-        // case SHOW_GROUP:
-        //     sv_show_group(conn_socket, &pkg);
-        //     break;
-        // case NEW_GROUP:
-        //     sv_new_group(conn_socket, &pkg);
-        //     break;
+            break;       
         case JOINT_ROOM:
             JointRoomServer(conn_socket, &pkg);
             break;
@@ -388,29 +377,14 @@ void sv_user_use(int conn_socket)
             RemoveFriendServer(conn_socket, &pkg);
             break;
         case SHOW_FRIEND_REQUEST:
-            ReplyFriendServer(conn_socket,&pkg);
+            ReplyFriendServer(conn_socket, &pkg);
             break;
         case ACCEPT:
-            AcceptFriend(conn_socket,&pkg);
+            AcceptFriend(conn_socket, &pkg);
             break;
         case NO_ACCEPT:
-            NotAcceptFriend(conn_socket,&pkg);
-            break;
-        // case HANDEL_GROUP_MESS:
-        //     // hien ra thong tin phong
-        //     break;
-        // case INVITE_FRIEND:
-        //     sv_invite_friend(conn_socket, &pkg);
-        //     break;
-        // case GROUP_CHAT:
-        //     sv_group_chat(conn_socket, &pkg);
-        //     break;
-        // case GROUP_INFO:
-        //     sv_show_group_info(conn_socket, &pkg);
-        //     break;
-        // case LEAVE_GROUP:
-        //     sv_leave_group(conn_socket, &pkg);
-        //     break;
+            NotAcceptFriend(conn_socket, &pkg);
+            break;        
         default:
             break;
         }
@@ -445,66 +419,7 @@ void sv_user_use(int conn_socket)
     }
 }
 
-void sv_active_user(int conn_socket, Package *pkg)
-{
 
-    char user_list[MSG_SIZE] = {0};
-    for (int i = 0; i < MAX_USER; i++)
-    {
-        if (user[i].socket > 0)
-        {
-            strcat(user_list, user[i].username);
-            int len = strlen(user_list);
-            user_list[len] = ' ';
-        }
-    }
-    strcpy(pkg->msg, user_list);
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-void sv_private_chat(int conn_socket, Package *pkg)
-{
-
-    printf("%d: %s to %s: %s\n", pkg->ctrl_signal, pkg->sender, pkg->receiver, pkg->msg);
-
-    int i = 0;
-
-    for (i = 0; i < MAX_USER; i++)
-    {
-        if (strcmp(pkg->receiver, user[i].username) == 0 && user[i].socket > 0)
-        {
-            // recv_socket = user[i].socket;
-            send(user[i].socket, pkg, sizeof(*pkg), 0);
-            break;
-        }
-    }
-
-    if (i == MAX_USER)
-        pkg->ctrl_signal = ERR_INVALID_RECEIVER;
-    else
-        pkg->ctrl_signal = MSG_SENT_SUCC;
-
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-void sv_chat_all(int conn_socket, Package *pkg)
-{
-    printf("%d: %s to all: %s\n", pkg->ctrl_signal, pkg->sender, pkg->msg);
-
-    int i = 0;
-
-    for (i = 0; i < MAX_USER; i++)
-    {
-        if (user[i].socket > 0)
-            send(user[i].socket, pkg, sizeof(*pkg), 0);
-    }
-
-    pkg->ctrl_signal = MSG_SENT_SUCC;
-
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-// 17/1/2023
 int search_user(int conn_socket)
 {
     int i = 0;
@@ -515,70 +430,20 @@ int search_user(int conn_socket)
     }
     return -1;
 }
-int sv_search_id_user(Active_user user[], char *user_name)
-{
-    int user_id = -1;
-    int i = 0;
-    for (i = 0; i < MAX_USER; i++)
-    {
-        if (strcmp(user[i].username, user_name) == 0 && user[i].socket >= 0)
-        {
-            user_id = i;
-            return user_id;
-        }
-    }
-    return -1;
-}
+
 int sv_search_id_user_group(Group group, char *user_name)
 {
     int i = 0;
     for (i = 0; i < MAX_USER; i++)
     {
         if (strcmp(group.group_member[i].username, user_name) == 0)
-        {
-            // printf("%d %s\n", i, user_name);
+        {            
             return i;
         }
     }
     return -1;
 }
 
-void sv_group_chat_init(int conn_socket, Package *pkg)
-{
-    strcpy(pkg->msg, "CHUC NANG CHAT NHOM\n");
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-void sv_show_group(int conn_socket, Package *pkg)
-{
-    int user_id = search_user(conn_socket);
-    char group_list[MSG_SIZE] = {0};
-    int group_id;
-    for (int i = 0; i < MAX_GROUP; i++)
-    {
-        if (user[user_id].group_id[i] >= 0)
-        {
-            int group_id = user[user_id].group_id[i];
-            strcat(group_list, group[group_id].group_name);
-            int len = strlen(group_list);
-            group_list[len] = '\n';
-        }
-    }
-    strcpy(pkg->msg, group_list);
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-// new group
-
-int check_user_in_group(Active_user user, int group_id)
-{
-    int i = 0;
-    for (i = 0; i < MAX_GROUP; i++)
-    {
-        if (user.group_id[i] == group_id)
-            return 1;
-    }
-    return 0;
-}
 int sv_add_group_user(Active_user *user, int group_id)
 {
     for (int i = 0; i < MAX_GROUP; i++)
@@ -592,239 +457,6 @@ int sv_add_group_user(Active_user *user, int group_id)
     return 0;
 }
 
-int sv_add_user(Active_user user, Group *group)
-{
-    int i = 0;
-    for (i = 0; i < MAX_USER; i++)
-    {
-        if (group->group_member[i].socket < 0)
-        {
-            group->group_member[i].socket = user.socket;
-            strcpy(group->group_member[i].username, user.username);
-            group->curr_num++;
-            return i;
-        }
-    }
-    return 0;
-}
-
-void print_members(Group group)
-{
-    printf("MEMBERS OF GROUP %s: \n", group.group_name);
-    for (int i = 0; i < MAX_USER; i++)
-    {
-        if (group.group_member[i].socket > 0)
-        {
-            printf("%s\n", group.group_member[i].username);
-        }
-    }
-}
-void sv_new_group(int conn_socket, Package *pkg)
-{
-    int user_id = search_user(conn_socket);
-    int group_id = -1;
-    for (int i = 0; i < MAX_GROUP; i++)
-    {
-        if (group[i].curr_num == 0)
-        {
-            group_id = i;
-            sv_add_group_user(&user[user_id], group_id);
-            sv_add_user(user[user_id], &group[i]);
-            sprintf(group[i].group_name, "Group_%d", group_id);
-            break;
-        }
-    }
-    strcpy(pkg->msg, group[group_id].group_name);
-    pkg->ctrl_signal = MSG_MAKE_GROUP_SUCC;
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-// join group
-int sv_search_id_group(Group group[], Active_user user, char *group_name)
-{
-    int i;
-    int group_id = -1;
-    for (i = 0; i < MAX_GROUP; i++)
-    {
-        if (user.group_id[i] >= 0)
-        {
-            group_id = user.group_id[i];
-            if (strcmp(group[group_id].group_name, group_name) == 0)
-            {
-                // printf("%s\n",group[i].group_name);
-                return group_id;
-            }
-        }
-    }
-    return -1;
-}
-
-void sv_join_group(int conn_socket, Package *pkg)
-{
-    char group_name[GROUP_NAME_SIZE];
-    int group_id = -1;
-    int user_id = -1;
-
-    user_id = search_user(conn_socket);
-    strcpy(group_name, pkg->msg);
-    group_id = sv_search_id_group(group, user[user_id], group_name);
-    if (group_id >= 0)
-    {
-        printf("%s JOIN GROUP %s\n", pkg->sender, group[group_id].group_name);
-        strcpy(pkg->msg, group_name);
-        pkg->ctrl_signal = JOIN_GROUP_SUCC;
-        pkg->group_id = group_id;
-        send(conn_socket, pkg, sizeof(*pkg), 0);
-    }
-    else
-    {
-        pkg->ctrl_signal = ERR_GROUP_NOT_FOUND;
-        send(conn_socket, pkg, sizeof(*pkg), 0);
-    }
-}
-
-void sv_invite_friend(int conn_socket, Package *pkg)
-{
-    char friend_name[USERNAME_SIZE];
-    int user_id = search_user(conn_socket);
-    int friend_id;
-    int group_id;
-
-    group_id = pkg->group_id;
-    strcpy(friend_name, pkg->receiver);
-    friend_id = sv_search_id_user(user, friend_name);
-    if (friend_id >= 0)
-    {
-        if (friend_id == user_id)
-        {
-            pkg->ctrl_signal = ERR_IVITE_MYSELF;
-            send(conn_socket, pkg, sizeof(*pkg), 0);
-            return;
-        }
-        else if (group[group_id].curr_num > MAX_USER - 1)
-        {
-            pkg->ctrl_signal = ERR_FULL_MEM;
-            send(conn_socket, pkg, sizeof(*pkg), 0);
-            return;
-        }
-        else if (check_user_in_group(user[friend_id], group_id))
-        {
-            pkg->ctrl_signal = ERR_FULL_MEM;
-            send(conn_socket, pkg, sizeof(*pkg), 0);
-            return;
-        }
-        else // thanh cong
-        {
-            send(user[friend_id].socket, pkg, sizeof(*pkg), 0);
-            printf("%s add %s to %s\n", user[user_id].username,
-                   user[friend_id].username, group[group_id].group_name);
-            sv_add_group_user(&user[friend_id], group_id);
-            sv_add_user(user[friend_id], &group[group_id]);
-
-            strcpy(pkg->msg, "Successful invite");
-            pkg->ctrl_signal = INVITE_FRIEND_SUCC;
-            send(conn_socket, pkg, sizeof(*pkg), 0);
-        }
-    }
-
-    else
-    {
-        pkg->ctrl_signal = ERR_USER_NOT_FOUND;
-        send(conn_socket, pkg, sizeof(*pkg), 0);
-        return;
-    }
-}
-
-// chat trong nhom
-void sv_group_chat(int conn_socket, Package *pkg)
-{
-    int group_id = pkg->group_id;
-
-    int i = 0;
-    for (i = 0; i < MAX_USER; i++)
-    {
-        if (group[group_id].group_member[i].socket > 0 && group[group_id].group_member[i].socket != conn_socket)
-        {
-            send(group[group_id].group_member[i].socket, pkg, sizeof(*pkg), 0);
-        }
-    }
-    pkg->ctrl_signal = MSG_SENT_SUCC;
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-// group info
-void sv_show_group_info(int conn_socket, Package *pkg)
-{
-    int group_id = pkg->group_id;
-    printf("Group name: %s\n", group[group_id].group_name);
-    // gui group name
-    strcpy(pkg->msg, group[group_id].group_name);
-    pkg->ctrl_signal = SHOW_GROUP_NAME;
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-
-    // gui ten thanh vien
-    print_members(group[group_id]);
-
-    sprintf(pkg->msg, "NUMBER OF MEMBERS: %d", group[group_id].curr_num);
-    pkg->ctrl_signal = SHOW_GROUP_MEM;
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-
-    strcpy(pkg->msg, "MEMBERS OF GROUP:");
-    pkg->ctrl_signal = SHOW_GROUP_MEM;
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-    for (int i = 0; i < MAX_USER; i++)
-    {
-        if (group[group_id].group_member[i].socket >= 0)
-        {
-            strcpy(pkg->msg, group[group_id].group_member[i].username);
-            pkg->ctrl_signal = SHOW_GROUP_MEM;
-            send(conn_socket, pkg, sizeof(*pkg), 0);
-        }
-    }
-}
-
-// thoat nhom
-void sv_leave_group(int conn_socket, Package *pkg)
-{
-    int group_id = pkg->group_id;
-    int user_id = search_user(conn_socket);
-    int i = 0;
-    for (i = 0; i < MAX_USER; i++)
-    {
-        Member mem = group[group_id].group_member[i];
-        if (strcmp(mem.username, user[user_id].username) == 0)
-        {
-            group[group_id].group_member[i].socket = -1;
-            group[group_id].curr_num--;
-            if (sv_leave_group_user(&user[user_id], group_id))
-            {
-                // gui thong bao den cho moi nguoi
-                strcpy(pkg->msg, "LEAVE GROUP ");
-                pkg->ctrl_signal = GROUP_CHAT;
-                sv_group_chat(conn_socket, pkg);
-
-                // gui lai cho user
-                strcpy(pkg->msg, "LEAVE GROUP SUCCESS: ");
-                strcat(pkg->msg, group[group_id].group_name);
-                pkg->ctrl_signal = LEAVE_GROUP_SUCC;
-                send(conn_socket, pkg, sizeof(*pkg), 0);
-            }
-        }
-    }
-}
-
-int sv_leave_group_user(Active_user *user, int group_id)
-{
-    for (int i = 0; i < MAX_GROUP; i++)
-    {
-        if (user->group_id[i] == group_id)
-        {
-            user->group_id[i] = -1;
-            return 1;
-        }
-    }
-    return 0;
-}
 
 void sv_update_port_group(Active_user *user, Group *group)
 {
@@ -908,43 +540,52 @@ void ViewInformationServer(int conn_socket, Package *pkg)
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void readFileChessPuzzle() {
+void readFileChessPuzzle()
+{
     char levelPuzzle[3];
     char filePuzzle[FILENAME_SIZE];
     char line[MAX_LENGTH];
-    for(int i = 0; i < 10; i++) {
-        sprintf(levelPuzzle, "%d", i+1);
+    for (int i = 0; i < 10; i++)
+    {
+        sprintf(levelPuzzle, "%d", i + 1);
         strcpy(filePuzzle, "./puzzle/");
         strcat(filePuzzle, levelPuzzle);
         strcat(filePuzzle, ".txt");
         FILE *file = fopen(filePuzzle, "r");
-        if(file == NULL) {
+        if (file == NULL)
+        {
             printf("no such file.");
             return;
         }
         int j = 0;
-        while(fgets(line, sizeof(line), file) != NULL) {
-            if(strstr(line, "8") || strstr(line, "7") || strstr(line, "6") || strstr(line, "5") || strstr(line, "4") || strstr(line, "3") ||
-            strstr(line, "2") || strstr(line, "1")) {
+        while (fgets(line, sizeof(line), file) != NULL)
+        {
+            if (strstr(line, "8") || strstr(line, "7") || strstr(line, "6") || strstr(line, "5") || strstr(line, "4") || strstr(line, "3") ||
+                strstr(line, "2") || strstr(line, "1"))
+            {
                 strcpy(puzzle_list[i].board[j++], line);
             }
-            if(strstr(line, "0")) {
+            if (strstr(line, "0"))
+            {
                 line[0] = ' ';
                 strcpy(puzzle_list[i].board[j++], line);
             }
-            if(strstr(line, "MOVE")) {
-                char *p = (char*) malloc(100 * sizeof(char));
+            if (strstr(line, "MOVE"))
+            {
+                char *p = (char *)malloc(100 * sizeof(char));
                 p = strtok(line, " ");
-                while(p != NULL) {
+                while (p != NULL)
+                {
                     p = strtok(NULL, " ");
-                    if(p != NULL){
-                        p[strlen(p)] = '\0'; 
+                    if (p != NULL)
+                    {
+                        p[strlen(p)] = '\0';
                         if (p[strlen(p) - 1] == '\n')
                         {
                             p[strlen(p) - 1] = '\0';
                         }
                         strcpy(puzzle_list[i].move, p);
-                    } 
+                    }
                 }
             }
         }
@@ -952,26 +593,29 @@ void readFileChessPuzzle() {
     }
 }
 
-void printPuzzle() {
-    for(int i = 0; i < 10; i++) {
-        for(int j = 0; j < 9; j++) {
+void printPuzzle()
+{
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
             printf("%s", puzzle_list[i].board[j]);
         }
         printf("MOVE: %s\n", puzzle_list[i].move);
     }
-} 
+}
 
 void ChessPuzzleServer(int conn_socket, Package *pkg)
 {
-    //Thai
-    node user_name = search(acc_list,pkg->sender);
-    strcpy(pkg->msg,"Your level : ");
+    // Thai
+    node user_name = search(acc_list, pkg->sender);
+    strcpy(pkg->msg, "Your level : ");
     pkg->msg[strlen(pkg->msg)] = user_name->current_puzzle + 49;
-    //strcat(pkg->msg,user_name->current_puzzle);
-    strcat(pkg->msg,"\n");
-    for(int j = 0; j < 9; j++) 
+    // strcat(pkg->msg,user_name->current_puzzle);
+    strcat(pkg->msg, "\n");
+    for (int j = 0; j < 9; j++)
     {
-        strcat(pkg->msg,puzzle_list[user_name->current_puzzle].board[j]);
+        strcat(pkg->msg, puzzle_list[user_name->current_puzzle].board[j]);
         // strcat(pkg->msg,"\n");
     }
     send(conn_socket, pkg, sizeof(*pkg), 0);
@@ -979,15 +623,17 @@ void ChessPuzzleServer(int conn_socket, Package *pkg)
 
 void ChessPuzzleTurnServer(int conn_socket, Package *pkg)
 {
-    node user_name = search(acc_list,pkg->sender);
-    if (strcmp(pkg->msg,puzzle_list[user_name->current_puzzle].move)==0)
+    node user_name = search(acc_list, pkg->sender);
+    if (strcmp(pkg->msg, puzzle_list[user_name->current_puzzle].move) == 0)
     {
-        strcpy(pkg->msg,"Congratulations, You win...!");
+        strcpy(pkg->msg, "Congratulations, You win...!");
         user_name->puzzle_point = user_name->puzzle_point + user_name->current_puzzle;
         user_name->current_puzzle++;
         addFileAccount(acc_list, user_name->username);
-    } else {
-        strcpy(pkg->msg,"Wrong !! You lost..!");
+    }
+    else
+    {
+        strcpy(pkg->msg, "Wrong !! You lost..!");
         send(conn_socket, pkg, sizeof(*pkg), 0);
     }
     pkg->ctrl_signal = CHECK_TURN_PUZZLE_SUCC;
@@ -1038,7 +684,8 @@ void ViewChessRankServer(int conn_socket, Package *pkg){
     char chessRank_string[MAX_LENGTH];
     getListUserRanking(acc_list);
     sortUserRanking(0);
-    for(int i = 0; i < getUserCount(acc_list); i++){
+    for (int i = 0; i < getUserCount(acc_list); i++)
+    {
         sprintf(elo_string, "%d", rank[i].elo);
         strcat(chessRank_string, rank[i].username);
         strcat(chessRank_string, " ");
@@ -1051,13 +698,15 @@ void ViewChessRankServer(int conn_socket, Package *pkg){
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void ViewChessPuzzleRankServer(int conn_socket, Package *pkg){
-    //Ngoc
+void ViewChessPuzzleRankServer(int conn_socket, Package *pkg)
+{
+    // Ngoc
     char puzzle_point_string[5];
     char chessPuzzleRanking[MAX_LENGTH];
     getListUserRanking(acc_list);
     sortUserRanking(1);
-    for(int i = 0; i < getUserCount(acc_list); i++){
+    for (int i = 0; i < getUserCount(acc_list); i++)
+    {
         sprintf(puzzle_point_string, "%d", rank[i].puzzle_point);
         strcat(chessPuzzleRanking, rank[i].username);
         strcat(chessPuzzleRanking, " ");
@@ -1080,30 +729,37 @@ node getAccountBySocket(int conn_socket)
     return temp;
 }
 
-node searchRecommendFriendByElo(int conn_socket, Package *pkg) {
+node searchRecommendFriendByElo(int conn_socket, Package *pkg)
+{
     node temp = getAccountBySocket(conn_socket);
     Ranking compareElo[100];
     Ranking tmp;
     int count = 0;
     getListUserRanking(acc_list);
     sortUserRanking(0);
-    for(int i = 0; i < getUserCount(acc_list); i++) {
+    for (int i = 0; i < getUserCount(acc_list); i++)
+    {
         strcpy(compareElo[i].username, rank[i].username);
         compareElo[i].elo = abs(rank[i].elo - temp->elo);
     }
-    for(int i = 0; i < getUserCount(acc_list) - 1; i++) {
-        for(int j = i+1; j < getUserCount(acc_list); j++) {
-            if(compareElo[i].elo > compareElo[j].elo) {
+    for (int i = 0; i < getUserCount(acc_list) - 1; i++)
+    {
+        for (int j = i + 1; j < getUserCount(acc_list); j++)
+        {
+            if (compareElo[i].elo > compareElo[j].elo)
+            {
                 tmp = compareElo[i];
                 compareElo[i] = compareElo[j];
                 compareElo[j] = tmp;
             }
         }
     }
-    while(count < 5) {
-        if(strcmp(temp->username, compareElo[count].username) == 0) {
+    while (count < 5)
+    {
+        if (strcmp(temp->username, compareElo[count].username) == 0)
+        {
             continue;
-        } 
+        }
         strcat(pkg->msg, compareElo[count].username);
         strcat(pkg->msg, "\n");
         count++;
@@ -1122,10 +778,12 @@ void ChangePassServer(int conn_socket, Package *pkg)
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void getListUserRanking(node head) {
+void getListUserRanking(node head)
+{
     node p = head;
     int i = 0;
-    while(p != NULL) {
+    while (p != NULL)
+    {
         strcpy(rank[i].username, p->username);
         rank[i].elo = p->elo;
         rank[i].puzzle_point = p->puzzle_point;
@@ -1134,38 +792,46 @@ void getListUserRanking(node head) {
     }
 }
 
-void sortUserRanking(int type) {
+void sortUserRanking(int type)
+{
     Ranking temp;
-    switch (type) {
-        case 0:
-            for (int i = 0; i < getUserCount(acc_list)-1; i++) {
-                for (int j = i+1; j < getUserCount(acc_list); j++) {
-                    if(rank[i].elo < rank[j].elo) {
-                        temp = rank[i];
-                        rank[i] = rank[j];
-                        rank[j] = temp;
-                    }
+    switch (type)
+    {
+    case 0:
+        for (int i = 0; i < getUserCount(acc_list) - 1; i++)
+        {
+            for (int j = i + 1; j < getUserCount(acc_list); j++)
+            {
+                if (rank[i].elo < rank[j].elo)
+                {
+                    temp = rank[i];
+                    rank[i] = rank[j];
+                    rank[j] = temp;
                 }
             }
-            break;
-        case 1:
-            for (int i = 0; i < getUserCount(acc_list)-1; i++) {
-                for (int j = i+1; j < getUserCount(acc_list); j++) {
-                    if(rank[i].puzzle_point < rank[j].puzzle_point) {
-                        temp = rank[i];
-                        rank[i] = rank[j];
-                        rank[j] = temp;
-                    }
+        }
+        break;
+    case 1:
+        for (int i = 0; i < getUserCount(acc_list) - 1; i++)
+        {
+            for (int j = i + 1; j < getUserCount(acc_list); j++)
+            {
+                if (rank[i].puzzle_point < rank[j].puzzle_point)
+                {
+                    temp = rank[i];
+                    rank[i] = rank[j];
+                    rank[j] = temp;
                 }
             }
-            break;
-        default:
-            break;
+        }
+        break;
+    default:
+        break;
     }
-    
 }
 
-void ChooseDiffcultServer(int conn_socket, Package *pkg){
+void ChooseDiffcultServer(int conn_socket, Package *pkg)
+{
     strcpy(pkg->msg, "Diffcult\n");
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
@@ -1191,157 +857,199 @@ void ShowFriendServer(int conn_socket, Package *pkg)
 void ShowMatchHistoryServer(int conn_socket, Package *pkg)
 {
     strcpy(pkg->msg, "Match\n");
-    send(conn_socket, pkg, sizeof(*pkg), 0);    
+    send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-int SearchRoomPlayComputer(){
+int SearchRoomPlayComputer()
+{
     for (int i = 0; i < 30; i++)
     {
-        if(play_with_computer[i] < 0){
-           play_with_computer[i] = 1;
-           return i;
+        if (play_with_computer[i] < 0)
+        {
+            play_with_computer[i] = 1;
+            return i;
         }
     }
-    return -1;    
+    return -1;
 }
 
-void CreateMatchWithPlayer(int conn_socket, Package *pkg){
-   
+void CreateMatchWithPlayer(int conn_socket, Package *pkg)
+{
+
     int difficult;
     int color;
     sscanf(pkg->msg, "%d %d", &difficult, &color);
-       	
+
     int user_id = search_user(conn_socket);
     user[user_id].computer_id = SearchRoomPlayComputer();
     int current_id = user[user_id].computer_id;
 
-    CreateNewBoard(current_id); 
+    CreateNewBoard(current_id);
     info[current_id].GAME_MODE = CONSOLEMODE;
-	info[current_id].POST_THINKING = TRUE;
-    	
-	setbuf(stdin, NULL);
+    info[current_id].POST_THINKING = TRUE;
+
+    setbuf(stdin, NULL);
     setbuf(stdout, NULL);
     printf("Create Match Complete\n");
 
-    // printf("MSG: %d %d\n", difficult, color);	
-		
-	engineSide[current_id] = !color;
+    engineSide[current_id] = !color;
     depth[current_id] = difficult;
-	ParseFen(START_FEN, &pos[current_id]);
-    pkg->ctrl_signal = CREATE_MATCH_SUCC;  
-    strcpy(pkg->msg, PrintBoard(&pos[current_id])); 
-    send(conn_socket, pkg, sizeof(*pkg), 0); 
+    ParseFen(START_FEN, &pos[current_id]);
+    pkg->ctrl_signal = CREATE_MATCH_SUCC;
+    strcpy(pkg->msg, PrintBoard(&pos[current_id]));
+    send(conn_socket, pkg, sizeof(*pkg), 0);
 
-    if(pos[current_id].side == engineSide[current_id]){
+    if (pos[current_id].side == engineSide[current_id])
+    {
         info[current_id].starttime = GetTimeMs();
-		info[current_id].depth = depth[current_id];
+        info[current_id].depth = depth[current_id];
 
-			if(movetime != 0) {
-				info[current_id].timeset = TRUE;
-				info[current_id].stoptime = info[current_id].starttime + movetime;
-			}        
+        if (movetime != 0)
+        {
+            info[current_id].timeset = TRUE;
+            info[current_id].stoptime = info[current_id].starttime + movetime;
+        }
         strcpy(pkg->msg, SearchPosition(&pos[current_id], &info[current_id]));
         pkg->ctrl_signal = PLAY_MOVE_SUCC;
         send(conn_socket, pkg, sizeof(*pkg), 0);
-    }               
+    }
 }
 
-void PlayWithPlayer(int conn_socket, Package *pkg){    
+void PlayWithPlayer(int conn_socket, Package *pkg)
+{
     char inBuf[80], command[80];
     int move = NOMOVE;
     int result;
     strcpy(inBuf, pkg->msg);
+    node user_account = getAccountBySocket(conn_socket);
 
-    int user_id = search_user(conn_socket);   
+    int user_id = search_user(conn_socket);
     int current_id = user[user_id].computer_id;
 
     move = ParseMove(inBuf, &pos[current_id]);
-		if(move == NOMOVE) {
-            pkg->ctrl_signal = ERR_MOVE;
-            send(conn_socket, pkg, sizeof(*pkg), 0);
-			// printf("Command unknown:%s\n",inBuf);
-			return;
-		}    
-    MakeMove(&pos[current_id], move);      
-	pos[current_id].ply=0;
+    if (move == NOMOVE)
+    {
+        pkg->ctrl_signal = ERR_MOVE;
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+        // printf("Command unknown:%s\n",inBuf);
+        return;
+    }
+    MakeMove(&pos[current_id], move);
+    pos[current_id].ply = 0;
 
     if ((checkresult(&pos[current_id]) == FALSE))
     {
         info[current_id].starttime = GetTimeMs();
-		info[current_id].depth = depth[current_id];
+        info[current_id].depth = depth[current_id];
 
-			if(movetime != 0) {
-				info[current_id].timeset = TRUE;
-				info[current_id].stoptime = info[current_id].starttime + movetime;
-			}        
+        if (movetime != 0)
+        {
+            info[current_id].timeset = TRUE;
+            info[current_id].stoptime = info[current_id].starttime + movetime;
+        }
         strcpy(pkg->msg, SearchPosition(&pos[current_id], &info[current_id]));
         pkg->ctrl_signal = PLAY_MOVE_SUCC;
         send(conn_socket, pkg, sizeof(*pkg), 0);
         result = checkresult(&pos[current_id]);
 
-        if(result >= 3 && result <= 6){
-           pkg->ctrl_signal = END_GAME_DRAW;
-           strcpy(pkg->msg, "Draw\n");
-           send(conn_socket, pkg, sizeof(*pkg), 0);
-        }else
-        if(result == 1){
+        if (result >= 3 && result <= 6)
+        {
+            pkg->ctrl_signal = END_GAME_DRAW;
+            strcpy(pkg->msg, "Draw\n");
+            strcpy(user_account->match[user_account->match_count].state, "DRAW");
+            send(conn_socket, pkg, sizeof(*pkg), 0);
+        }
+        else if (result == 1)
+        {
+            strcpy(user_account->match[user_account->match_count].competitor_name, "Computer");
             if (pos[current_id].side)
             {
-                pkg->ctrl_signal = END_GAME_LOSE;
+                pkg->ctrl_signal = END_GAME_LOSE;   
+                strcpy(user_account->match[user_account->match_count].state, "LOSE");             
                 strcpy(pkg->msg, "You Lose\n");
-            }else{
-                pkg->ctrl_signal = END_GAME_WIN;
-                strcpy(pkg->msg, "You Win\n");
-            }                    
-            send(conn_socket, pkg, sizeof(*pkg), 0);            
-        }else{
-        if(result == 2){
-            if (pos[current_id].side)
+            }
+            else
             {
                 pkg->ctrl_signal = END_GAME_WIN;
+                user_account->win++;
+                strcpy(user_account->match[user_account->match_count].state, "WIN");
                 strcpy(pkg->msg, "You Win\n");
-            }else{
-                pkg->ctrl_signal = END_GAME_LOSE;
-                strcpy(pkg->msg, "You Lose\n");
-            } 
-            send(conn_socket, pkg, sizeof(*pkg), 0);             
-        }            
-        }        
+            }           
+            user_account->match_count++;
+            send(conn_socket, pkg, sizeof(*pkg), 0);
+        }
+        else
+        {
+            strcpy(user_account->match[user_account->match_count].competitor_name, "Computer");
+            if (result == 2)
+            {
+                if (pos[current_id].side)
+                {
+                    pkg->ctrl_signal = END_GAME_WIN;
+                    strcpy(user_account->match[user_account->match_count].state, "WIN");
+                    strcpy(pkg->msg, "You Win\n");
+                }
+                else
+                {
+                    pkg->ctrl_signal = END_GAME_LOSE;
+                    strcpy(user_account->match[user_account->match_count].state, "LOSE");          
+                    strcpy(pkg->msg, "You Lose\n");
+                }
+                user_account->match_count++;
+                send(conn_socket, pkg, sizeof(*pkg), 0);
+            }
+        }
     }
-    else{
+    else
+    {
         result = checkresult(&pos[current_id]);
-        if(result >= 3 && result <= 6){
-           pkg->ctrl_signal = END_GAME_DRAW;
-           strcpy(pkg->msg, "Draw 1\n");
-           send(conn_socket, pkg, sizeof(*pkg), 0);
-        }else
-        if(result == 1){
+        if (result >= 3 && result <= 6)
+        {
+            pkg->ctrl_signal = END_GAME_DRAW;
+            strcpy(pkg->msg, "Draw 1\n");
+            send(conn_socket, pkg, sizeof(*pkg), 0);
+        }
+        else if (result == 1)
+        {
             if (pos[current_id].side)
             {
                 pkg->ctrl_signal = END_GAME_LOSE;
+                strcpy(user_account->match[user_account->match_count].state, "LOSE"); 
                 strcpy(pkg->msg, "You Lose\n");
-            }else{
+            }
+            else
+            {
                 pkg->ctrl_signal = END_GAME_WIN;
+                strcpy(user_account->match[user_account->match_count].state, "WIN"); 
                 strcpy(pkg->msg, "You Win\n");
-            }                    
-            send(conn_socket, pkg, sizeof(*pkg), 0);        
-        }else{
+            }
+            user_account->match_count++;
+            send(conn_socket, pkg, sizeof(*pkg), 0);
+        }
+        else
+        {
             if (pos[current_id].side)
             {
                 pkg->ctrl_signal = END_GAME_WIN;
+                strcpy(user_account->match[user_account->match_count].state, "WIN"); 
                 strcpy(pkg->msg, "You Win\n");
-            }else{
+            }
+            else
+            {
                 pkg->ctrl_signal = END_GAME_LOSE;
+                strcpy(user_account->match[user_account->match_count].state, "LOSE"); 
                 strcpy(pkg->msg, "You Lose\n");
-            }                    
-            send(conn_socket, pkg, sizeof(*pkg), 0);   
-        }        
+            }
+            user_account->match_count++;            
+            send(conn_socket, pkg, sizeof(*pkg), 0);
+        }
     }
 }
 
-void LeavePlayComputerServer(int conn_socket, Package *pkg){
+void LeavePlayComputerServer(int conn_socket, Package *pkg)
+{
     int user_id = search_user(conn_socket);
-    play_with_computer[user[user_id].computer_id] = -1; 
+    play_with_computer[user[user_id].computer_id] = -1;
     pkg->ctrl_signal = LEAVE_COMPUTER_MATCH_SUCC;
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
@@ -1418,11 +1126,34 @@ void JointRoomServer(int conn_socket, Package *pkg)
         if (room[room_id].curr_num == 2)
         {
             sleep(1);
+            int user2_id = search_user(room[room_id].member[0].socket);
             pkg->ctrl_signal = START_GAME;
-            //Tuan
+            // Tuan
             strcpy(pkg->msg, "Start Game");
             send(room[room_id].member[0].socket, pkg, sizeof(*pkg), 0);
             send(room[room_id].member[1].socket, pkg, sizeof(*pkg), 0);
+
+            user[user_id].computer_id = SearchRoomPlayComputer();
+            user[user2_id].computer_id = user[user_id].computer_id;
+            int current_id = user[user_id].computer_id;
+
+            CreateNewBoard(current_id);
+            info[current_id].GAME_MODE = CONSOLEMODE;
+            info[current_id].POST_THINKING = TRUE;
+
+            setbuf(stdin, NULL);
+            setbuf(stdout, NULL);
+            printf("Create Match Complete\n");
+            
+            ParseFen(START_FEN, &pos[current_id]);
+            pkg->ctrl_signal = CREATE_MATCH_SUCC;
+            strcpy(pkg->msg, PrintBoard(&pos[current_id]));
+            send(room[room_id].member[0].socket, pkg, sizeof(*pkg), 0);
+            send(room[room_id].member[1].socket, pkg, sizeof(*pkg), 0);
+
+            pkg->ctrl_signal = WAIT_MOVE;
+            strcpy(pkg->msg, "Wait Player Move");
+            send(room[room_id].member[1].socket, pkg, sizeof(*pkg), 0);            
         }
     }
     else
@@ -1432,19 +1163,117 @@ void JointRoomServer(int conn_socket, Package *pkg)
     }
 }
 
+void PlayWithOtherPlayer(int conn_socket, Package *pkg)
+{
+    char inBuf[80], command[80];
+    int move = NOMOVE;
+    int result;
+    strcpy(inBuf, pkg->msg);
+    int room_id = pkg->group_id;
+    int user1_id;
+
+    if (room[room_id].member[0].socket != conn_socket)
+    {
+        user1_id = search_user(room[room_id].member[0].socket);
+    }
+    else
+    {
+        user1_id = search_user(room[room_id].member[1].socket);
+    }
+    int user_id = search_user(conn_socket);
+
+    int current_id = user[user_id].computer_id;
+
+    move = ParseMove(inBuf, &pos[current_id]);
+    if (move == NOMOVE)
+    {
+        pkg->ctrl_signal = ERR_MOVE;
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+        return;
+    }
+    MakeMove(&pos[current_id], move);
+    pos[current_id].ply = 0;
+
+    if ((checkresult(&pos[current_id]) == FALSE))
+    {
+
+        pkg->ctrl_signal = PLAY_MOVE_SUCC;
+        strcpy(pkg->msg, PrintBoard(&pos[current_id]));
+        send(user[user_id].socket, pkg, sizeof(*pkg), 0);
+        send(user[user1_id].socket, pkg, sizeof(*pkg), 0);
+
+        pkg->ctrl_signal = WAIT_MOVE;
+        strcpy(pkg->msg, "Wait Player Move");
+        send(user[user_id].socket, pkg, sizeof(*pkg), 0);
+    }
+    else
+    {
+        result = checkresult(&pos[current_id]);
+        if (result >= 3 && result <= 6)
+        {
+            pkg->ctrl_signal = END_GAME_DRAW;
+            strcpy(pkg->msg, "Draw 1\n");
+            send(user[user_id].socket, pkg, sizeof(*pkg), 0);
+            send(user[user1_id].socket, pkg, sizeof(*pkg), 0);
+        }
+        else if (result == 1)
+        {
+            if (pos[current_id].side)
+            {
+                pkg->ctrl_signal = END_GAME_LOSE;
+                strcpy(pkg->msg, "You Lose\n");
+                send(user[user_id].socket, pkg, sizeof(*pkg), 0);
+                pkg->ctrl_signal = END_GAME_WIN;
+                strcpy(pkg->msg, "You Win\n");
+                send(user[user1_id].socket, pkg, sizeof(*pkg), 0);
+            }
+            else
+            {
+                pkg->ctrl_signal = END_GAME_WIN;
+                strcpy(pkg->msg, "You Win\n");
+                send(user[user_id].socket, pkg, sizeof(*pkg), 0);
+                pkg->ctrl_signal = END_GAME_LOSE;
+                strcpy(pkg->msg, "You Lose\n");
+                send(user[user1_id].socket, pkg, sizeof(*pkg), 0);
+            }            
+        }
+        else
+        {
+            if (pos[current_id].side)
+            {
+                pkg->ctrl_signal = END_GAME_LOSE;
+                strcpy(pkg->msg, "You Lose\n");
+                send(user[user_id].socket, pkg, sizeof(*pkg), 0);
+                pkg->ctrl_signal = END_GAME_WIN;
+                strcpy(pkg->msg, "You Win\n");
+                send(user[user1_id].socket, pkg, sizeof(*pkg), 0);
+            }
+            else
+            {
+                pkg->ctrl_signal = END_GAME_WIN;
+                strcpy(pkg->msg, "You Win\n");
+                send(user[user_id].socket, pkg, sizeof(*pkg), 0);
+                pkg->ctrl_signal = END_GAME_LOSE;
+                strcpy(pkg->msg, "You Lose\n");
+                send(user[user1_id].socket, pkg, sizeof(*pkg), 0);
+            }            
+        }
+    }
+}
+
 int SearchRoom(Room room[], Active_user user, char *name)
 {
     int i;
     int room_id = -1;
     for (i = 0; i < MAX_ROOM; i++)
-    {        
+    {
         printf("Room %s %s\n", room[i].name, name);
-            if (strcmp(room[i].name, name) == 0)
-            {
-                room_id = i;
-                // printf("%s\n",group[i].group_name);
-                return room_id;
-            }        
+        if (strcmp(room[i].name, name) == 0)
+        {
+            room_id = i;
+            // printf("%s\n",group[i].group_name);
+            return room_id;
+        }
     }
     return -1;
 }
@@ -1501,7 +1330,6 @@ void ViewFriendServer(int conn_socket, Package *pkg)
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-
 void AddFriendServer(int conn_socket, Package *pkg)
 {
     // Thai
@@ -1557,7 +1385,6 @@ void AddFriendServer(int conn_socket, Package *pkg)
     }
 }
 
-
 void DeleteFriendRequest(node account_friend, char sender_name[])
 {
     for (int i = 0; i < account_friend->frie_req_count; i++)
@@ -1582,7 +1409,7 @@ int DeleteFriend(node account_friend, char sender_name[])
         {
             for (int j = i; j < account_friend->frie_count - 1; j++)
             {
-                strcpy(account_friend->friends[i], account_friend->friends[i + 1]); 
+                strcpy(account_friend->friends[i], account_friend->friends[i + 1]);
             }
             account_friend->frie_count--;
             return 1;
@@ -1606,24 +1433,26 @@ void RemoveFriendServer(int conn_socket, Package *pkg)
     // Thai
     node use_friend = search(acc_list, pkg->receiver);
     node sender = search(acc_list, pkg->sender);
-    if(use_friend == NULL){
-        strcpy(pkg->msg,"Don't see this person in your friend list.");
+    if (use_friend == NULL)
+    {
+        strcpy(pkg->msg, "Don't see this person in your friend list.");
         send(conn_socket, pkg, sizeof(*pkg), 0);
         return;
     }
 
-    int check = DeleteFriend(use_friend,pkg->sender);
+    int check = DeleteFriend(use_friend, pkg->sender);
     // pkg->ctrl_signal = REMOVE_FRIEND;
-    if(check == -1)
+    if (check == -1)
     {
-        strcpy(pkg->msg,"Don't see this person in your friend list.");
-        send(conn_socket, pkg, sizeof(*pkg), 0);
-    } else {
-        check = DeleteFriend(sender,pkg->receiver);
-        strcpy(pkg->msg,"Deleted.");
+        strcpy(pkg->msg, "Don't see this person in your friend list.");
         send(conn_socket, pkg, sizeof(*pkg), 0);
     }
-
+    else
+    {
+        check = DeleteFriend(sender, pkg->receiver);
+        strcpy(pkg->msg, "Deleted.");
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    }
 }
 
 void ReplyFriendServer(int conn_socket, Package *pkg)
@@ -1651,75 +1480,80 @@ void ReplyFriendServer(int conn_socket, Package *pkg)
 
 void AcceptFriend(int conn_socket, Package *pkg)
 {
-    int check =-1;
-    node user_name = search(acc_list,pkg->sender);
+    int check = -1;
+    node user_name = search(acc_list, pkg->sender);
     node use_friend = search(acc_list, pkg->receiver);
     for (int i = 0; i < user_name->frie_req_count; i++)
     {
-        if (strcmp(user_name->friend_req[i],pkg->receiver)==0)
+        if (strcmp(user_name->friend_req[i], pkg->receiver) == 0)
         {
-            check=1;
+            check = 1;
             break;
         }
-        
     }
     if (check == -1)
     {
         pkg->ctrl_signal = SHOW_FRIEND_REQUEST_ERROR;
-        strcpy(pkg->msg,"Not found this person in your list request.\n");
+        strcpy(pkg->msg, "Not found this person in your list request.\n");
         send(conn_socket, pkg, sizeof(*pkg), 0);
-    } else {
-        if (user_name->frie_count==10)
+    }
+    else
+    {
+        if (user_name->frie_count == 10)
         {
             pkg->ctrl_signal = SHOW_FRIEND_REQUEST_ERROR;
-            strcpy(pkg->msg,"Full friend.\n");
+            strcpy(pkg->msg, "Full friend.\n");
             send(conn_socket, pkg, sizeof(*pkg), 0);
-        } else {
-            strcpy(user_name->friends[user_name->frie_count],pkg->receiver);
+        }
+        else
+        {
+            strcpy(user_name->friends[user_name->frie_count], pkg->receiver);
             user_name->frie_count++;
-            strcpy(use_friend->friends[use_friend->frie_count],pkg->sender);
+            strcpy(use_friend->friends[use_friend->frie_count], pkg->sender);
             use_friend->frie_count++;
-            DeleteFriendRequest(user_name,pkg->receiver);
-            strcpy(pkg->msg,"Make friends successfully.");
+            DeleteFriendRequest(user_name, pkg->receiver);
+            strcpy(pkg->msg, "Make friends successfully.");
             pkg->ctrl_signal = FRIEND_REQUEST_SUCC;
             send(conn_socket, pkg, sizeof(*pkg), 0);
-        }        
-    }    
+        }
+    }
 }
 
 void NotAcceptFriend(int conn_socket, Package *pkg)
 {
-    int check =-1;
-    node user_name = search(acc_list,pkg->sender);
+    int check = -1;
+    node user_name = search(acc_list, pkg->sender);
     node use_friend = search(acc_list, pkg->receiver);
     for (int i = 0; i < user_name->frie_req_count; i++)
     {
-        if (strcmp(user_name->friend_req[i],pkg->receiver)==0)
+        if (strcmp(user_name->friend_req[i], pkg->receiver) == 0)
         {
-            check=1;
+            check = 1;
             break;
         }
-        
     }
     if (check == -1)
     {
         pkg->ctrl_signal = SHOW_FRIEND_REQUEST_ERROR;
-        strcpy(pkg->msg,"Not found this person in your list request.\n");
+        strcpy(pkg->msg, "Not found this person in your list request.\n");
         send(conn_socket, pkg, sizeof(*pkg), 0);
-    } else {
-        DeleteFriendRequest(user_name,pkg->receiver);
-        strcpy(pkg->msg,"Deleted.");
+    }
+    else
+    {
+        DeleteFriendRequest(user_name, pkg->receiver);
+        strcpy(pkg->msg, "Deleted.");
         pkg->ctrl_signal = FRIEND_REQUEST_SUCC;
-        send(conn_socket, pkg, sizeof(*pkg), 0);       
-    }    
+        send(conn_socket, pkg, sizeof(*pkg), 0);
+    }
 }
 
-void CreateNewBoard(int current_id){
-    // AllInit();	
+void CreateNewBoard(int current_id)
+{
+    // AllInit();
     info[current_id].quit = FALSE;
-	pos[current_id].HashTable->pTable = NULL;
+    pos[current_id].HashTable->pTable = NULL;
     InitHashTable(pos[current_id].HashTable, 64);
-	setbuf(stdin, NULL);
+    setbuf(stdin, NULL);
     setbuf(stdout, NULL);
 }
 // main
