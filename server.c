@@ -75,6 +75,7 @@ void make_server()
 
     readFileAccount(&acc_list);
     readFileChessPuzzle();
+    printHistoryMatch(acc_list);
     // printPuzzle();
     // printFriendList(acc_list);
     printLists(acc_list);
@@ -319,6 +320,10 @@ void sv_user_use(int conn_socket)
 
         case SHOW_MATCH_HISTORY_MENU:
             ShowMatchHistoryServer(conn_socket, &pkg);
+            break;
+        case VIEW_MATCH_HISTORY:
+            printf("History match:\n");
+            ViewMatchHistoryServer(conn_socket, &pkg);
             break;
         case VIEW_INFORMATION:
             printf("View information\n");
@@ -986,6 +991,44 @@ void ChessPuzzleTurnServer(int conn_socket, Package *pkg)
         send(conn_socket, pkg, sizeof(*pkg), 0);
     }
     pkg->ctrl_signal = CHECK_TURN_PUZZLE_SUCC;
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void ViewMatchHistoryServer(int conn_socket, Package *pkg) {
+    node temp = getAccountBySocket(conn_socket);
+    char history_match[MAX_LENGTH];
+    char num[2];
+    if(temp->match_count <= 5 && temp->match_count > 0) {
+        for(int i = 0; i < temp->match_count; i++) {
+            char num_match[10];
+            strcpy(num_match, "MATCH_");
+            sprintf(num, "%d", i+1);
+            strcat(num_match, num);
+            strcat(history_match, num_match);
+            strcat(history_match, " ");
+            strcat(history_match, temp->match[i].competitor_name);
+            strcat(history_match, " ");
+            strcat(history_match, temp->match[i].state);
+            strcat(history_match, "\n");
+        }
+    } else {
+        for(int i = 0; i < 5; i++) {
+            char num_match[10];
+            strcpy(num_match, "MATCH_");
+            sprintf(num, "%d", i+1);
+            strcat(num_match, num);
+            strcat(history_match, num_match);
+            strcat(history_match, " ");
+            strcat(history_match, temp->match[i].competitor_name);
+            strcat(history_match, " ");
+            strcat(history_match, temp->match[i].state);
+            strcat(history_match, "\n");
+        }
+    }
+    printf("%s\n", history_match);
+    strcpy(pkg->msg, history_match);
+    strcpy(history_match, "");
+    pkg->ctrl_signal = VIEW_MATCH_HISTORY;
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 

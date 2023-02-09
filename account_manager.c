@@ -95,6 +95,14 @@ void printLists(node head)
     }
 }
 
+void printHistoryMatch(node head) {
+    int i = 0;
+    while(i < head->match_count) {
+        printf("%s %s\n", head->match[i].competitor_name, head->match[i].state);
+        i++;
+    }
+}
+
 void printFriendList(node head)
 {
     node p = head;
@@ -380,7 +388,7 @@ void addFileAccount(node head, char username[])
     fprintf(file, "%s %s\n", "WAIT_ADD_FRIEND", waitAddFriend);
     strcpy(waitAddFriend, "");
     fprintf(file, "%s", "MATCH_HISTORY");
-    if(temp->match_count <= 5) {
+    if(temp->match_count <= 5 && temp->match_count > 0) {
         for(int i = 0; i < temp->match_count; i++) {
             char number_match[10];
             strcpy(number_match, "MATCH_");

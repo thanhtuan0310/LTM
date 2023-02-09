@@ -196,6 +196,8 @@ void InRoom(int client_socket);
 */
 void RoomTutorial();
 
+void ViewMatchHistory(int client_socket);
+
 /**
 * Nhận các message gửi từ server, in ra kết quả
 */

@@ -76,6 +76,8 @@ void printFriendList(node head);
 */
 void printLists(node head);
 
+void printHistoryMatch(node head);
+
 /**
 * Đọc file account.txt lấy thông tin username và password của tất cả người chơi lưu vào danh sách
 * Đọc các file thông tin của từng người chơi lưu vào danh sách: player1.txt, player2.txt...
