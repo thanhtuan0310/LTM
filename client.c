@@ -224,8 +224,13 @@ void *read_msg(void *param)
         case VIEW_FRIEND:
             printf("\n%s \n", pkg.msg);
             break;
-        case VIEW_MATCH_HISTORY:
+        case VIEW_MATCH_HISTORY_FRIEND:
+            printf("Friends history: \n");
             printf("\n%s \n", pkg.msg);
+            break;
+        case VIEW_MATCH_HISTORY:
+            printf("Match history: \n");
+            printf("\n%s \n\n", pkg.msg);
             break;
         case REMOVE_FRIEND:
             printf("\n%s \n", pkg.msg);
@@ -611,6 +616,13 @@ void ReplyRequestFriend2(int client_socket)
     send(client_socket, &pkg, sizeof(pkg), 0);
 }
 
+void ViewFriendsMatchHistory(int client_socket) {
+    Package pkg;
+    pkg.ctrl_signal = VIEW_MATCH_HISTORY_FRIEND;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
+}
+
 void ViewMatchHistory(int client_socket) {
     Package pkg;
     pkg.ctrl_signal = VIEW_MATCH_HISTORY;
@@ -827,7 +839,7 @@ void ShowMatchHistoryMenu(int client_socket)
         {
         case 1:
             // show_group(client_socket);
-
+            ViewFriendsMatchHistory(client_socket);
             break;
         case 2:
             // new_group(client_socket);
@@ -835,9 +847,11 @@ void ShowMatchHistoryMenu(int client_socket)
             break;
         case 3:
             // join_group(client_socket);
+            return;
             break;
         default:
-            return;
+            printf("Input is not incorrect!\n");
+            break;
         }
     }
 }

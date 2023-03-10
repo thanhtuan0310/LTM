@@ -319,9 +319,15 @@ void sv_user_use(int conn_socket)
         case SHOW_MATCH_HISTORY_MENU:
             ShowMatchHistoryServer(conn_socket, &pkg);
             break;
+
+        case VIEW_MATCH_HISTORY_FRIEND:
+            printf("Friends match history: \n");
+            ViewMatchHistoryServer(conn_socket, &pkg, 1);
+            break;
+
         case VIEW_MATCH_HISTORY:
             printf("History match:\n");
-            ViewMatchHistoryServer(conn_socket, &pkg);
+            ViewMatchHistoryServer(conn_socket, &pkg, 2);
             break;
         case VIEW_INFORMATION:
             printf("View information\n");
@@ -640,7 +646,7 @@ void ChessPuzzleTurnServer(int conn_socket, Package *pkg)
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void ViewMatchHistoryServer(int conn_socket, Package *pkg) {
+void ViewMatchHistoryServer(int conn_socket, Package *pkg, int type) {
     node temp = getAccountBySocket(conn_socket);
     char history_match[MAX_LENGTH];
     char num[2];
@@ -653,9 +659,12 @@ void ViewMatchHistoryServer(int conn_socket, Package *pkg) {
             strcat(history_match, num_match);
             strcat(history_match, " ");
             strcat(history_match, temp->match[i].competitor_name);
-            strcat(history_match, " ");
-            strcat(history_match, temp->match[i].state);
-            strcat(history_match, "\n");
+            if(type == 2) {
+                strcat(history_match, " ");
+                strcat(history_match, temp->match[i].state);
+            } else {
+                strcat(history_match, "\n");
+            }
         }
     } else {
         for(int i = 0; i < 5; i++) {
@@ -666,15 +675,22 @@ void ViewMatchHistoryServer(int conn_socket, Package *pkg) {
             strcat(history_match, num_match);
             strcat(history_match, " ");
             strcat(history_match, temp->match[i].competitor_name);
-            strcat(history_match, " ");
-            strcat(history_match, temp->match[i].state);
-            strcat(history_match, "\n");
+            if(type == 2) {
+                strcat(history_match, " ");
+                strcat(history_match, temp->match[i].state);
+            } else {
+                strcat(history_match, "\n");
+            }
         }
     }
     printf("%s\n", history_match);
     strcpy(pkg->msg, history_match);
     strcpy(history_match, "");
-    pkg->ctrl_signal = VIEW_MATCH_HISTORY;
+    if(type == 2) {
+        pkg->ctrl_signal = VIEW_MATCH_HISTORY;
+    } else {
+        pkg->ctrl_signal = VIEW_MATCH_HISTORY_FRIEND;
+    }
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
