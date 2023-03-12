@@ -34,6 +34,7 @@
 #define LOG_OUT 404  /* Đăng xuất */
 
 #define VIEW_INFORMATION 501  /* Xem thông tin cá nhan */
+#define VIEW_MATCH_HISTORY_FRIEND 502
 #define VIEW_MATCH_HISTORY 503  /* Xem lịch sử đấu */
 #define SHOW_PLAY_PLAYER_MENU 504 /* Hiện Menu chơi */
 #define CHOOSE_DIFFCULT 505 /* Chọn độ khó */

@@ -40,11 +40,13 @@ node create(char username[], char password[], int elo, int current_puzzle, int p
         for(int i = 0; i < match_count; i++) {
             strcpy(temp->match[i].competitor_name, match[i].competitor_name);
             strcpy(temp->match[i].state, match[i].state);
+            temp->match[i].creation_date = match[i].creation_date;
         }
     } else {
         for(int i = 0; i < 5; i++) {
             strcpy(temp->match[i].competitor_name, match[i].competitor_name);
             strcpy(temp->match[i].state, match[i].state);
+            temp->match[i].creation_date = match[i].creation_date;
         }
     }
     return temp;
@@ -104,8 +106,13 @@ void printHistoryMatch(node head) {
         // struct tm *tm = localtime(&head->match[i].creation_date);
         // strftime(date_str, 100, "%Y-%m-%d", tm); 
         // printf("%d %s %s %s\n", i + 1, head->match[i].competitor_name, head->match[i].state, date_str);
-        while(i < p->match_count) {
-            printf("%s %s %s\n", p->match[i].competitor_name, p->match[i].state, ctime(&(p->match[i]).creation_date));
+        while(i < p->match_count) {                       
+            Match tmp = p->match[i];
+            // printf("%s\n", ctime(&tmp.creation_date));
+            char date_str[100];
+            struct tm *tm = localtime(&tmp.creation_date);
+            strftime(date_str, 100, "%Y-%m-%d", tm);
+            printf("%s %s %s\n", p->match[i].competitor_name, p->match[i].state, date_str);
             i++;
         }
         p = p -> next;
@@ -344,8 +351,8 @@ void readFileAccount(node *head)
                             }
                             printf("%s\n", p);
                             strptime(p, "%Y-%m-%d", &tm);
-                            match[i].creation_date = mktime(&tm);
-                            printf("%s\n", ctime(&match[i].creation_date));
+                            match[m].creation_date = mktime(&tm);
+                            printf("%s\n", ctime(&match[m].creation_date));
                         };
                     }
                     m++;
