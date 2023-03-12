@@ -2,6 +2,7 @@
 #define __ACCOUNT_MANAGER_H__
 
 #include <stdio.h>
+#include <time.h>
 
 #define USERNAME_SIZE 50
 #define PASSWORD_SIZE 10
@@ -18,6 +19,7 @@
 typedef struct Match {
     char competitor_name[30];
     char state[10]; 
+    time_t creation_date;
 } Match;
 
 //Cau truc mot account

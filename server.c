@@ -320,6 +320,10 @@ void sv_user_use(int conn_socket)
             ShowMatchHistoryServer(conn_socket, &pkg);
             break;
 
+        case SHOW_FILTER_HISTORY_MATCH_MENU:
+            ShowFilterHistoryMatchServer(conn_socket, &pkg);
+            break;
+
         case VIEW_MATCH_HISTORY_FRIEND:
             printf("Friends match history: \n");
             ViewMatchHistoryServer(conn_socket, &pkg, 1);
@@ -329,6 +333,12 @@ void sv_user_use(int conn_socket)
             printf("History match:\n");
             ViewMatchHistoryServer(conn_socket, &pkg, 2);
             break;
+
+        case FILTER_HISTORY_MATCH:
+            printf("Filter match:\n");
+            FilterHistoryMatchServer(conn_socket, &pkg);
+            break;
+
         case VIEW_INFORMATION:
             printf("View information\n");
             ViewInformationServer(conn_socket, &pkg);
@@ -694,6 +704,12 @@ void ViewMatchHistoryServer(int conn_socket, Package *pkg, int type) {
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
+void FilterHistoryMatchServer(int conn_socket, Package *pkg) {
+    strcpy(pkg->msg, "Filter result\n");
+    pkg->ctrl_signal = FILTER_HISTORY_MATCH;
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
 void ViewChessRankServer(int conn_socket, Package *pkg){
     //Ngoc
     char elo_string[6];
@@ -873,6 +889,11 @@ void ShowFriendServer(int conn_socket, Package *pkg)
 void ShowMatchHistoryServer(int conn_socket, Package *pkg)
 {
     strcpy(pkg->msg, "Match\n");
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void ShowFilterHistoryMatchServer(int conn_socket, Package *pkg) {
+    strcpy(pkg->msg, "Filter history match\n");
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
