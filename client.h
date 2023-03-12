@@ -127,6 +127,21 @@ void ShowFriendMenu(int client_socket);
 void ShowMatchHistoryMenu(int client_socket);
 
 /**
+* Lọc lịch sử đấu (request tới server)
+*/
+void FilterMatchHistory(int client_socket);
+
+/**
+* Hiển thị các chức năng lọc lịch sử đấu
+*/
+void FilterMatchHistoryMenu();
+
+/**
+* Chọn lọc lịch sử đấu
+*/
+void FilterMatchHistoryTime(int client_socket);
+
+/**
 * Chọn màu quân cờ
 */
 void ShowChooseColor(int client_socket, int diffcult);
@@ -195,6 +210,8 @@ void InRoom(int client_socket);
 * Hướng dẫn người chơi sử dụng các lệnh để chơi
 */
 void RoomTutorial();
+
+void ViewMatchHistory(int client_socket);
 
 /**
 * Nhận các message gửi từ server, in ra kết quả

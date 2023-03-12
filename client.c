@@ -195,6 +195,10 @@ void *read_msg(void *param)
             printf("%s\n", pkg.msg);
             break;
 
+        case SHOW_FILTER_HISTORY_MATCH_MENU:
+            printf("%s\n", pkg.msg);
+            break;
+
         case VIEW_INFORMATION:
             printf("Your information: \n%s \n", pkg.msg);
             break;
@@ -223,6 +227,18 @@ void *read_msg(void *param)
             break;
         case VIEW_FRIEND:
             printf("\n%s \n", pkg.msg);
+            break;
+        case VIEW_MATCH_HISTORY_FRIEND:
+            printf("Friends history: \n");
+            printf("\n%s \n", pkg.msg);
+            break;
+        case VIEW_MATCH_HISTORY:
+            printf("Match history: \n");
+            printf("\n%s \n\n", pkg.msg);
+            break;
+        case FILTER_HISTORY_MATCH:
+            printf("Match history: \n");
+            printf("\n%s \n\n", pkg.msg);
             break;
         case REMOVE_FRIEND:
             printf("\n%s \n", pkg.msg);
@@ -453,12 +469,20 @@ void FriendMenu()
     printf("5. Return main menu\n\n");
 }
 
+void FilterMatchHistoryMenu() {
+    printf("-------Filter match history--------\n");
+    printf("1. filter 1\n");
+    printf("2. filter 2\n");
+    printf("3. Return Match history menu\n\n");
+}
+
 void MatchHistoryMenu()
 {
     printf("-------Match history--------\n");
     printf("1. View Friends Match history\n");
     printf("2. View match history\n");
-    printf("3. Return main menu\n\n");
+    printf("3. Filter match history\n");
+    printf("4. Return main menu\n\n");
 }
 
 void ViewInformation(int client_socket)
@@ -607,6 +631,65 @@ void ReplyRequestFriend2(int client_socket)
 
     send(client_socket, &pkg, sizeof(pkg), 0);
 }
+
+void ViewFriendsMatchHistory(int client_socket) {
+    Package pkg;
+    pkg.ctrl_signal = VIEW_MATCH_HISTORY_FRIEND;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
+}
+
+void ViewMatchHistory(int client_socket) {
+    Package pkg;
+    pkg.ctrl_signal = VIEW_MATCH_HISTORY;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
+}
+
+void FilterMatchHistory(int client_socket) {
+    Package pkg;
+    pkg.ctrl_signal = FILTER_HISTORY_MATCH;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    sleep(1);
+}
+
+void FilterMatchHistoryTime(int client_socket) {
+    Package pkg;
+    pkg.ctrl_signal = SHOW_FILTER_HISTORY_MATCH_MENU;
+    send(client_socket, &pkg, sizeof(pkg), 0);
+    // xu ly
+    int choice = 0;
+
+    while (1)
+    {
+        sleep(1);
+
+        FilterMatchHistoryMenu();
+        printf("Your choice: \n");
+        scanf("%d", &choice);
+        clear_stdin_buff();
+
+        switch (choice)
+        {
+        case 1:
+            // show_group(client_socket);
+            FilterMatchHistory(client_socket);
+            break;
+        case 2:
+            FilterMatchHistory(client_socket);
+            // new_group(client_socket);
+            break;
+        case 3:
+            return;
+            // join_group(client_socket);
+            break;
+        default:
+            printf("Input is not incorrect!\n");
+            break;
+        }
+    }
+}
+
 
 void ShowPlayComputer(int client_socket)
 {
@@ -815,15 +898,23 @@ void ShowMatchHistoryMenu(int client_socket)
         {
         case 1:
             // show_group(client_socket);
+            ViewFriendsMatchHistory(client_socket);
             break;
         case 2:
             // new_group(client_socket);
+            ViewMatchHistory(client_socket);
             break;
         case 3:
+            // filter match histoty time
+            FilterMatchHistoryTime(client_socket);
+            break;
+        case 4:
             // join_group(client_socket);
+            return;
             break;
         default:
-            return;
+            printf("Input is not incorrect!\n");
+            break;
         }
     }
 }

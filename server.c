@@ -75,6 +75,7 @@ void make_server()
 
     readFileAccount(&acc_list);
     readFileChessPuzzle();
+    printHistoryMatch(acc_list);
     // printPuzzle();
     // printFriendList(acc_list);
     // printLists(acc_list);
@@ -318,6 +319,26 @@ void sv_user_use(int conn_socket)
         case SHOW_MATCH_HISTORY_MENU:
             ShowMatchHistoryServer(conn_socket, &pkg);
             break;
+
+        case SHOW_FILTER_HISTORY_MATCH_MENU:
+            ShowFilterHistoryMatchServer(conn_socket, &pkg);
+            break;
+
+        case VIEW_MATCH_HISTORY_FRIEND:
+            printf("Friends match history: \n");
+            ViewMatchHistoryServer(conn_socket, &pkg, 1);
+            break;
+
+        case VIEW_MATCH_HISTORY:
+            printf("History match:\n");
+            ViewMatchHistoryServer(conn_socket, &pkg, 2);
+            break;
+
+        case FILTER_HISTORY_MATCH:
+            printf("Filter match:\n");
+            FilterHistoryMatchServer(conn_socket, &pkg);
+            break;
+
         case VIEW_INFORMATION:
             printf("View information\n");
             ViewInformationServer(conn_socket, &pkg);
@@ -635,9 +656,62 @@ void ChessPuzzleTurnServer(int conn_socket, Package *pkg)
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
-void ViewChessRankServer(int conn_socket, Package *pkg)
-{
-    // Ngoc
+void ViewMatchHistoryServer(int conn_socket, Package *pkg, int type) {
+    node temp = getAccountBySocket(conn_socket);
+    char history_match[MAX_LENGTH];
+    char num[2];
+    if(temp->match_count <= 5 && temp->match_count > 0) {
+        for(int i = 0; i < temp->match_count; i++) {
+            char num_match[10];
+            strcpy(num_match, "MATCH_");
+            sprintf(num, "%d", i+1);
+            strcat(num_match, num);
+            strcat(history_match, num_match);
+            strcat(history_match, " ");
+            strcat(history_match, temp->match[i].competitor_name);
+            if(type == 2) {
+                strcat(history_match, " ");
+                strcat(history_match, temp->match[i].state);
+            } else {
+                strcat(history_match, "\n");
+            }
+        }
+    } else {
+        for(int i = 0; i < 5; i++) {
+            char num_match[10];
+            strcpy(num_match, "MATCH_");
+            sprintf(num, "%d", i+1);
+            strcat(num_match, num);
+            strcat(history_match, num_match);
+            strcat(history_match, " ");
+            strcat(history_match, temp->match[i].competitor_name);
+            if(type == 2) {
+                strcat(history_match, " ");
+                strcat(history_match, temp->match[i].state);
+            } else {
+                strcat(history_match, "\n");
+            }
+        }
+    }
+    printf("%s\n", history_match);
+    strcpy(pkg->msg, history_match);
+    strcpy(history_match, "");
+    if(type == 2) {
+        pkg->ctrl_signal = VIEW_MATCH_HISTORY;
+    } else {
+        pkg->ctrl_signal = VIEW_MATCH_HISTORY_FRIEND;
+    }
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void FilterHistoryMatchServer(int conn_socket, Package *pkg) {
+    strcpy(pkg->msg, "Filter result\n");
+    pkg->ctrl_signal = FILTER_HISTORY_MATCH;
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void ViewChessRankServer(int conn_socket, Package *pkg){
+    //Ngoc
     char elo_string[6];
     char chessRank_string[MAX_LENGTH];
     getListUserRanking(acc_list);
@@ -815,6 +889,11 @@ void ShowFriendServer(int conn_socket, Package *pkg)
 void ShowMatchHistoryServer(int conn_socket, Package *pkg)
 {
     strcpy(pkg->msg, "Match\n");
+    send(conn_socket, pkg, sizeof(*pkg), 0);
+}
+
+void ShowFilterHistoryMatchServer(int conn_socket, Package *pkg) {
+    strcpy(pkg->msg, "Filter history match\n");
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 

@@ -195,6 +195,16 @@ Hiển thị lịch sử chơi cờ đến client
 void ShowMatchHistoryServer(int conn_socket, Package *pkg);
 
 /**
+Hiển thị menu lọc lịch sử đấu tới client
+*/
+void ShowFilterHistoryMatchServer(int conn_socket, Package *pkg);
+
+/**
+Lọc lịch sử đấu gửi đến client
+*/
+void FilterHistoryMatchServer(int conn_socket, Package *pkg);
+
+/**
 Tạo trận đấu khi bắt cặp thành công người chơi
 */
 void CreateMatchWithPlayer(int conn_socket, Package *pkg);
@@ -308,5 +318,7 @@ void CheckFriendRequest(node user, int conn_socket);
 Tìm người chơi gợi ý kết bạn theo elo
 */
 node searchRecommendFriendByElo(int conn_socket, Package *pkg);
+
+void ViewMatchHistoryServer(int conn_socket, Package *pkg, int type);
 
 #endif

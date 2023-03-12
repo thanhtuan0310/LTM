@@ -4,6 +4,7 @@
         "server.h": "c",
         "defs.h": "c",
         "account_manager.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "typeinfo": "c"
     }
 }

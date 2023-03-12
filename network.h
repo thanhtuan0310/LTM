@@ -82,6 +82,8 @@
 #define WAIT_MOVE 544 /* Chờ người chơi khác di chuyển */
 #define PLAY_PLAYER_MOVE 545
 #define OTHER_PLAYER_MOVE 546
+#define SHOW_FILTER_HISTORY_MATCH_MENU 547
+#define FILTER_HISTORY_MATCH 548
 
 #define YES_TO_ADD_FRIEND 611
 #define DELETE_REQUEST 612
