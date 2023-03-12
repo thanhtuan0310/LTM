@@ -675,7 +675,7 @@ void ShowChooseColor(int client_socket, int diffcult)
         break;
     case 3:
 
-        break;
+        return;
     default:
         return;
     }
@@ -712,7 +712,7 @@ void ShowPlayPlayer(int client_socket)
             break;
         case 3:
             // join_group(client_socket);
-            break;
+            return;
         default:
             return;
         }
@@ -783,7 +783,6 @@ void ShowFriendMenu(int client_socket)
             AddFriend(client_socket);
             break;
         case 3:
-
             RemoveFriend(client_socket);
             break;
         case 4:

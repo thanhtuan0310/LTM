@@ -383,7 +383,7 @@ void sv_user_use(int conn_socket)
         default:
             break;
         }
-        printf("Done %d of %d\n", pkg.ctrl_signal, conn_socket);
+        printf("Complete %d of %d\n", pkg.ctrl_signal, conn_socket);
     }
 
     for (int i = 0; i < MAX_USER; i++)
