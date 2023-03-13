@@ -195,11 +195,6 @@ Hiển thị lịch sử chơi cờ đến client
 void ShowMatchHistoryServer(int conn_socket, Package *pkg);
 
 /**
-Hiển thị menu lọc lịch sử đấu tới client
-*/
-void ShowFilterHistoryMatchServer(int conn_socket, Package *pkg);
-
-/**
 Lọc lịch sử đấu gửi đến client
 */
 void FilterHistoryMatchServer(int conn_socket, Package *pkg);

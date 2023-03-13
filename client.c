@@ -469,13 +469,6 @@ void FriendMenu()
     printf("5. Return main menu\n\n");
 }
 
-void FilterMatchHistoryMenu() {
-    printf("-------Filter match history--------\n");
-    printf("1. filter 1\n");
-    printf("2. filter 2\n");
-    printf("3. Return Match history menu\n\n");
-}
-
 void MatchHistoryMenu()
 {
     printf("-------Match history--------\n");
@@ -646,48 +639,21 @@ void ViewMatchHistory(int client_socket) {
     sleep(1);
 }
 
-void FilterMatchHistory(int client_socket) {
-    Package pkg;
-    pkg.ctrl_signal = FILTER_HISTORY_MATCH;
-    send(client_socket, &pkg, sizeof(pkg), 0);
-    sleep(1);
-}
-
 void FilterMatchHistoryTime(int client_socket) {
     Package pkg;
-    pkg.ctrl_signal = SHOW_FILTER_HISTORY_MATCH_MENU;
+    char from[20], to[20];
+    printf("Enter start date (YYYY-MM-DD): ");
+    scanf("%s", from);
+    clear_stdin_buff();
+    printf("Enter end date (YYYY-MM-DD): ");
+    scanf("%s", to);
+    clear_stdin_buff();
+
+    pkg.ctrl_signal = FILTER_HISTORY_MATCH;
+    strcpy(pkg.msg, from);
+    strcat(pkg.msg, " ");
+    strcat(pkg.msg, to);
     send(client_socket, &pkg, sizeof(pkg), 0);
-    // xu ly
-    int choice = 0;
-
-    while (1)
-    {
-        sleep(1);
-
-        FilterMatchHistoryMenu();
-        printf("Your choice: \n");
-        scanf("%d", &choice);
-        clear_stdin_buff();
-
-        switch (choice)
-        {
-        case 1:
-            // show_group(client_socket);
-            FilterMatchHistory(client_socket);
-            break;
-        case 2:
-            FilterMatchHistory(client_socket);
-            // new_group(client_socket);
-            break;
-        case 3:
-            return;
-            // join_group(client_socket);
-            break;
-        default:
-            printf("Input is not incorrect!\n");
-            break;
-        }
-    }
 }
 
 

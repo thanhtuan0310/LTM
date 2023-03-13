@@ -349,10 +349,10 @@ void readFileAccount(node *head)
                             {
                                 p[strlen(p) - 1] = '\0';
                             }
-                            printf("%s\n", p);
+                            // printf("%s\n", p);
                             strptime(p, "%Y-%m-%d", &tm);
                             match[m].creation_date = mktime(&tm);
-                            printf("%s\n", ctime(&match[m].creation_date));
+                            // printf("%s\n", ctime(&match[m].creation_date));
                         };
                     }
                     m++;

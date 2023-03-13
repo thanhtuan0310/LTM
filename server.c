@@ -320,10 +320,6 @@ void sv_user_use(int conn_socket)
             ShowMatchHistoryServer(conn_socket, &pkg);
             break;
 
-        case SHOW_FILTER_HISTORY_MATCH_MENU:
-            ShowFilterHistoryMatchServer(conn_socket, &pkg);
-            break;
-
         case VIEW_MATCH_HISTORY_FRIEND:
             printf("Friends match history: \n");
             ViewMatchHistoryServer(conn_socket, &pkg, 1);
@@ -705,7 +701,41 @@ void ViewMatchHistoryServer(int conn_socket, Package *pkg, int type) {
 }
 
 void FilterHistoryMatchServer(int conn_socket, Package *pkg) {
-    strcpy(pkg->msg, "Filter result\n");
+    char fromDate[100];
+    char toDate[100];
+    time_t from, to;
+    char filterHistoryMatch[MAX_LENGTH];
+    strcpy(filterHistoryMatch, "");
+    node temp = getAccountBySocket(conn_socket);
+    // strcpy(pkg->msg, "Filter result\n");
+    sscanf(pkg->msg, "%s %s", fromDate, toDate);
+
+    printf("%s\n", fromDate);
+    printf("%s\n", toDate);
+
+    struct tm tm1, tm2;
+    strptime(fromDate, "%Y-%m-%d", &tm1);
+    strptime(toDate, "%Y-%m-%d", &tm2);
+    from = mktime(&tm1);
+    to = mktime(&tm2);
+    for (int i = 0; i < temp->match_count; i++)
+    {
+        printf("%s %s %s\n", ctime(&from), ctime(&to), ctime(&temp->match[i].creation_date));
+        if (temp->match[i].creation_date >= from  && temp->match[i].creation_date <= to)
+        {   
+            strcat(filterHistoryMatch, temp->match[i].competitor_name);
+            strcat(filterHistoryMatch, " ");
+            strcat(filterHistoryMatch, temp->match[i].state);
+            strcat(filterHistoryMatch, " ");
+            char date_str[100];
+            struct tm *tm = localtime(&temp->match[i].creation_date);
+            strftime(date_str, 100, "%Y-%m-%d", tm);
+            strcat(filterHistoryMatch, date_str);
+            strcat(filterHistoryMatch, "\n");
+        }
+    }
+    strcpy(pkg->msg, filterHistoryMatch);
+    strcpy(filterHistoryMatch, "");
     pkg->ctrl_signal = FILTER_HISTORY_MATCH;
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
@@ -889,11 +919,6 @@ void ShowFriendServer(int conn_socket, Package *pkg)
 void ShowMatchHistoryServer(int conn_socket, Package *pkg)
 {
     strcpy(pkg->msg, "Match\n");
-    send(conn_socket, pkg, sizeof(*pkg), 0);
-}
-
-void ShowFilterHistoryMatchServer(int conn_socket, Package *pkg) {
-    strcpy(pkg->msg, "Filter history match\n");
     send(conn_socket, pkg, sizeof(*pkg), 0);
 }
 
