@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <limits.h>
 #include <pthread.h>
 
 Active_user user[MAX_USER];
@@ -1556,6 +1557,45 @@ void AcceptFriend(int conn_socket, Package *pkg)
     }
 }
 
+
+
+node find_closest_accounts(int elo) {
+  node closest[5] = {NULL};
+  int closest_elo[5] = {INT_MAX};
+  node curr = acc_list;
+
+  // Find the 5 accounts with closest elo
+  while (curr != NULL) {
+    int diff = abs(curr->elo - elo);
+    int max_diff = closest_elo[5 - 1];
+
+    if (diff < max_diff) {
+      // Shift the previous closest accounts down the array
+      for (int i = 5 - 1; i > 0; i--) {
+        closest[i] = closest[i-1];
+        closest_elo[i] = closest_elo[i-1];
+      }
+
+      // Insert the current account into the closest array
+      closest[0] = curr;
+      closest_elo[0] = diff;
+    }
+
+    curr = curr->next;
+  }
+
+  // Return a new list containing the closest accounts
+  node closest_list = NULL;
+  for (int i = 0; i < 5 && closest[i] != NULL; i++) {
+    node new_node = (node) malloc(sizeof(Account));
+    *new_node = *closest[i];
+    new_node->next = closest_list;
+    closest_list = new_node;
+  }
+
+  return closest_list;
+}
+
 void NotAcceptFriend(int conn_socket, Package *pkg)
 {
     int check = -1;
@@ -1593,6 +1633,7 @@ void CreateNewBoard(int current_id)
     setbuf(stdin, NULL);
     setbuf(stdout, NULL);
 }
+
 // main
 int main()
 {

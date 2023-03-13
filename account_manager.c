@@ -376,6 +376,9 @@ void updateAccountFile(node head)
     fclose(file);
 }
 
+Account *getFriendSugg(node head){
+    
+}
 void addFileAccount(node head, char username[])
 {
     char friends[MAX_LENGTH];
